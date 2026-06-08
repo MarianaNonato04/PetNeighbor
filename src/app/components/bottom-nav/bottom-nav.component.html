@@ -1,0 +1,27 @@
+<nav class="bottom-nav-container">
+  <div class="nav-pill">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+      <span class="material-symbols-rounded">home</span>
+      <span class="label">Início</span>
+    </a>
+    <a routerLink="/explorar" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded">search</span>
+      <span class="label">Explorar</span>
+    </a>
+    
+    <div class="nav-center">
+      <a routerLink="/meus-pets" class="add-btn">
+        <span class="material-symbols-rounded">pet_supplies</span>
+      </a>
+    </div>
+
+    <a routerLink="/agenda" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded">calendar_month</span>
+      <span class="label">Agenda</span>
+    </a>
+    <a routerLink="/perfil" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded">person</span>
+      <span class="label">Perfil</span>
+    </a>
+  </div>
+</nav>

@@ -1,0 +1,31 @@
+# General
+.DS_Store
+Thumbs.db
+db.sqlite3
+
+# Angular
+.angular/
+.angular/cache/
+dist/
+tmp/
+out-tsc/
+bazel-out/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.vscode/
+*.sublime-workspace
+
+# System Files
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,10 @@
+.register-container { padding: 2rem 1.5rem; }
+.header { text-align: center; margin-bottom: 2.5rem; }
+.header h1 { font-size: 2rem; margin-top: 1rem; color: var(--text-primary); }
+.header p { color: var(--text-secondary); }
+.form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); padding-left: 0.5rem; }
+textarea.input-field { resize: none; }
+.text-center { text-align: center; }
+.status-messages { margin-top: 1.5rem; }
+.success-banner { background: rgba(156, 175, 154, 0.1); border: 1px solid var(--color-salvia); color: var(--color-salvia); padding: 1rem; border-radius: 1rem; text-align: center; font-size: 0.875rem; }
+.error-banner { background: rgba(201, 123, 94, 0.1); border: 1px solid var(--color-terracota); color: var(--color-terracota); padding: 1rem; border-radius: 1rem; text-align: center; font-size: 0.875rem; }

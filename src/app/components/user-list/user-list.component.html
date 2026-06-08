@@ -1,0 +1,47 @@
+<div class="user-list-card glass-card">
+  <div class="header">
+    <h2>Usuários Cadastrados</h2>
+    <button class="btn-refresh" (click)="fetchUsers()" [disabled]="isLoading()">
+      <span *ngIf="!isLoading()">Atualizar</span>
+      <span *ngIf="isLoading()">...</span>
+    </button>
+  </div>
+
+  <div class="content">
+    <div *ngIf="isLoading()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Carregando usuários...</p>
+    </div>
+
+    <div *ngIf="errorMessage()" class="error-banner">
+      {{ errorMessage() }}
+    </div>
+
+    <div *ngIf="!isLoading() && users().length === 0" class="empty-state">
+      <p>Nenhum usuário encontrado.</p>
+    </div>
+
+    <div class="table-container" *ngIf="!isLoading() && users().length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>E-mail</th>
+            <th>Teste</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users()">
+            <td>#{{ user.id_user }}</td>
+            <td class="user-name">{{ user.nome }}</td>
+            <td>{{ user.idade }}</td>
+            <td class="user-email">{{ user.email || '-' }}</td>
+            <td>{{ user.teste || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

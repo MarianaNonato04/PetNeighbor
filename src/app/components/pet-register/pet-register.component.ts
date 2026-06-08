@@ -1,0 +1,63 @@
+import { Component, signal, inject, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { SupabaseService } from '../../services/supabase.service';
+import { Router, RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-pet-register',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  templateUrl: './pet-register.component.html',
+  styleUrls: ['./pet-register.component.css']
+})
+export class PetRegisterComponent {
+  private fb = inject(FormBuilder);
+  private supabase = inject(SupabaseService);
+  private router = inject(Router);
+
+  petForm: FormGroup;
+  isSubmitting = signal(false);
+  successMessage = signal('');
+  errorMessage = signal('');
+
+  isUserLoggedIn = computed(() => this.supabase.currentUser() !== null);
+
+  constructor() {
+    this.petForm = this.fb.group({
+      nome_pet: ['', [Validators.required]],
+      idade_pet: ['', [Validators.required]],
+      porte: ['Pequeno', [Validators.required]],
+      peso: ['', [Validators.required]],
+      describ_pet: ['', [Validators.required]]
+    });
+  }
+
+  onSubmit() {
+    const user = this.supabase.currentUser();
+    if (this.petForm.valid && user) {
+      this.isSubmitting.set(true);
+      this.errorMessage.set('');
+
+      const petData = {
+        ...this.petForm.value,
+        id_user: user.id_user
+      };
+
+      this.supabase.registerPet(petData).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.successMessage.set('Pet cadastrado com sucesso!');
+          this.petForm.reset({ porte: 'Pequeno' });
+        },
+        error: (err) => {
+          console.error(err);
+          this.isSubmitting.set(false);
+          this.errorMessage.set('Erro ao cadastrar pet. Tente novamente.');
+        }
+      });
+    } else {
+      this.petForm.markAllAsTouched();
+    }
+  }
+}

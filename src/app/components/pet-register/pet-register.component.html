@@ -1,0 +1,92 @@
+<div class="register-container">
+  <header class="header">
+    <div class="logo-placeholder">
+      <span class="material-symbols-rounded text-terracota" style="font-size: 3.5rem;">pet_supplies</span>
+    </div>
+    <h1>Novo Pet</h1>
+    <p>Cadastre seu amiguinho no <span class="text-terracota">PetNeighbor</span></p>
+  </header>
+
+  <div class="glass-card" *ngIf="isUserLoggedIn(); else loginRequired">
+    <form [formGroup]="petForm" (ngSubmit)="onSubmit()">
+      <!-- Nome do Pet -->
+      <div class="form-group">
+        <label for="nome_pet">Nome do Pet</label>
+        <input 
+          type="text" 
+          id="nome_pet" 
+          formControlName="nome_pet" 
+          class="input-field"
+          placeholder="Nome do pet"
+        >
+      </div>
+
+      <!-- idade_pet -->
+      <div class="form-group mt-4">
+        <label for="idade_pet">idade_pet (anos)</label>
+        <input 
+          type="number" 
+          id="idade_pet" 
+          formControlName="idade_pet" 
+          class="input-field"
+          placeholder="idade do pet"
+        >
+      </div>
+
+      <!-- Porte -->
+      <div class="form-group mt-4">
+        <label for="porte">Porte</label>
+        <select id="porte" formControlName="porte" class="input-field">
+          <option value="Pequeno">Pequeno</option>
+          <option value="Médio">Médio</option>
+          <option value="Grande">Grande</option>
+        </select>
+      </div>
+
+      <!-- Peso -->
+      <div class="form-group mt-4">
+        <label for="peso">Peso (kg)</label>
+        <input 
+          type="number" 
+          id="peso" 
+          formControlName="peso" 
+          class="input-field"
+          placeholder="Peso aproximado"
+        >
+      </div>
+
+      <!-- Descrição -->
+      <div class="form-group mt-4">
+        <label for="describ_pet">Descrição</label>
+        <textarea 
+          id="describ_pet" 
+          formControlName="describ_pet" 
+          class="input-field"
+          rows="3"
+          placeholder="Conte um pouco sobre o pet..."
+        ></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary mt-4" [disabled]="isSubmitting()">
+        <span *ngIf="!isSubmitting()">Cadastrar Pet</span>
+        <span *ngIf="isSubmitting()">Salvando...</span>
+      </button>
+    </form>
+
+    <div class="status-messages">
+      <div class="success-banner" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+      <div class="error-banner" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loginRequired>
+    <div class="glass-card text-center">
+      <p class="mb-2">Você precisa estar logado para cadastrar um pet.</p>
+      <button routerLink="/cadastro-usuario" class="btn-primary">Ir para Cadastro</button>
+    </div>
+  </ng-template>
+</div>

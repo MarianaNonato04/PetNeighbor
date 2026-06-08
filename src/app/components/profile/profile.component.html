@@ -1,0 +1,32 @@
+<div class="profile-container">
+  <header class="header">
+    <h1>Perfil</h1>
+    <p>Gerencie sua conta</p>
+  </header>
+
+  <div class="glass-card user-info-card" *ngIf="user() as u; else notLoggedIn">
+    <div class="user-avatar">
+      <span class="material-symbols-rounded">person</span>
+    </div>
+    <div class="user-details">
+      <h2>{{ u.nome }}</h2>
+      <p>{{ u.email }}</p>
+      <span class="age-badge">{{ u.idade }} anos</span>
+    </div>
+
+    <div class="actions mt-4">
+      <button class="btn-primary" routerLink="/meus-pets">Ver Meus Pets</button>
+      <button class="btn-outline mt-2" (click)="logout()">
+        <span class="material-symbols-rounded">logout</span>
+        Sair da Conta
+      </button>
+    </div>
+  </div>
+
+  <ng-template #notLoggedIn>
+    <div class="glass-card text-center">
+      <p class="mb-2">Você não está logado.</p>
+      <button routerLink="/cadastro-usuario" class="btn-primary">Entrar / Cadastrar</button>
+    </div>
+  </ng-template>
+</div>

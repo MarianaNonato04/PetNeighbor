@@ -1,0 +1,84 @@
+.login-container {
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  margin-top: 1rem;
+  color: var(--text-primary);
+}
+
+.header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding-left: 0.5rem;
+}
+
+.error-msg {
+  color: var(--error-color);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  padding-left: 0.5rem;
+}
+
+.status-messages {
+  margin-top: 1.5rem;
+}
+
+.error-banner {
+  background: rgba(201, 123, 94, 0.1);
+  border: 1px solid var(--color-terracota);
+  color: var(--color-terracota);
+  padding: 1rem;
+  border-radius: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #A09A94;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.password-toggle:hover {
+  color: var(--color-terracota);
+}
+
+.footer-link {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.footer-link a {
+  color: var(--color-terracota);
+  font-weight: 600;
+  text-decoration: none;
+}

@@ -1,0 +1,43 @@
+<div class="home-container">
+  <header class="home-header">
+    <div class="user-info" *ngIf="supabase.currentUser() as user">
+      <p class="greeting">Olá, <span class="text-terracota">{{ user.nome }}</span>! 🐾</p>
+      <h2>Seus Pets</h2>
+    </div>
+    <div class="user-info" *ngIf="!supabase.currentUser()">
+      <p class="greeting">Olá! 👋</p>
+      <h2>Bem-vindo ao PetNeighbor</h2>
+    </div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card glass-card">
+      <span class="material-symbols-rounded text-terracota">favorite</span>
+      <p class="stat-label">Pets Felizes</p>
+      <p class="stat-value">124</p>
+    </div>
+    <div class="stat-card glass-card">
+      <span class="material-symbols-rounded text-salvia">location_on</span>
+      <p class="stat-label">Vizinhos</p>
+      <p class="stat-value">48</p>
+    </div>
+  </div>
+
+  <section class="action-section mt-4">
+    <div class="glass-card promo-card">
+      <div class="promo-content">
+        <h3>Encontre um cuidador</h3>
+        <p>Seus vizinhos estão prontos para ajudar!</p>
+        <button class="btn-primary mt-4">Explorar agora</button>
+      </div>
+      <span class="material-symbols-rounded promo-icon">volunteer_activism</span>
+    </div>
+  </section>
+
+  <section class="mt-4" *ngIf="!supabase.currentUser()">
+    <div class="glass-card text-center">
+      <p>Faça parte da nossa comunidade!</p>
+      <button routerLink="/cadastro-usuario" class="btn-primary mt-2">Criar Minha Conta</button>
+    </div>
+  </section>
+</div>
