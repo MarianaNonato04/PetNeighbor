@@ -1,4 +1,4 @@
-<nav class="bottom-nav-container">
+<nav class="bottom-nav-container" *ngIf="visivel()">
   <div class="nav-pill">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
       <span class="material-symbols-rounded">home</span>
@@ -8,10 +8,10 @@
       <span class="material-symbols-rounded">search</span>
       <span class="label">Explorar</span>
     </a>
-    
+
     <div class="nav-center">
-      <a routerLink="/meus-pets" class="add-btn">
-        <span class="material-symbols-rounded">pet_supplies</span>
+      <a routerLink="/explorar" class="add-btn">
+        <span class="material-symbols-rounded">pets</span>
       </a>
     </div>
 

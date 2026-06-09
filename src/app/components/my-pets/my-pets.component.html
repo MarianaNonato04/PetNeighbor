@@ -1,51 +1,75 @@
-<div class="my-pets-container">
-  <header class="header">
-    <h1>Meus Pets</h1>
-    <p>Veja seus amiguinhos cadastrados</p>
+<div class="my-pets-page">
+
+  <header class="page-header">
+    <div class="header-text">
+      <h1>Meus Pets</h1>
+      <p>Seus amiguinhos cadastrados</p>
+    </div>
+    <a routerLink="/cadastro-pet" class="add-pet-btn" aria-label="Adicionar pet">
+      <span class="material-symbols-rounded">add</span>
+    </a>
   </header>
 
-  <div class="content" *ngIf="isUserLoggedIn(); else loginRequired">
-    <div *ngIf="isLoading()" class="loading-state">
-      <div class="spinner"></div>
-      <p>Carregando seus pets...</p>
-    </div>
+  <div class="page-body">
 
-    <div *ngIf="!isLoading() && pets().length === 0" class="empty-state">
-      <div class="glass-card">
-        <span class="material-symbols-rounded empty-icon">sentiment_dissatisfied</span>
-        <p>vc não possui nenhum pet cadastrado</p>
-        <button routerLink="/cadastro-pet" class="btn-primary mt-4">Adicionar Pet</button>
+    <div *ngIf="isUserLoggedIn(); else loginRequired">
+
+      <div *ngIf="isLoading()" class="state-box">
+        <div class="spinner"></div>
+        <p>Carregando seus pets...</p>
       </div>
-    </div>
 
-    <div class="pet-list" *ngIf="!isLoading() && pets().length > 0">
-      <div class="pet-card glass-card" *ngFor="let pet of pets()">
-        <div class="pet-image-placeholder">
-          <span class="material-symbols-rounded">pet_supplies</span>
+      <div *ngIf="!isLoading() && pets().length === 0" class="empty-state glass-card">
+        <div class="empty-art">
+          <span class="material-symbols-rounded">pets</span>
         </div>
-        
-        <div class="pet-info">
-          <div class="pet-header">
-            <h3 class="pet-name">{{ pet.nome_pet }}</h3>
-            <span class="porte-badge">{{ pet.porte }}</span>
+        <h3>Nenhum pet ainda</h3>
+        <p>Cadastre seu primeiro pet para começar!</p>
+        <button routerLink="/cadastro-pet" class="btn-primary" style="margin-top:1.25rem;">
+          <span class="material-symbols-rounded" style="font-size:1.125rem;">add_circle</span>
+          Adicionar pet
+        </button>
+      </div>
+
+      <div class="pet-list" *ngIf="!isLoading() && pets().length > 0">
+        <div class="pet-card glass-card" *ngFor="let pet of pets()">
+          <div class="pet-avatar">
+            <span class="material-symbols-rounded">pet_supplies</span>
           </div>
-          <p class="pet-details">
-            <span>{{ pet.idade_pet }} anos</span> • <span>{{ pet.peso }}kg</span>
-          </p>
-          <p class="pet-desc">{{ pet.describ_pet }}</p>
+          <div class="pet-info">
+            <div class="pet-name-row">
+              <h3 class="pet-name">{{ pet.nome_pet }}</h3>
+              <span class="porte-chip">{{ pet.porte }}</span>
+            </div>
+            <div class="pet-meta">
+              <span class="meta-tag">
+                <span class="material-symbols-rounded">cake</span>
+                {{ pet.idade_pet }} anos
+              </span>
+              <span class="meta-tag">
+                <span class="material-symbols-rounded">monitor_weight</span>
+                {{ pet.peso }} kg
+              </span>
+            </div>
+            <p class="pet-desc" *ngIf="pet.describ_pet">{{ pet.describ_pet }}</p>
+          </div>
         </div>
-      </div>
-      
-      <button routerLink="/cadastro-pet" class="btn-secondary mt-4 w-full">
-        + Cadastrar outro pet
-      </button>
-    </div>
-  </div>
 
-  <ng-template #loginRequired>
-    <div class="glass-card text-center">
-      <p class="mb-2">Você precisa estar logado para ver seus pets.</p>
-      <button routerLink="/cadastro-usuario" class="btn-primary">Fazer Cadastro</button>
+        <button routerLink="/cadastro-pet" class="btn-secondary w-full">
+          <span class="material-symbols-rounded" style="font-size:1.125rem;">add_circle</span>
+          Cadastrar outro pet
+        </button>
+      </div>
+
     </div>
-  </ng-template>
+
+    <ng-template #loginRequired>
+      <div class="glass-card text-center">
+        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
+        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver seus pets.</p>
+        <button routerLink="/cadastro-usuario" class="btn-primary">Criar conta</button>
+      </div>
+    </ng-template>
+
+  </div>
 </div>

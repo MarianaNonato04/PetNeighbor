@@ -1,0 +1,97 @@
+<div class="explorar-page">
+
+  <header class="page-header">
+    <div class="header-text">
+      <h1>Explorar</h1>
+      <p>Cuidadores perto de você</p>
+    </div>
+    <div class="geo-pill" [class.geo-pill--ok]="geoStatus() === 'ok'" (click)="localizar()">
+      <span class="material-symbols-rounded">{{ geoStatus() === 'ok' ? 'my_location' : 'location_searching' }}</span>
+      <span>{{ geoStatus() === 'ok' ? 'Localizado' : geoStatus() === 'pedindo' ? '...' : 'Ativar GPS' }}</span>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <div class="chips-row">
+      <button class="chip" [class.chip--active]="filtroServico() === 'Todos'" (click)="setServico('Todos')">Todos</button>
+      <button
+        *ngFor="let s of servicos"
+        class="chip"
+        [class.chip--active]="filtroServico() === s"
+        (click)="setServico(s)"
+      >{{ s }}</button>
+    </div>
+
+    <div class="price-filter glass-card">
+      <div class="price-filter-head">
+        <span class="price-filter-label">Preço máximo</span>
+        <span class="price-filter-value">até R$ {{ precoMaximo() }}</span>
+      </div>
+      <input
+        type="range"
+        min="10"
+        max="200"
+        step="5"
+        [ngModel]="precoMaximo()"
+        (ngModelChange)="precoMaximo.set($event)"
+        class="price-range"
+      >
+    </div>
+
+    <div class="geo-warning" *ngIf="geoStatus() === 'negado'">
+      <span class="material-symbols-rounded">info</span>
+      <span>Ative a localização para ver a distância até cada cuidador. A lista continua disponível.</span>
+    </div>
+
+    <div *ngIf="isLoading()" class="state-box">
+      <div class="spinner"></div>
+      <p>Buscando cuidadores...</p>
+    </div>
+
+    <div *ngIf="!isLoading() && errorMessage()" class="error-banner">{{ errorMessage() }}</div>
+
+    <div *ngIf="!isLoading() && !errorMessage() && cuidadoresProximos().length === 0" class="empty-state glass-card">
+      <div class="empty-art"><span class="material-symbols-rounded">person_search</span></div>
+      <h3>Nenhum cuidador encontrado</h3>
+      <p>Tente ampliar o preço máximo ou trocar o tipo de serviço.</p>
+    </div>
+
+    <div class="cuidador-list" *ngIf="!isLoading() && cuidadoresProximos().length > 0">
+      <div class="cuidador-count">{{ cuidadoresProximos().length }} cuidador(es) disponível(eis)</div>
+
+      <button class="cuidador-card glass-card" *ngFor="let c of cuidadoresProximos()" (click)="abrirCuidador(c)">
+        <div class="cuidador-avatar">
+          <img *ngIf="c.foto_url" [src]="c.foto_url" [alt]="c.nome">
+          <span *ngIf="!c.foto_url" class="material-symbols-rounded">account_circle</span>
+          <span class="verified-badge" *ngIf="c.verificado" title="Verificado">
+            <span class="material-symbols-rounded">verified</span>
+          </span>
+        </div>
+
+        <div class="cuidador-info">
+          <div class="cuidador-top">
+            <h3 class="cuidador-name">{{ c.nome }}</h3>
+            <span class="dist-chip" *ngIf="geoStatus() === 'ok'">
+              <span class="material-symbols-rounded">near_me</span>
+              {{ formatDistancia(c.distancia_km) }}
+            </span>
+          </div>
+          <p class="cuidador-bio">{{ c.bio }}</p>
+          <div class="cuidador-services">
+            <span class="service-tag" *ngFor="let s of c.servicos">{{ s }}</span>
+          </div>
+          <div class="cuidador-footer">
+            <span class="cuidador-price">
+              a partir de <strong>R$ {{ precoExibido(c) }}</strong>
+            </span>
+            <span class="cuidador-cidade">
+              <span class="material-symbols-rounded">location_on</span>{{ c.cidade }}
+            </span>
+          </div>
+        </div>
+      </button>
+    </div>
+
+  </div>
+</div>

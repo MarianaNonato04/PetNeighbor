@@ -1,0 +1,53 @@
+import { TestBed, ComponentFixture, fakeAsync, tick } from '@angular/core/testing';
+import { BottomNavComponent } from './bottom-nav.component';
+import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+
+describe('BottomNavComponent', () => {
+  let fixture: ComponentFixture<BottomNavComponent>;
+  let component: BottomNavComponent;
+  let router: Router;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [
+        BottomNavComponent,
+        RouterTestingModule.withRoutes([
+          { path: 'home', component: class DummyComponent {} },
+          { path: 'login', component: class DummyComponent {} },
+          { path: 'chat/:id', component: class DummyComponent {} }
+        ])
+      ]
+    }).compileComponents();
+
+    router = TestBed.inject(Router);
+    fixture = TestBed.createComponent(BottomNavComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create bottom nav', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should be visible on home route', fakeAsync(() => {
+    router.navigate(['/home']);
+    tick();
+    fixture.detectChanges();
+    expect(component.visivel()).toBeTrue();
+  }));
+
+  it('should not be visible on login route', fakeAsync(() => {
+    router.navigate(['/login']);
+    tick();
+    fixture.detectChanges();
+    expect(component.visivel()).toBeFalse();
+  }));
+
+  it('should not be visible on chat route', fakeAsync(() => {
+    router.navigate(['/chat/123']);
+    tick();
+    fixture.detectChanges();
+    expect(component.visivel()).toBeFalse();
+  }));
+});

@@ -1,32 +1,110 @@
-<div class="profile-container">
-  <header class="header">
-    <h1>Perfil</h1>
-    <p>Gerencie sua conta</p>
-  </header>
+<div class="profile-page">
 
-  <div class="glass-card user-info-card" *ngIf="user() as u; else notLoggedIn">
-    <div class="user-avatar">
-      <span class="material-symbols-rounded">person</span>
-    </div>
-    <div class="user-details">
-      <h2>{{ u.nome }}</h2>
-      <p>{{ u.email }}</p>
-      <span class="age-badge">{{ u.idade }} anos</span>
+  <div *ngIf="user() as u; else notLoggedIn">
+
+    <div class="profile-hero">
+      <div class="avatar-ring">
+        <div class="avatar">
+          <span class="material-symbols-rounded">person</span>
+        </div>
+      </div>
+      <h1 class="user-name">{{ u.nome }}</h1>
+      <p class="user-email">{{ u.email }}</p>
+      <span class="age-chip">{{ u.idade }} anos</span>
     </div>
 
-    <div class="actions mt-4">
-      <button class="btn-primary" routerLink="/meus-pets">Ver Meus Pets</button>
-      <button class="btn-outline mt-2" (click)="logout()">
+    <div class="page-body">
+
+      <div class="glass-card info-section">
+        <h2 class="section-label">Conta</h2>
+
+        <div class="info-row">
+          <div class="info-icon info-icon--orange">
+            <span class="material-symbols-rounded">person</span>
+          </div>
+          <div class="info-content">
+            <p class="info-label">Nome</p>
+            <p class="info-value">{{ u.nome }}</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="info-row">
+          <div class="info-icon info-icon--blue">
+            <span class="material-symbols-rounded">mail</span>
+          </div>
+          <div class="info-content">
+            <p class="info-label">E-mail</p>
+            <p class="info-value">{{ u.email }}</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="info-row">
+          <div class="info-icon info-icon--green">
+            <span class="material-symbols-rounded">cake</span>
+          </div>
+          <div class="info-content">
+            <p class="info-label">Idade</p>
+            <p class="info-value">{{ u.idade }} anos</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card actions-card">
+        <h2 class="section-label">Ações</h2>
+
+        <button class="action-row" routerLink="/meus-pets">
+          <div class="info-icon info-icon--orange">
+            <span class="material-symbols-rounded">pet_supplies</span>
+          </div>
+          <span class="action-label">Meus Pets</span>
+          <span class="material-symbols-rounded action-arrow">chevron_right</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="action-row" routerLink="/cadastro-pet">
+          <div class="info-icon info-icon--green">
+            <span class="material-symbols-rounded">add_circle</span>
+          </div>
+          <span class="action-label">Cadastrar Pet</span>
+          <span class="material-symbols-rounded action-arrow">chevron_right</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="action-row" routerLink="/seja-cuidador">
+          <div class="info-icon info-icon--blue">
+            <span class="material-symbols-rounded">volunteer_activism</span>
+          </div>
+          <span class="action-label">Seja um cuidador</span>
+          <span class="material-symbols-rounded action-arrow">chevron_right</span>
+        </button>
+      </div>
+
+      <button class="logout-btn" (click)="logout()">
         <span class="material-symbols-rounded">logout</span>
-        Sair da Conta
+        Sair da conta
       </button>
+
     </div>
   </div>
 
   <ng-template #notLoggedIn>
-    <div class="glass-card text-center">
-      <p class="mb-2">Você não está logado.</p>
-      <button routerLink="/cadastro-usuario" class="btn-primary">Entrar / Cadastrar</button>
+    <div class="not-logged-hero">
+      <div class="lock-art">
+        <span class="material-symbols-rounded">pets</span>
+      </div>
+      <h2>Bem-vindo ao PetNeighbor</h2>
+      <p>Entre na sua conta ou cadastre-se para acessar seu perfil.</p>
+    </div>
+    <div class="page-body">
+      <button routerLink="/login" class="btn-primary">Fazer login</button>
+      <button routerLink="/cadastro-usuario" class="btn-outline" style="margin-top:0.75rem;">Criar conta</button>
     </div>
   </ng-template>
+
 </div>

@@ -1,43 +1,112 @@
-<div class="home-container">
-  <header class="home-header">
-    <div class="user-info" *ngIf="supabase.currentUser() as user">
-      <p class="greeting">Olá, <span class="text-terracota">{{ user.nome }}</span>! 🐾</p>
-      <h2>Seus Pets</h2>
+<div class="home-page">
+
+  <header class="app-bar">
+    <div class="app-bar-left">
+      <div class="brand-mark">
+        <span class="material-symbols-rounded">pets</span>
+      </div>
+      <div>
+        <p class="app-bar-subtitle" *ngIf="supabase.currentUser() as user">Olá, {{ user.nome.split(' ')[0] }} 👋</p>
+        <p class="app-bar-subtitle" *ngIf="!supabase.currentUser()">Bem-vindo 👋</p>
+        <h1 class="app-bar-title">PetNeighbor</h1>
+      </div>
     </div>
-    <div class="user-info" *ngIf="!supabase.currentUser()">
-      <p class="greeting">Olá! 👋</p>
-      <h2>Bem-vindo ao PetNeighbor</h2>
+    <div class="app-bar-actions">
+      <button class="icon-btn" routerLink="/notificacoes" aria-label="Notificações">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge" *ngIf="naoLidas() > 0">{{ naoLidas() > 9 ? '9+' : naoLidas() }}</span>
+      </button>
+      <button class="icon-btn" routerLink="/perfil" aria-label="Perfil">
+        <span class="material-symbols-rounded">person</span>
+      </button>
     </div>
   </header>
 
-  <div class="stats-grid">
-    <div class="stat-card glass-card">
-      <span class="material-symbols-rounded text-terracota">favorite</span>
-      <p class="stat-label">Pets Felizes</p>
-      <p class="stat-value">124</p>
-    </div>
-    <div class="stat-card glass-card">
-      <span class="material-symbols-rounded text-salvia">location_on</span>
-      <p class="stat-label">Vizinhos</p>
-      <p class="stat-value">48</p>
-    </div>
-  </div>
-
-  <section class="action-section mt-4">
-    <div class="glass-card promo-card">
-      <div class="promo-content">
-        <h3>Encontre um cuidador</h3>
-        <p>Seus vizinhos estão prontos para ajudar!</p>
-        <button class="btn-primary mt-4">Explorar agora</button>
+  <section class="hero-section">
+    <div class="hero-card">
+      <div class="hero-content">
+        <span class="hero-tag">Novidade</span>
+        <h2 class="hero-title">Encontre o cuidador ideal</h2>
+        <p class="hero-desc">Vizinhos de confiança prontos para cuidar do seu pet.</p>
+        <button class="hero-btn" routerLink="/explorar">
+          Explorar agora
+          <span class="material-symbols-rounded">arrow_forward</span>
+        </button>
       </div>
-      <span class="material-symbols-rounded promo-icon">volunteer_activism</span>
+      <div class="hero-art">
+        <span class="material-symbols-rounded hero-icon-bg">volunteer_activism</span>
+      </div>
     </div>
   </section>
 
-  <section class="mt-4" *ngIf="!supabase.currentUser()">
-    <div class="glass-card text-center">
-      <p>Faça parte da nossa comunidade!</p>
-      <button routerLink="/cadastro-usuario" class="btn-primary mt-2">Criar Minha Conta</button>
+  <section class="stats-section">
+    <div class="stat-item glass-card">
+      <div class="stat-icon stat-icon--orange">
+        <span class="material-symbols-rounded">favorite</span>
+      </div>
+      <div>
+        <p class="stat-value">124</p>
+        <p class="stat-label">Pets felizes</p>
+      </div>
+    </div>
+    <div class="stat-item glass-card">
+      <div class="stat-icon stat-icon--green">
+        <span class="material-symbols-rounded">group</span>
+      </div>
+      <div>
+        <p class="stat-value">48</p>
+        <p class="stat-label">Vizinhos</p>
+      </div>
+    </div>
+    <div class="stat-item glass-card">
+      <div class="stat-icon stat-icon--blue">
+        <span class="material-symbols-rounded">verified</span>
+      </div>
+      <div>
+        <p class="stat-value">4.9</p>
+        <p class="stat-label">Avaliação</p>
+      </div>
     </div>
   </section>
+
+  <section class="section-block">
+    <h2 class="section-title">Acesso rápido</h2>
+    <div class="quick-actions">
+      <a routerLink="/meus-pets" class="quick-card">
+        <div class="quick-icon quick-icon--terracota">
+          <span class="material-symbols-rounded">pet_supplies</span>
+        </div>
+        <span class="quick-label">Meus Pets</span>
+      </a>
+      <a routerLink="/cadastro-pet" class="quick-card">
+        <div class="quick-icon quick-icon--salvia">
+          <span class="material-symbols-rounded">add_circle</span>
+        </div>
+        <span class="quick-label">Novo Pet</span>
+      </a>
+      <a routerLink="/agenda" class="quick-card">
+        <div class="quick-icon quick-icon--areia">
+          <span class="material-symbols-rounded">calendar_month</span>
+        </div>
+        <span class="quick-label">Agenda</span>
+      </a>
+      <a routerLink="/perfil" class="quick-card">
+        <div class="quick-icon quick-icon--terracota">
+          <span class="material-symbols-rounded">manage_accounts</span>
+        </div>
+        <span class="quick-label">Perfil</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section-block" *ngIf="!supabase.currentUser()">
+    <div class="cta-card glass-card">
+      <span class="material-symbols-rounded cta-icon">celebration</span>
+      <h3>Faça parte da comunidade!</h3>
+      <p>Crie sua conta e conecte-se com cuidadores de pets na sua vizinhança.</p>
+      <button routerLink="/cadastro-usuario" class="btn-primary mt-4">Criar minha conta</button>
+      <a routerLink="/login" class="cta-login-link">Já tenho conta</a>
+    </div>
+  </section>
+
 </div>

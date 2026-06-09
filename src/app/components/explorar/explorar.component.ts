@@ -1,0 +1,102 @@
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { SupabaseService } from '../../services/supabase.service';
+import { Cuidador, CuidadorProximo, TipoServico, SERVICOS } from '../../models/interfaces';
+import { haversineKm, getCurrentPosition, formatDistancia } from '../../services/geo.util';
+
+@Component({
+  selector: 'app-explorar',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
+  templateUrl: './explorar.component.html',
+  styleUrls: ['./explorar.component.css']
+})
+export class ExplorarComponent implements OnInit {
+  private supabase = inject(SupabaseService);
+  private router = inject(Router);
+
+  servicos = SERVICOS;
+  formatDistancia = formatDistancia;
+
+  isLoading = signal(true);
+  geoStatus = signal<'pedindo' | 'ok' | 'negado'>('pedindo');
+  errorMessage = signal('');
+
+  private cuidadores = signal<Cuidador[]>([]);
+  private posicao = signal<{ latitude: number; longitude: number } | null>(null);
+
+  filtroServico = signal<TipoServico | 'Todos'>('Todos');
+  precoMaximo = signal<number>(100);
+
+  cuidadoresProximos = computed<CuidadorProximo[]>(() => {
+    const pos = this.posicao();
+    const servico = this.filtroServico();
+    const precoMax = this.precoMaximo();
+
+    return this.cuidadores()
+      .map(c => ({
+        ...c,
+        distancia_km: pos ? haversineKm(pos.latitude, pos.longitude, c.latitude, c.longitude) : 0
+      }))
+      .filter(c => servico === 'Todos' || c.servicos?.includes(servico))
+      .filter(c => this.precoDoServico(c, servico) <= precoMax)
+      .sort((a, b) => a.distancia_km - b.distancia_km);
+  });
+
+  async ngOnInit() {
+    this.carregarCuidadores();
+    await this.localizar();
+  }
+
+  carregarCuidadores() {
+    this.supabase.getCuidadores().subscribe({
+      next: data => {
+        this.cuidadores.set(data || []);
+        this.isLoading.set(false);
+      },
+      error: err => {
+        console.error(err);
+        this.errorMessage.set('Não foi possível carregar os cuidadores.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  async localizar() {
+    this.geoStatus.set('pedindo');
+    try {
+      const pos = await getCurrentPosition();
+      this.posicao.set(pos);
+      this.geoStatus.set('ok');
+    } catch {
+      this.geoStatus.set('negado');
+    }
+  }
+
+  precoDoServico(c: Cuidador, servico: TipoServico | 'Todos'): number {
+    const precos: Record<TipoServico, number> = {
+      'Passeio': c.preco_passeio,
+      'Alimentação': c.preco_alimentacao,
+      'Companhia': c.preco_companhia
+    };
+    if (servico === 'Todos') {
+      const valores = (c.servicos || []).map(s => precos[s]).filter(v => v != null);
+      return valores.length ? Math.min(...valores) : 0;
+    }
+    return precos[servico] ?? 0;
+  }
+
+  precoExibido(c: Cuidador): number {
+    return this.precoDoServico(c, this.filtroServico());
+  }
+
+  setServico(s: TipoServico | 'Todos') {
+    this.filtroServico.set(s);
+  }
+
+  abrirCuidador(c: Cuidador) {
+    this.router.navigate(['/cuidador', c.id_cuidador]);
+  }
+}

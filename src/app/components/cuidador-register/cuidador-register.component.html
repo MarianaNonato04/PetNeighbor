@@ -1,0 +1,126 @@
+<div class="cuidador-reg-page">
+
+  <header class="page-header">
+    <button class="back-btn" routerLink="/perfil" aria-label="Voltar">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Seja um cuidador</h1>
+      <p>Ofereça seus serviços na vizinhança</p>
+    </div>
+    <div class="header-art"><span class="material-symbols-rounded">volunteer_activism</span></div>
+  </header>
+
+  <div class="page-body">
+    <div class="glass-card form-card">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+          <label for="nome">Nome completo</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">person</span>
+            <input id="nome" type="text" formControlName="nome" class="input-field input-with-icon"
+              placeholder="Seu nome" [class.invalid]="hasError('nome','required') || hasError('nome','minlength')">
+          </div>
+          <span class="error-msg" *ngIf="hasError('nome','required')">Nome é obrigatório</span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">mail</span>
+            <input id="email" type="email" formControlName="email" class="input-field input-with-icon"
+              placeholder="seu@email.com" [class.invalid]="hasError('email','email')">
+          </div>
+          <span class="error-msg" *ngIf="hasError('email','email')">E-mail inválido</span>
+        </div>
+
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <div class="password-input-wrapper input-wrapper">
+            <span class="input-icon material-symbols-rounded">lock</span>
+            <input [type]="showPassword() ? 'text' : 'password'" id="senha" formControlName="senha"
+              class="input-field input-with-icon" placeholder="Mínimo 6 caracteres"
+              [class.invalid]="hasError('senha','minlength')">
+            <button type="button" class="password-toggle" (click)="togglePassword()">
+              <span class="material-symbols-rounded">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cidade">Cidade / Bairro</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">apartment</span>
+            <input id="cidade" type="text" formControlName="cidade" class="input-field input-with-icon"
+              placeholder="Ex: Vila Mariana, São Paulo">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="documento">Documento (CPF/RG)</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">badge</span>
+            <input id="documento" type="text" formControlName="documento" class="input-field input-with-icon"
+              placeholder="Para verificação de segurança">
+          </div>
+          <span class="hint-msg">Usado apenas para validação de cadastro (RF01).</span>
+        </div>
+
+        <div class="form-group">
+          <label for="bio">Sobre você</label>
+          <textarea id="bio" formControlName="bio" rows="3" class="input-field"
+            placeholder="Conte sua experiência com animais..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Serviços oferecidos</label>
+          <div class="servico-chips">
+            <button type="button" *ngFor="let s of servicos" class="servico-chip"
+              [class.servico-chip--on]="isServicoSelecionado(s)" (click)="toggleServico(s)">
+              <span class="material-symbols-rounded">{{ isServicoSelecionado(s) ? 'check_circle' : 'add_circle' }}</span>
+              {{ s }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Preços por serviço (R$)</label>
+          <div class="preco-grid">
+            <div class="preco-item">
+              <span class="preco-label">Passeio</span>
+              <input type="number" formControlName="preco_passeio" class="input-field" min="0">
+            </div>
+            <div class="preco-item">
+              <span class="preco-label">Alimentação</span>
+              <input type="number" formControlName="preco_alimentacao" class="input-field" min="0">
+            </div>
+            <div class="preco-item">
+              <span class="preco-label">Companhia</span>
+              <input type="number" formControlName="preco_companhia" class="input-field" min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Localização (para o Explorar)</label>
+          <button type="button" class="geo-btn" [class.geo-btn--ok]="geoStatus() === 'ok'" (click)="capturarLocalizacao()">
+            <span class="material-symbols-rounded">{{ geoStatus() === 'ok' ? 'check_circle' : 'my_location' }}</span>
+            {{ geoStatus() === 'ok' ? 'Localização capturada' : geoStatus() === 'erro' ? 'Falhou — tentar de novo' : 'Capturar minha localização' }}
+          </button>
+        </div>
+
+        <div class="success-banner" *ngIf="successMessage()" style="margin-top:0.5rem;">{{ successMessage() }}</div>
+        <div class="error-banner" *ngIf="errorMessage()" style="margin-top:0.5rem;">{{ errorMessage() }}</div>
+
+        <button type="submit" class="btn-primary" style="margin-top:1.5rem;" [disabled]="isSubmitting()">
+          <span *ngIf="!isSubmitting()">Cadastrar como cuidador</span>
+          <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="btn-spinner"></span> Cadastrando...
+          </span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+</div>
