@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, from, map, tap } from 'rxjs';
 import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 import {
   Usuario, Pet, Cuidador, Agendamento, Mensagem, Notificacao, StatusAgendamento
@@ -18,43 +17,39 @@ export class SupabaseService {
 
   currentUser = signal<Usuario | null>(null);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     const savedUser = localStorage.getItem('petneighbor_user');
     if (savedUser) {
       this.currentUser.set(JSON.parse(savedUser));
     }
   }
 
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'apikey': this.apiKey,
-      'Authorization': `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    });
-  }
-
-  registerUsuario(user: Usuario): Observable<Usuario[]> {
-    return this.http.post<Usuario[]>(`${this.apiUrl}/usuarios`, user, {
-      headers: this.getHeaders()
-    }).pipe(
-      tap(users => {
-        if (users && users.length > 0) {
-          this.setCurrentUser(users[0]);
-        }
+  private handleResponse<T>(p: any): Observable<T[]> {
+    // supabase-js query builders are thenable but not typed as Promise — cast safely
+    return from(p as Promise<any>).pipe(
+      map(r => {
+        if (r.error) throw r.error;
+        return (r.data ?? []) as T[];
       })
     );
   }
 
+  private toPromise(q: any): Promise<any> {
+    // supabase-js query builders are thenable; ensure we return a real Promise
+    return (q as any).then ? (q as any).then((r: any) => r) : Promise.resolve(q);
+  }
+
+  registerUsuario(user: Usuario): Observable<Usuario[]> {
+    const p = this.client.from('usuarios').insert(user).select();
+    return this.handleResponse<Usuario>(this.toPromise(p)).pipe(
+      tap(users => { if (users && users.length > 0) this.setCurrentUser(users[0]); })
+    );
+  }
+
   login(email: string, senha: string): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(`${this.apiUrl}/usuarios?email=eq.${email}&senha=eq.${senha}`, {
-      headers: this.getHeaders()
-    }).pipe(
-      tap(users => {
-        if (users && users.length > 0) {
-          this.setCurrentUser(users[0]);
-        }
-      })
+    const p = this.client.from('usuarios').select('*').eq('email', email).eq('senha', senha);
+    return this.handleResponse<Usuario>(this.toPromise(p)).pipe(
+      tap(users => { if (users && users.length > 0) this.setCurrentUser(users[0]); })
     );
   }
 
@@ -69,54 +64,43 @@ export class SupabaseService {
   }
 
   registerPet(pet: Pet): Observable<Pet[]> {
-    return this.http.post<Pet[]>(`${this.apiUrl}/pets`, pet, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('pets').insert(pet).select();
+    return this.handleResponse<Pet>(this.toPromise(p));
   }
 
   getPetsByUser(userId: number): Observable<Pet[]> {
-    return this.http.get<Pet[]>(`${this.apiUrl}/pets?id_user=eq.${userId}`, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('pets').select('*').eq('id_user', userId);
+    return this.handleResponse<Pet>(this.toPromise(p));
   }
 
   registerCuidador(cuidador: Cuidador): Observable<Cuidador[]> {
-    return this.http.post<Cuidador[]>(`${this.apiUrl}/cuidadores`, cuidador, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('cuidadores').insert(cuidador).select();
+    return this.handleResponse<Cuidador>(this.toPromise(p));
   }
 
   getCuidadores(): Observable<Cuidador[]> {
-    return this.http.get<Cuidador[]>(`${this.apiUrl}/cuidadores?order=created_at.desc`, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('cuidadores').select('*').order('created_at', { ascending: false });
+    return this.handleResponse<Cuidador>(this.toPromise(p));
   }
 
   getCuidador(id: number): Observable<Cuidador[]> {
-    return this.http.get<Cuidador[]>(`${this.apiUrl}/cuidadores?id_cuidador=eq.${id}`, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('cuidadores').select('*').eq('id_cuidador', id);
+    return this.handleResponse<Cuidador>(this.toPromise(p));
   }
 
   createAgendamento(ag: Agendamento): Observable<Agendamento[]> {
-    return this.http.post<Agendamento[]>(`${this.apiUrl}/agendamentos`, ag, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('agendamentos').insert(ag).select();
+    return this.handleResponse<Agendamento>(this.toPromise(p));
   }
 
   getAgendamentosByUser(userId: number): Observable<Agendamento[]> {
-    return this.http.get<Agendamento[]>(
-      `${this.apiUrl}/agendamentos?id_user=eq.${userId}&order=data.asc,hora.asc`,
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('agendamentos').select('*').eq('id_user', userId).order('data', { ascending: true }).order('hora', { ascending: true });
+    return this.handleResponse<Agendamento>(this.toPromise(p));
   }
 
   updateAgendamentoStatus(id: number, status: StatusAgendamento): Observable<Agendamento[]> {
-    return this.http.patch<Agendamento[]>(
-      `${this.apiUrl}/agendamentos?id_agendamento=eq.${id}`,
-      { status },
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('agendamentos').update({ status }).eq('id_agendamento', id).select();
+    return this.handleResponse<Agendamento>(this.toPromise(p));
   }
 
   buildConversaId(idUser: number, idCuidador: number): string {
@@ -124,26 +108,21 @@ export class SupabaseService {
   }
 
   getMensagens(conversaId: string): Observable<Mensagem[]> {
-    return this.http.get<Mensagem[]>(
-      `${this.apiUrl}/mensagens?conversa_id=eq.${conversaId}&order=created_at.asc`,
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('mensagens').select('*').eq('conversa_id', conversaId).order('created_at', { ascending: true });
+    return this.handleResponse<Mensagem>(this.toPromise(p));
   }
 
   sendMensagem(msg: Mensagem): Observable<Mensagem[]> {
-    return this.http.post<Mensagem[]>(`${this.apiUrl}/mensagens`, msg, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('mensagens').insert(msg).select();
+    return this.handleResponse<Mensagem>(this.toPromise(p));
   }
 
   getConversasByUser(userId: number): Observable<Mensagem[]> {
-    return this.http.get<Mensagem[]>(
-      `${this.apiUrl}/mensagens?id_user=eq.${userId}&order=created_at.desc`,
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('mensagens').select('*').eq('id_user', userId).order('created_at', { ascending: false });
+    return this.handleResponse<Mensagem>(this.toPromise(p));
   }
 
-  subscribeMensagens(conversaId: string, onInsert: (msg: Mensagem) => void): RealtimeChannel {
+  subscribeMensagens(conversaId: string, onInsert: (msg: Mensagem) => void): any {
     return this.client
       .channel(`mensagens:${conversaId}`)
       .on(
@@ -155,27 +134,21 @@ export class SupabaseService {
   }
 
   getNotificacoes(userId: number): Observable<Notificacao[]> {
-    return this.http.get<Notificacao[]>(
-      `${this.apiUrl}/notificacoes?id_user=eq.${userId}&order=created_at.desc`,
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('notificacoes').select('*').eq('id_user', userId).order('created_at', { ascending: false });
+    return this.handleResponse<Notificacao>(this.toPromise(p));
   }
 
   createNotificacao(n: Notificacao): Observable<Notificacao[]> {
-    return this.http.post<Notificacao[]>(`${this.apiUrl}/notificacoes`, n, {
-      headers: this.getHeaders()
-    });
+    const p = this.client.from('notificacoes').insert(n).select();
+    return this.handleResponse<Notificacao>(this.toPromise(p));
   }
 
   marcarNotificacaoLida(id: number): Observable<Notificacao[]> {
-    return this.http.patch<Notificacao[]>(
-      `${this.apiUrl}/notificacoes?id_notificacao=eq.${id}`,
-      { lida: true },
-      { headers: this.getHeaders() }
-    );
+    const p = this.client.from('notificacoes').update({ lida: true }).eq('id_notificacao', id).select();
+    return this.handleResponse<Notificacao>(this.toPromise(p));
   }
 
-  subscribeNotificacoes(userId: number, onInsert: (n: Notificacao) => void): RealtimeChannel {
+  subscribeNotificacoes(userId: number, onInsert: (n: Notificacao) => void): any {
     return this.client
       .channel(`notificacoes:${userId}`)
       .on(
@@ -186,7 +159,13 @@ export class SupabaseService {
       .subscribe();
   }
 
-  removeChannel(channel: RealtimeChannel) {
-    this.client.removeChannel(channel);
+  removeChannel(channel: any) {
+    // supabase-js v2 exposes `removeChannel` or `unsubscribe`; try both safely
+    if (this.client.removeChannel) {
+      // @ts-ignore
+      this.client.removeChannel(channel);
+    } else if (channel.unsubscribe) {
+      channel.unsubscribe();
+    }
   }
 }
