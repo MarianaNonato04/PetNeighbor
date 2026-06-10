@@ -127,6 +127,14 @@
   box-shadow: var(--shadow-xs);
 }
 
+@media (min-width: 900px) {
+  .chat-header { padding: 2.75rem 2rem 1.25rem; }
+  .chat-header-info h1 { font-size: 1.25rem; }
+  .chat-scroll { padding: 1.75rem 2rem; }
+  .msg-bubble { max-width: 60%; padding: 0.75rem 1rem; }
+  .chat-composer { padding: 1rem 2rem; }
+}
+
 .msg-row--mine .msg-bubble {
   background: linear-gradient(135deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
   border-radius: 18px 18px 4px 18px;
@@ -152,6 +160,9 @@
 .msg-row--mine .msg-time { color: rgba(255,255,255,0.75); }
 
 .chat-composer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1100;
   flex-shrink: 0;
   display: flex;
   align-items: center;
