@@ -1,0 +1,57 @@
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { UserService, User } from './user.service';
+
+describe('UserService', () => {
+  let service: UserService;
+  let httpMock: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [UserService]
+    });
+    service = TestBed.inject(UserService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should fetch users (GET)', () => {
+    const mockUsers: User[] = [
+      { id_user: 1, nome: 'John', idade: 30, email: 'john@example.com', teste: null },
+      { id_user: 2, nome: 'Jane', idade: 25, email: 'jane@example.com', teste: null }
+    ];
+
+    service.getUsers().subscribe(users => {
+      expect(users.length).toBe(2);
+      expect(users).toEqual(mockUsers);
+    });
+
+    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios');
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('apikey')).toBe('sb_publishable_rpEaVx5nlKopfuGxkh5uxg_YO8iKyrQ');
+    req.flush(mockUsers);
+  });
+
+  it('should create user (POST)', () => {
+    const newUser: User = { nome: 'Bob', idade: 40, email: 'bob@example.com', teste: null };
+    const mockResponse: User[] = [{ id_user: 3, ...newUser }];
+
+    service.createUser(newUser).subscribe(users => {
+      expect(users[0].id_user).toBe(3);
+      expect(users[0].nome).toBe('Bob');
+    });
+
+    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(newUser);
+    req.flush(mockResponse);
+  });
+});

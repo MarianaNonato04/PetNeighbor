@@ -35,7 +35,7 @@ export class RegisterComponent {
     if (this.registerForm.valid) {
       this.isSubmitting.set(true);
       this.errorMessage.set('');
-      
+
       this.supabase.registerUsuario(this.registerForm.value).subscribe({
         next: () => {
           this.isSubmitting.set(false);

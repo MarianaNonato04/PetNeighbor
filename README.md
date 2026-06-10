@@ -1,6 +1,7 @@
-# 🐾 PetNeighbor - Cadastro de Usuários & Pets
 
-O **PetNeighbor** é um aplicativo mobile-first moderno e premium construído com **Angular 17+**, focado no cadastro e gerenciamento de tutores e seus pets dentro de uma rede de vizinhança integrada. O design do aplicativo conta com uma interface baseada em **Glassmorphism**, combinando uma paleta de cores elegantes e naturais com animações suaves e interações reativas.
+# 🐾 PetNeighbor - Cadastro de Usuários & Pets (v1.1.0)
+
+O **PetNeighbor** é um aplicativo mobile-first moderno e premium construído com **Angular 17+**, focado no cadastro e gerenciamento de tutores, pets e cuidadores dentro de uma rede de vizinhança integrada. O design do aplicativo conta com uma interface baseada em **Glassmorphism**, combinando uma paleta de cores elegantes e naturais com animações suaves e interações reativas.
 
 ---
 
@@ -55,13 +56,33 @@ src/
 
 ## 🎨 Paleta de Cores e Tokens de Design
 
-O design utiliza cores suaves e acolhedoras que remetem a natureza e bem-estar animal, configuradas no arquivo [styles.css](file:///c:/Users/marin/Desktop/Projetos/angular-user-registration/src/styles.css):
+O design utiliza cores suaves e acolhedoras que remetem a natureza e bem-estar animal, configuradas no arquivo [styles.css]
 
 *   🎨 **Terracota (`#C97B5E`)**: Cor principal de destaque (botões principais, links e títulos importantes).
 *   🌿 **Salvia (`#9CAF9A`)**: Cor secundária para estados de sucesso, botões secundários e detalhes visuais.
 *   🌾 **Areia (`#EDE4D1`)**: Cor de fundo da aplicação, oferecendo excelente legibilidade e elegância.
 *   🥚 **Off-White (`#FAF6F1`)**: Cor dos cards e containers com efeito glassmorphism suave.
 *   🖤 **Carvão (`#2E2A26`)**: Texto primário para alto contraste e sofisticação.
+
+---
+
+## 🚀 Novas funcionalidades (a partir da v1.1.0)
+
+*   💬 **Chat em tempo real**: funcionalidade de mensagens entre usuários e cuidadores para combinar serviços e tirar dúvidas (componente `chat`).
+*   📅 **Agenda e Agendamento**: tela de agenda e fluxo de agendamento de serviços/passeios com calendário e listas (`agenda`, `agendar`).
+*   🔔 **Notificações**: sistema de notificações para lembretes de agendamentos e mensagens (`notificacoes`).
+*   📍 **Geolocalização e busca de cuidadores próximos**: utilitários de localização para encontrar cuidadores na vizinhança e cálculo de distâncias (`geo.util.ts`).
+*   🧑‍⚕️ **Cadastro e detalhe de cuidadores**: telas para registro e visualização de cuidadores com detalhes de serviços oferecidos (`cuidador-register`, `cuidador-detalhe`).
+*   🔎 **Explorar e filtros**: página de exploração de cuidadores e serviços com filtros por distância, porte de pet e disponibilidade (`explorar`).
+*   🧭 **Navegação móvel aprimorada**: barra de navegação inferior flutuante e fluxo de UX otimizado para telas pequenas (`bottom-nav`).
+
+---
+
+## 🔧 Melhorias e Observações
+
+*   Atualizado o projeto para versão **v1.1.0** — inclui as novas telas e fluxos listados acima.
+*   Arquivo de configuração/seed para banco: `supabase_setup.sql` (verifique credenciais e políticas de RLS antes de rodar em produção).
+*   Recomenda-se testar os fluxos de autenticação e integrações com Supabase em um ambiente de desenvolvimento isolado.
 
 ---
 
@@ -93,3 +114,13 @@ Certifique-se de ter o [Node.js](https://nodejs.org/) instalado em sua máquina.
 
 4.  **Acesse a aplicação no seu navegador:**
     Abra [http://localhost:4200](http://localhost:4200) para ver o aplicativo em execução.
+
+---
+
+## 📫 Contato / Contribuição
+
+Contribuições são bem-vindas: abra issues e pull requests com descrições claras das mudanças. Para dúvidas rápidas, crie uma issue descrevendo o cenário e os logs relevantes.
+
+---
+
+Obrigado por usar o PetNeighbor! 🐶🐱

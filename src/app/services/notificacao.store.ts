@@ -1,0 +1,55 @@
+import { Injectable, computed, signal, inject } from '@angular/core';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { SupabaseService } from './supabase.service';
+import { Notificacao } from '../models/interfaces';
+
+@Injectable({ providedIn: 'root' })
+export class NotificacaoStore {
+  private supabase = inject(SupabaseService);
+
+  notificacoes = signal<Notificacao[]>([]);
+  naoLidas = computed(() => this.notificacoes().filter(n => !n.lida).length);
+
+  private canal?: RealtimeChannel;
+  private userIdAtivo: number | null = null;
+
+  iniciar(userId: number) {
+    if (this.userIdAtivo === userId) return;
+    this.parar();
+    this.userIdAtivo = userId;
+
+    this.supabase.getNotificacoes(userId).subscribe({
+      next: data => this.notificacoes.set(data || []),
+      error: err => console.error(err)
+    });
+
+    this.canal = this.supabase.subscribeNotificacoes(userId, nova => {
+      this.notificacoes.update(list =>
+        list.some(n => n.id_notificacao === nova.id_notificacao) ? list : [nova, ...list]
+      );
+    });
+  }
+
+  marcarLida(n: Notificacao) {
+    if (!n.id_notificacao || n.lida) return;
+    this.supabase.marcarNotificacaoLida(n.id_notificacao).subscribe({
+      next: () => this.notificacoes.update(list =>
+        list.map(x => x.id_notificacao === n.id_notificacao ? { ...x, lida: true } : x)
+      ),
+      error: err => console.error(err)
+    });
+  }
+
+  marcarTodasLidas() {
+    this.notificacoes().filter(n => !n.lida).forEach(n => this.marcarLida(n));
+  }
+
+  parar() {
+    if (this.canal) {
+      this.supabase.removeChannel(this.canal);
+      this.canal = undefined;
+    }
+    this.userIdAtivo = null;
+    this.notificacoes.set([]);
+  }
+}

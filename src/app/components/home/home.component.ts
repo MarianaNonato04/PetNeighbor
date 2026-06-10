@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
+import { NotificacaoStore } from '../../services/notificacao.store';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -12,4 +13,6 @@ import { RouterModule } from '@angular/router';
 })
 export class HomeComponent {
   supabase = inject(SupabaseService);
+  private store = inject(NotificacaoStore);
+  naoLidas = this.store.naoLidas;
 }
