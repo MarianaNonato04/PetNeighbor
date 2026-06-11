@@ -1,15 +1,16 @@
-import { Component, effect, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, effect, inject, signal } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';
 import { SupabaseService } from './services/supabase.service';
 import { NotificacaoStore } from './services/notificacao.store';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, BottomNavComponent],
   template: `
-    <div class="app-container">
+    <div class="app-container" [class.nav-hidden]="isNavHidden()">
       <main class="main-content">
         <router-outlet></router-outlet>
       </main>
@@ -24,6 +25,9 @@ import { NotificacaoStore } from './services/notificacao.store';
       display: flex;
       flex-direction: column;
     }
+    .app-container.nav-hidden .main-content {
+      padding-bottom: 0;
+    }
   `]
 })
 export class AppComponent {
@@ -31,8 +35,16 @@ export class AppComponent {
 
   private supabase = inject(SupabaseService);
   private notificacoes = inject(NotificacaoStore);
+  private router = inject(Router);
+
+  isNavHidden = signal(false);
+  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat'];
 
   constructor() {
+    this.atualizarRota(this.router.url);
+    this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+      .subscribe(e => this.atualizarRota(e.urlAfterRedirects));
 
     effect(() => {
       const user = this.supabase.currentUser();
@@ -42,5 +54,9 @@ export class AppComponent {
         this.notificacoes.parar();
       }
     }, { allowSignalWrites: true });
+  }
+
+  private atualizarRota(url: string) {
+    this.isNavHidden.set(this.rotasOcultas.some(r => url.startsWith(r)));
   }
 }

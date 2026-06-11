@@ -27,7 +27,8 @@ export class AgendarComponent implements OnInit {
   recorrencias: Recorrencia[] = ['Único', 'Diário', 'Semanal'];
 
   petSelecionado = signal<number | null>(null);
-  servicoSelecionado = signal<TipoServico | null>(null);
+  servicosSelecionados = signal<TipoServico[]>([]);
+  duracao = signal<number>(1);
   data = signal<string>('');
   hora = signal<string>('09:00');
   recorrencia = signal<Recorrencia>('Único');
@@ -37,10 +38,37 @@ export class AgendarComponent implements OnInit {
 
   precoSelecionado = computed<number>(() => {
     const c = this.cuidador();
-    const s = this.servicoSelecionado();
-    if (!c || !s) return 0;
-    return { 'Passeio': c.preco_passeio, 'Alimentação': c.preco_alimentacao, 'Companhia': c.preco_companhia }[s];
+    const selecionados = this.servicosSelecionados();
+    if (!c || selecionados.length === 0) return 0;
+    
+    let somaPorHora = 0;
+    selecionados.forEach(s => {
+      const preco = { 
+        'Passeio': c.preco_passeio, 
+        'Alimentação': c.preco_alimentacao, 
+        'Companhia': c.preco_companhia 
+      }[s] || 0;
+      somaPorHora += preco;
+    });
+    return somaPorHora;
   });
+
+  precoTotal = computed<number>(() => {
+    return this.precoSelecionado() * this.duracao();
+  });
+
+  toggleServico(s: TipoServico) {
+    const list = this.servicosSelecionados();
+    if (list.includes(s)) {
+      this.servicosSelecionados.set(list.filter(x => x !== s));
+    } else {
+      this.servicosSelecionados.set([...list, s]);
+    }
+  }
+
+  isServicoSelecionado(s: TipoServico): boolean {
+    return this.servicosSelecionados().includes(s);
+  }
 
   ngOnInit() {
     const tutor = this.supabase.currentUser();
@@ -56,7 +84,7 @@ export class AgendarComponent implements OnInit {
       next: data => {
         const c = data?.[0] ?? null;
         this.cuidador.set(c);
-        if (c?.servicos?.length) this.servicoSelecionado.set(c.servicos[0]);
+        if (c?.servicos?.length) this.servicosSelecionados.set([c.servicos[0]]);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
@@ -81,20 +109,21 @@ export class AgendarComponent implements OnInit {
 
     if (!tutor || !c) return;
     if (!this.petSelecionado()) { this.errorMessage.set('Cadastre ou selecione um pet.'); return; }
-    if (!this.servicoSelecionado()) { this.errorMessage.set('Selecione um serviço.'); return; }
+    if (this.servicosSelecionados().length === 0) { this.errorMessage.set('Selecione pelo menos um serviço.'); return; }
     if (!this.data()) { this.errorMessage.set('Escolha uma data.'); return; }
+    if (!this.duracao() || this.duracao() < 1) { this.errorMessage.set('A duração deve ser de pelo menos 1 hora.'); return; }
 
     this.isSubmitting.set(true);
     const agendamento: Agendamento = {
       id_user: tutor.id_user!,
       id_cuidador: c.id_cuidador!,
       id_pet: this.petSelecionado()!,
-      tipo_servico: this.servicoSelecionado()!,
+      tipo_servico: this.servicosSelecionados().join(', ') as any,
       data: this.data(),
       hora: this.hora(),
       recorrencia: this.recorrencia(),
-      preco: this.precoSelecionado(),
-      observacoes: this.observacoes(),
+      preco: this.precoTotal(),
+      observacoes: `${this.observacoes()}${this.observacoes() ? ' | ' : ''}Duração: ${this.duracao()}h`,
       status: 'Pendente'
     };
 

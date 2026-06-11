@@ -38,7 +38,9 @@
           </div>
           <div class="pet-info">
             <div class="pet-name-row">
-              <h3 class="pet-name">{{ pet.nome_pet }}</h3>
+              <h3 class="pet-name">{{ pet.nome_pet }} <span
+                  style="font-size: 0.9375rem; color: var(--text-secondary); font-weight: 500;" *ngIf="pet.especie">({{
+                  pet.especie }})</span></h3>
               <span class="porte-chip">{{ pet.porte }}</span>
             </div>
             <div class="pet-meta">
@@ -54,18 +56,14 @@
             <p class="pet-desc" *ngIf="pet.describ_pet">{{ pet.describ_pet }}</p>
           </div>
         </div>
-
-        <button routerLink="/cadastro-pet" class="btn-secondary w-full">
-          <span class="material-symbols-rounded" style="font-size:1.125rem;">add_circle</span>
-          Cadastrar outro pet
-        </button>
       </div>
 
     </div>
 
     <ng-template #loginRequired>
       <div class="glass-card text-center">
-        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
+        <span class="material-symbols-rounded"
+          style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
         <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver seus pets.</p>
         <button routerLink="/cadastro-usuario" class="btn-primary">Criar conta</button>
       </div>

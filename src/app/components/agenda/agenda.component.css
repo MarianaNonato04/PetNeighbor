@@ -177,3 +177,22 @@
 .ag-cancel .material-symbols-rounded { font-size: 0.9375rem; }
 
 .text-center { text-align: center; }
+
+@media (min-width: 768px) {
+  .agenda-page .tabs {
+    max-width: 400px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .agenda-page .ag-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .agenda-page .empty-state,
+  .agenda-page .state-box {
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+}

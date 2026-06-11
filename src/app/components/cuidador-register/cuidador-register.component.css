@@ -132,3 +132,12 @@
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
+
+@media (min-width: 768px) {
+  .cuidador-reg-page .page-body {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2.5rem 1.5rem;
+  }
+}

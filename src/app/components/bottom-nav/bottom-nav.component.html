@@ -1,5 +1,6 @@
-<nav class="bottom-nav-container" *ngIf="visivel()">
-  <div class="nav-pill">
+<nav class="bottom-nav-container" *ngIf="visivelMobile() || visivelDesktop()">
+  <!-- Layout Mobile (Pílula Inferior) -->
+  <div class="nav-pill mobile-nav" *ngIf="visivelMobile()">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
       <span class="material-symbols-rounded">home</span>
       <span class="label">Início</span>
@@ -23,5 +24,58 @@
       <span class="material-symbols-rounded">person</span>
       <span class="label">Perfil</span>
     </a>
+  </div>
+
+  <!-- Layout Desktop (Navbar Superior Completa) -->
+  <div class="nav-pill desktop-nav" *ngIf="visivelDesktop()">
+    <!-- Esquerda: Logo + Saudação -->
+    <div class="desktop-left">
+      <div class="desktop-logo" routerLink="/">
+        <span class="material-symbols-rounded">pets</span>
+        <span class="logo-text">PetNeighbor</span>
+      </div>
+      <div class="greeting-text" *ngIf="supabase.currentUser() as user">
+        Olá, {{ user.nome.split(' ')[0] }} 👋
+      </div>
+      <div class="greeting-text" *ngIf="!supabase.currentUser()">
+        Olá, visitante 👋
+      </div>
+    </div>
+
+    <!-- Centro: Links de Navegação -->
+    <div class="desktop-menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
+        <span class="material-symbols-rounded">home</span>
+        <span class="label">Início</span>
+      </a>
+      <a routerLink="/explorar" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">search</span>
+        <span class="label">Explorar</span>
+      </a>
+      <a routerLink="/meus-pets" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">pets</span>
+        <span class="label">Meus Pets</span>
+      </a>
+      <a routerLink="/agenda" routerLinkActive="active" class="nav-item">
+        <span class="material-symbols-rounded">calendar_month</span>
+        <span class="label">Agenda</span>
+      </a>
+    </div>
+
+    <!-- Direita: Notificações + Perfil -->
+    <div class="desktop-right">
+      <button class="icon-btn chat-btn" routerLink="/conversas" aria-label="Conversas">
+        <span class="material-symbols-rounded">chat</span>
+      </button>
+      <button class="icon-btn notif-btn" routerLink="/notificacoes" aria-label="Notificações">
+        <span class="material-symbols-rounded">notifications</span>
+        <span class="notif-badge" *ngIf="notificacaoStore.naoLidas() > 0">
+          {{ notificacaoStore.naoLidas() > 9 ? '9+' : notificacaoStore.naoLidas() }}
+        </span>
+      </button>
+      <button class="icon-btn profile-btn" routerLink="/perfil" aria-label="Perfil">
+        <span class="material-symbols-rounded">account_circle</span>
+      </button>
+    </div>
   </div>
 </nav>

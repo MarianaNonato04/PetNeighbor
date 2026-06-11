@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
+import { SupabaseService } from '../../services/supabase.service';
+import { NotificacaoStore } from '../../services/notificacao.store';
 
 @Component({
   selector: 'app-bottom-nav',
@@ -12,8 +14,14 @@ import { filter } from 'rxjs';
 })
 export class BottomNavComponent {
   private router = inject(Router);
+  supabase = inject(SupabaseService);
+  notificacaoStore = inject(NotificacaoStore);
 
-  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat'];
+  private rotasOcultasDesktop = ['/login', '/cadastro-usuario'];
+  private rotasOcultasMobile = ['/login', '/cadastro-usuario', '/chat'];
+
+  visivelDesktop = signal(true);
+  visivelMobile = signal(true);
 
   visivel = signal(true);
 
@@ -25,6 +33,8 @@ export class BottomNavComponent {
   }
 
   private atualizar(url: string) {
-    this.visivel.set(!this.rotasOcultas.some(r => url.startsWith(r)));
+    this.visivelDesktop.set(!this.rotasOcultasDesktop.some(r => url.startsWith(r)));
+    this.visivelMobile.set(!this.rotasOcultasMobile.some(r => url.startsWith(r)));
+    this.visivel.set(this.visivelDesktop() || this.visivelMobile());
   }
 }

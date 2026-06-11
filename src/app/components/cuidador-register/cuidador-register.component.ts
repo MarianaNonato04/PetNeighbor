@@ -118,7 +118,11 @@ export class CuidadorRegisterComponent {
       error: err => {
         console.error(err);
         this.isSubmitting.set(false);
-        this.errorMessage.set('Erro ao cadastrar. Verifique os dados e tente novamente.');
+        if (err?.code === '23505' || err?.message?.toLowerCase().includes('already exists') || err?.message?.toLowerCase().includes('duplicate')) {
+          this.errorMessage.set('E-mail já existe.');
+        } else {
+          this.errorMessage.set('Erro ao cadastrar. Verifique os dados e tente novamente.');
+        }
       }
     });
   }

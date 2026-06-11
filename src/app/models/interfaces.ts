@@ -9,6 +9,7 @@ export interface Usuario {
 export interface Pet {
   id_pet?: number;
   nome_pet: string;
+  especie: string;
   idade_pet: number;
   describ_pet: string;
   peso: number;

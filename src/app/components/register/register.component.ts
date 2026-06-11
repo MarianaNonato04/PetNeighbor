@@ -25,7 +25,7 @@ export class RegisterComponent {
   constructor() {
     this.registerForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3)]],
-      idade: ['', [Validators.required, Validators.min(0)]],
+      idade: ['', [Validators.required, Validators.min(1)]],
       email: ['', [Validators.required, Validators.email]],
       senha: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -45,7 +45,11 @@ export class RegisterComponent {
         error: (err) => {
           console.error(err);
           this.isSubmitting.set(false);
-          this.errorMessage.set('Erro ao criar conta. Tente outro e-mail.');
+          if (err?.code === '23505' || err?.message?.toLowerCase().includes('already exists') || err?.message?.toLowerCase().includes('duplicate')) {
+            this.errorMessage.set('E-mail já existe.');
+          } else {
+            this.errorMessage.set('Erro ao criar conta. Tente outro e-mail.');
+          }
         }
       });
     } else {

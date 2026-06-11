@@ -126,7 +126,7 @@
   box-shadow: 0 0 0 3px rgba(201,123,94,0.08);
 }
 
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
 
 .recorrencia-options { display: flex; gap: 0.5rem; }
 
@@ -184,4 +184,26 @@
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .agendar-page .page-body {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  .agendar-page .glass-card {
+    box-shadow: var(--shadow-soft);
+    border-radius: var(--radius-xl);
+  }
+
+  .agendar-page form {
+    background: white;
+    padding: 2.25rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
 }

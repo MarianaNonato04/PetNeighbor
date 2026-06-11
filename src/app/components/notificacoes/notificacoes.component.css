@@ -119,3 +119,17 @@
 }
 
 .text-center { text-align: center; }
+
+@media (min-width: 768px) {
+  .notif-page .page-body {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2rem 1.5rem;
+  }
+
+  .notif-page .empty-state {
+    max-width: 500px;
+    margin: 2rem auto;
+  }
+}

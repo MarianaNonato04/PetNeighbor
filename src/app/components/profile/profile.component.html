@@ -1,8 +1,8 @@
-<div class="profile-page">
+<div class="profile-page" *ngIf="user() as u; else notLoggedIn">
 
-  <div *ngIf="user() as u; else notLoggedIn">
-
-    <div class="profile-hero">
+  <div class="profile-hero">
+    <!-- Mode: Visualização -->
+    <ng-container *ngIf="!editando()">
       <div class="avatar-ring">
         <div class="avatar">
           <span class="material-symbols-rounded">person</span>
@@ -11,89 +11,110 @@
       <h1 class="user-name">{{ u.nome }}</h1>
       <p class="user-email">{{ u.email }}</p>
       <span class="age-chip">{{ u.idade }} anos</span>
-    </div>
 
-    <div class="page-body">
-
-      <div class="glass-card info-section">
-        <h2 class="section-label">Conta</h2>
-
-        <div class="info-row">
-          <div class="info-icon info-icon--orange">
-            <span class="material-symbols-rounded">person</span>
-          </div>
-          <div class="info-content">
-            <p class="info-label">Nome</p>
-            <p class="info-value">{{ u.nome }}</p>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="info-row">
-          <div class="info-icon info-icon--blue">
-            <span class="material-symbols-rounded">mail</span>
-          </div>
-          <div class="info-content">
-            <p class="info-label">E-mail</p>
-            <p class="info-value">{{ u.email }}</p>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="info-row">
-          <div class="info-icon info-icon--green">
-            <span class="material-symbols-rounded">cake</span>
-          </div>
-          <div class="info-content">
-            <p class="info-label">Idade</p>
-            <p class="info-value">{{ u.idade }} anos</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="glass-card actions-card">
-        <h2 class="section-label">Ações</h2>
-
-        <button class="action-row" routerLink="/meus-pets">
-          <div class="info-icon info-icon--orange">
-            <span class="material-symbols-rounded">pet_supplies</span>
-          </div>
-          <span class="action-label">Meus Pets</span>
-          <span class="material-symbols-rounded action-arrow">chevron_right</span>
-        </button>
-
-        <div class="divider"></div>
-
-        <button class="action-row" routerLink="/cadastro-pet">
-          <div class="info-icon info-icon--green">
-            <span class="material-symbols-rounded">add_circle</span>
-          </div>
-          <span class="action-label">Cadastrar Pet</span>
-          <span class="material-symbols-rounded action-arrow">chevron_right</span>
-        </button>
-
-        <div class="divider"></div>
-
-        <button class="action-row" routerLink="/seja-cuidador">
-          <div class="info-icon info-icon--blue">
-            <span class="material-symbols-rounded">volunteer_activism</span>
-          </div>
-          <span class="action-label">Seja um cuidador</span>
-          <span class="material-symbols-rounded action-arrow">chevron_right</span>
-        </button>
-      </div>
-
-      <button class="logout-btn" (click)="logout()">
-        <span class="material-symbols-rounded">logout</span>
-        Sair da conta
+      <button class="hero-edit-btn" (click)="iniciarEdicao(u)">
+        <span class="material-symbols-rounded">edit</span>
+        <span>Editar Perfil</span>
       </button>
+    </ng-container>
 
-    </div>
+    <!-- Mode: Edição -->
+    <ng-container *ngIf="editando()">
+      <div class="avatar-ring">
+        <div class="avatar">
+          <span class="material-symbols-rounded">edit_square</span>
+        </div>
+      </div>
+
+      <div class="hero-edit-form">
+        <div class="hero-form-group">
+          <label class="hero-form-label" for="edit-nome">Nome</label>
+          <input id="edit-nome" type="text" [(ngModel)]="editNome" name="nome" class="hero-input" required>
+        </div>
+
+        <div class="hero-form-group">
+          <label class="hero-form-label" for="edit-idade">Idade</label>
+          <input id="edit-idade" type="number" [(ngModel)]="editIdade" name="idade" class="hero-input" required min="1">
+        </div>
+
+        <div class="hero-edit-actions">
+          <button class="hero-btn-cancel" (click)="cancelarEdicao()" title="Cancelar">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+          <button class="hero-btn-save" (click)="salvarPerfil(u)" [disabled]="salvando()" title="Salvar">
+            <span class="material-symbols-rounded">{{ salvando() ? 'sync' : 'done' }}</span>
+          </button>
+        </div>
+
+        <div *ngIf="erroEdicao()" class="hero-error-msg">
+          {{ erroEdicao() }}
+        </div>
+      </div>
+    </ng-container>
   </div>
 
-  <ng-template #notLoggedIn>
+  <div class="page-body">
+
+    <div class="glass-card info-section">
+      <h2 class="section-label">Conta</h2>
+
+      <div class="divider"></div>
+
+      <div class="info-row">
+        <div class="info-icon info-icon--orange">
+          <span class="material-symbols-rounded">pets</span>
+        </div>
+        <div class="info-content">
+          <p class="info-label">Pets Cadastrados</p>
+          <p class="info-value">{{ qtdPets() }} {{ qtdPets() === 1 ? 'pet' : 'pets' }}</p>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="info-row">
+        <div class="info-icon info-icon--blue">
+          <span class="material-symbols-rounded">calendar_month</span>
+        </div>
+        <div class="info-content">
+          <p class="info-label">Agendamentos Realizados</p>
+          <p class="info-value">{{ qtdAgendamentos() }} {{ qtdAgendamentos() === 1 ? 'serviço' : 'serviços' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card actions-card">
+      <h2 class="section-label">Ações</h2>
+
+      <button class="action-row" routerLink="/conversas">
+        <div class="info-icon info-icon--orange">
+          <span class="material-symbols-rounded">chat</span>
+        </div>
+        <span class="action-label">Minhas conversas</span>
+        <span class="material-symbols-rounded action-arrow">chevron_right</span>
+      </button>
+
+      <div class="divider"></div>
+
+      <button class="action-row" routerLink="/seja-cuidador">
+        <div class="info-icon info-icon--blue">
+          <span class="material-symbols-rounded">volunteer_activism</span>
+        </div>
+        <span class="action-label">Seja um cuidador</span>
+        <span class="material-symbols-rounded action-arrow">chevron_right</span>
+      </button>
+    </div>
+
+    <button class="logout-btn" (click)="logout()">
+      <span class="material-symbols-rounded">logout</span>
+      Sair da conta
+    </button>
+
+  </div>
+</div>
+
+<ng-template #notLoggedIn>
+  <div class="profile-page profile-page--unlogged">
     <div class="not-logged-hero">
       <div class="lock-art">
         <span class="material-symbols-rounded">pets</span>
@@ -105,6 +126,5 @@
       <button routerLink="/login" class="btn-primary">Fazer login</button>
       <button routerLink="/cadastro-usuario" class="btn-outline" style="margin-top:0.75rem;">Criar conta</button>
     </div>
-  </ng-template>
-
-</div>
+  </div>
+</ng-template>

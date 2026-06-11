@@ -21,15 +21,15 @@
 
 .header-text p {
   font-size: 0.875rem;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   margin-top: 0.125rem;
 }
 
 .add-pet-btn {
   width: 42px;
   height: 42px;
-  background: rgba(255,255,255,0.2);
-  border: 1.5px solid rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -41,7 +41,7 @@
 }
 
 .add-pet-btn:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
@@ -113,13 +113,13 @@
 .pet-avatar {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, rgba(201,123,94,0.15) 0%, rgba(201,123,94,0.08) 100%);
+  background: linear-gradient(135deg, rgba(201, 123, 94, 0.15) 0%, rgba(201, 123, 94, 0.08) 100%);
   border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(201,123,94,0.12);
+  border: 1px solid rgba(201, 123, 94, 0.12);
 }
 
 .pet-avatar .material-symbols-rounded {
@@ -149,11 +149,11 @@
 .porte-chip {
   font-size: 0.6875rem;
   font-weight: 700;
-  background: rgba(122,158,120,0.15);
+  background: rgba(122, 158, 120, 0.15);
   color: var(--color-salvia);
   padding: 2px 10px;
   border-radius: var(--radius-full);
-  border: 1px solid rgba(122,158,120,0.2);
+  border: 1px solid rgba(122, 158, 120, 0.2);
   letter-spacing: 0.02em;
 }
 
@@ -186,7 +186,6 @@
   font-style: italic;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -205,10 +204,29 @@
   justify-content: center;
   gap: 0.5rem;
   transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(122,158,120,0.3);
+  box-shadow: 0 4px 12px rgba(122, 158, 120, 0.3);
 }
 
 .btn-secondary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(122,158,120,0.4);
+  box-shadow: 0 6px 18px rgba(122, 158, 120, 0.4);
+}
+
+@media (min-width: 768px) {
+  .my-pets-page .pet-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .my-pets-page .btn-secondary {
+    grid-column: 1 / -1;
+    max-width: 320px;
+    margin: 1.5rem auto 0;
+  }
+
+  .my-pets-page .empty-state {
+    max-width: 500px;
+    margin: 2rem auto;
+  }
 }

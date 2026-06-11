@@ -26,6 +26,7 @@ export class PetRegisterComponent {
   constructor() {
     this.petForm = this.fb.group({
       nome_pet: ['', [Validators.required]],
+      especie: ['', [Validators.required]],
       idade_pet: ['', [Validators.required]],
       porte: ['Pequeno', [Validators.required]],
       peso: ['', [Validators.required]],

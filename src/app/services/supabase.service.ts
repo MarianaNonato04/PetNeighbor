@@ -46,6 +46,13 @@ export class SupabaseService {
     );
   }
 
+  updateUsuario(userId: number, updates: Partial<Usuario>): Observable<Usuario[]> {
+    const p = this.client.from('usuarios').update(updates).eq('id_user', userId).select();
+    return this.handleResponse<Usuario>(this.toPromise(p)).pipe(
+      tap(users => { if (users && users.length > 0) this.setCurrentUser(users[0]); })
+    );
+  }
+
   login(email: string, senha: string): Observable<Usuario[]> {
     const p = this.client.from('usuarios').select('*').eq('email', email).eq('senha', senha);
     return this.handleResponse<Usuario>(this.toPromise(p)).pipe(

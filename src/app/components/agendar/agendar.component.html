@@ -34,17 +34,20 @@
       </div>
 
       <div class="form-group mt-4">
-        <label>Serviço</label>
+        <label>Serviços desejados</label>
         <div class="servico-options">
           <button type="button" class="servico-option" *ngFor="let s of servicosDisponiveis()"
-            [class.servico-option--on]="servicoSelecionado() === s" (click)="servicoSelecionado.set(s)">
+            [class.servico-option--on]="isServicoSelecionado(s)" (click)="toggleServico(s)">
             <span class="material-symbols-rounded">{{
               s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite'
             }}</span>
             <span class="servico-option-nome">{{ s }}</span>
             <span class="servico-option-preco">R$ {{
               s === 'Passeio' ? c.preco_passeio : s === 'Alimentação' ? c.preco_alimentacao : c.preco_companhia
-            }}</span>
+            }} / hora</span>
+            <span class="material-symbols-rounded select-indicator" style="font-size: 1.25rem; color: var(--color-terracota);">
+              {{ isServicoSelecionado(s) ? 'check_box' : 'check_box_outline_blank' }}
+            </span>
           </button>
         </div>
       </div>
@@ -63,6 +66,16 @@
       </div>
 
       <div class="form-group mt-4">
+        <label for="duracao">Duração do atendimento</label>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <input id="duracao" type="number" class="input-field" min="1" max="12" style="max-width: 120px;"
+            [ngModel]="duracao()" (ngModelChange)="duracao.set($event)" name="duracao">
+          <span style="font-size:0.9rem; font-weight: 600; color:var(--text-secondary);">hora(s)</span>
+        </div>
+        <span class="hint-msg">O valor final é calculado multiplicando a soma dos serviços pela quantidade de horas.</span>
+      </div>
+
+      <div class="form-group mt-4">
         <label>Frequência</label>
         <div class="recorrencia-options">
           <button type="button" class="rec-option" *ngFor="let r of recorrencias"
@@ -78,8 +91,14 @@
       </div>
 
       <div class="resumo-card">
-        <span>Total estimado</span>
-        <strong>R$ {{ precoSelecionado() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>
+        <div style="display:flex; flex-direction:column; gap:0.25rem; align-items: flex-start;">
+          <span>Total estimado</span>
+          <small style="opacity: 0.85; font-size:0.75rem; text-align: left; font-weight: normal; line-height: 1.2;">
+            Soma dos serviços: R$ {{ precoSelecionado() }}/h <br>
+            Duração contratada: {{ duracao() }}h
+          </small>
+        </div>
+        <strong>R$ {{ precoTotal() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>
       </div>
 
       <div class="error-banner" *ngIf="errorMessage()" style="margin-top:1rem;">{{ errorMessage() }}</div>

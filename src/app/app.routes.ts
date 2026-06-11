@@ -12,6 +12,7 @@ import { AgendarComponent } from './components/agendar/agendar.component';
 import { AgendaComponent } from './components/agenda/agenda.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { NotificacoesComponent } from './components/notificacoes/notificacoes.component';
+import { ConversasComponent } from './components/conversas/conversas.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -30,6 +31,7 @@ export const routes: Routes = [
 
   { path: 'chat/:id', component: ChatComponent },
   { path: 'notificacoes', component: NotificacoesComponent },
+  { path: 'conversas', component: ConversasComponent },
 
   { path: '**', redirectTo: '' }
 ];

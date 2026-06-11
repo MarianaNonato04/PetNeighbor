@@ -1,5 +1,6 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { Cuidador, TipoServico } from '../../models/interfaces';
@@ -15,9 +16,17 @@ export class CuidadorDetalheComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private supabase = inject(SupabaseService);
+  private sanitizer = inject(DomSanitizer);
 
   cuidador = signal<Cuidador | null>(null);
   isLoading = signal(true);
+
+  mapUrl = computed<SafeResourceUrl | null>(() => {
+    const c = this.cuidador();
+    if (!c || !c.cidade) return null;
+    const url = `https://maps.google.com/maps?q=${encodeURIComponent(c.cidade)}&z=14&output=embed`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  });
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));

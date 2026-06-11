@@ -12,12 +12,12 @@
       </div>
     </div>
     <div class="app-bar-actions">
+      <button class="icon-btn" routerLink="/conversas" aria-label="Conversas">
+        <span class="material-symbols-rounded">chat</span>
+      </button>
       <button class="icon-btn" routerLink="/notificacoes" aria-label="Notificações">
         <span class="material-symbols-rounded">notifications</span>
         <span class="notif-badge" *ngIf="naoLidas() > 0">{{ naoLidas() > 9 ? '9+' : naoLidas() }}</span>
-      </button>
-      <button class="icon-btn" routerLink="/perfil" aria-label="Perfil">
-        <span class="material-symbols-rounded">person</span>
       </button>
     </div>
   </header>

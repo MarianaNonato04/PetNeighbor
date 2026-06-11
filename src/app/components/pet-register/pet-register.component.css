@@ -17,8 +17,8 @@
 .back-btn {
   width: 38px;
   height: 38px;
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
   color: white;
   display: flex;
@@ -31,7 +31,7 @@
 }
 
 .back-btn:hover {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .header-text {
@@ -46,7 +46,7 @@
 
 .header-text p {
   font-size: 0.875rem;
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   margin-top: 0.125rem;
 }
 
@@ -73,11 +73,7 @@
   padding: 1.5rem;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
+
 
 .input-wrapper {
   position: relative;
@@ -110,9 +106,18 @@
 .btn-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255,255,255,0.35);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .pet-register-page .page-body {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2.5rem 1.5rem;
+  }
 }
