@@ -1,130 +1,1 @@
-<div class="profile-page" *ngIf="user() as u; else notLoggedIn">
-
-  <div class="profile-hero">
-    <!-- Mode: Visualização -->
-    <ng-container *ngIf="!editando()">
-      <div class="avatar-ring">
-        <div class="avatar">
-          <span class="material-symbols-rounded">person</span>
-        </div>
-      </div>
-      <h1 class="user-name">{{ u.nome }}</h1>
-      <p class="user-email">{{ u.email }}</p>
-      <span class="age-chip">{{ u.idade }} anos</span>
-
-      <button class="hero-edit-btn" (click)="iniciarEdicao(u)">
-        <span class="material-symbols-rounded">edit</span>
-        <span>Editar Perfil</span>
-      </button>
-    </ng-container>
-
-    <!-- Mode: Edição -->
-    <ng-container *ngIf="editando()">
-      <div class="avatar-ring">
-        <div class="avatar">
-          <span class="material-symbols-rounded">edit_square</span>
-        </div>
-      </div>
-
-      <div class="hero-edit-form">
-        <div class="hero-form-group">
-          <label class="hero-form-label" for="edit-nome">Nome</label>
-          <input id="edit-nome" type="text" [(ngModel)]="editNome" name="nome" class="hero-input" required>
-        </div>
-
-        <div class="hero-form-group">
-          <label class="hero-form-label" for="edit-idade">Idade</label>
-          <input id="edit-idade" type="number" [(ngModel)]="editIdade" name="idade" class="hero-input" required min="1">
-        </div>
-
-        <div class="hero-edit-actions">
-          <button class="hero-btn-cancel" (click)="cancelarEdicao()" title="Cancelar">
-            <span class="material-symbols-rounded">close</span>
-          </button>
-          <button class="hero-btn-save" (click)="salvarPerfil(u)" [disabled]="salvando()" title="Salvar">
-            <span class="material-symbols-rounded">{{ salvando() ? 'sync' : 'done' }}</span>
-          </button>
-        </div>
-
-        <div *ngIf="erroEdicao()" class="hero-error-msg">
-          {{ erroEdicao() }}
-        </div>
-      </div>
-    </ng-container>
-  </div>
-
-  <div class="page-body">
-
-    <div class="glass-card info-section">
-      <h2 class="section-label">Conta</h2>
-
-      <div class="divider"></div>
-
-      <div class="info-row">
-        <div class="info-icon info-icon--orange">
-          <span class="material-symbols-rounded">pets</span>
-        </div>
-        <div class="info-content">
-          <p class="info-label">Pets Cadastrados</p>
-          <p class="info-value">{{ qtdPets() }} {{ qtdPets() === 1 ? 'pet' : 'pets' }}</p>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="info-row">
-        <div class="info-icon info-icon--blue">
-          <span class="material-symbols-rounded">calendar_month</span>
-        </div>
-        <div class="info-content">
-          <p class="info-label">Agendamentos Realizados</p>
-          <p class="info-value">{{ qtdAgendamentos() }} {{ qtdAgendamentos() === 1 ? 'serviço' : 'serviços' }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass-card actions-card">
-      <h2 class="section-label">Ações</h2>
-
-      <button class="action-row" routerLink="/conversas">
-        <div class="info-icon info-icon--orange">
-          <span class="material-symbols-rounded">chat</span>
-        </div>
-        <span class="action-label">Minhas conversas</span>
-        <span class="material-symbols-rounded action-arrow">chevron_right</span>
-      </button>
-
-      <div class="divider"></div>
-
-      <button class="action-row" routerLink="/seja-cuidador">
-        <div class="info-icon info-icon--blue">
-          <span class="material-symbols-rounded">volunteer_activism</span>
-        </div>
-        <span class="action-label">Seja um cuidador</span>
-        <span class="material-symbols-rounded action-arrow">chevron_right</span>
-      </button>
-    </div>
-
-    <button class="logout-btn" (click)="logout()">
-      <span class="material-symbols-rounded">logout</span>
-      Sair da conta
-    </button>
-
-  </div>
-</div>
-
-<ng-template #notLoggedIn>
-  <div class="profile-page profile-page--unlogged">
-    <div class="not-logged-hero">
-      <div class="lock-art">
-        <span class="material-symbols-rounded">pets</span>
-      </div>
-      <h2>Bem-vindo ao PetNeighbor</h2>
-      <p>Entre na sua conta ou cadastre-se para acessar seu perfil.</p>
-    </div>
-    <div class="page-body">
-      <button routerLink="/login" class="btn-primary">Fazer login</button>
-      <button routerLink="/cadastro-usuario" class="btn-outline" style="margin-top:0.75rem;">Criar conta</button>
-    </div>
-  </div>
-</ng-template>
+<div class="profile-page" *ngIf="user() as u; else notLoggedIn">  <div class="profile-hero">    <ng-container *ngIf="!editando()">      <div class="avatar-ring">        <div class="avatar">          <span class="material-symbols-rounded">person</span>        </div>      </div>      <h1 class="user-name">{{ u.nome }}</h1>      <p class="user-email">{{ u.email }}</p>      <span class="age-chip">{{ u.idade }} anos</span>      <div class="hero-buttons-group">        <button class="hero-edit-btn" (click)="iniciarEdicao(u)">          <span class="material-symbols-rounded">edit</span>          <span>Editar Perfil</span>        </button>        <button class="hero-cuidador-btn" routerLink="/seja-cuidador" *ngIf="!cuidador()">          <span class="material-symbols-rounded">volunteer_activism</span>          <span>Seja um cuidador</span>        </button>      </div>    </ng-container>    <ng-container *ngIf="editando()">      <div class="avatar-ring">        <div class="avatar">          <span class="material-symbols-rounded">edit_square</span>        </div>      </div>      <div class="hero-edit-form">        <div class="hero-form-group">          <label class="hero-form-label" for="edit-nome">Nome</label>          <input id="edit-nome" type="text" [(ngModel)]="editNome" name="nome" class="hero-input" required>        </div>        <div class="hero-form-group">          <label class="hero-form-label" for="edit-idade">Idade</label>          <input id="edit-idade" type="number" [(ngModel)]="editIdade" name="idade" class="hero-input" required min="1">        </div>        <div class="hero-edit-actions">          <button class="hero-btn-cancel" (click)="cancelarEdicao()" title="Cancelar">            <span class="material-symbols-rounded">close</span>          </button>          <button class="hero-btn-save" (click)="salvarPerfil(u)" [disabled]="salvando()" title="Salvar">            <span class="material-symbols-rounded">{{ salvando() ? 'sync' : 'done' }}</span>          </button>        </div>        <div *ngIf="erroEdicao()" class="hero-error-msg">          {{ erroEdicao() }}        </div>      </div>    </ng-container>  </div>  <div class="page-body">    <div class="glass-card info-section">      <h2 class="section-label">Conta</h2>      <div class="divider"></div>      <div class="info-row">        <div class="info-icon info-icon--orange">          <span class="material-symbols-rounded">pets</span>        </div>        <div class="info-content">          <p class="info-label">Pets Cadastrados</p>          <p class="info-value">{{ qtdPets() }} {{ qtdPets() === 1 ? 'pet' : 'pets' }}</p>        </div>      </div>      <div class="divider"></div>      <div class="info-row">        <div class="info-icon info-icon--blue">          <span class="material-symbols-rounded">calendar_month</span>        </div>        <div class="info-content">          <p class="info-label">Agendamentos Realizados</p>          <p class="info-value">{{ qtdAgendamentos() }} {{ qtdAgendamentos() === 1 ? 'serviço' : 'serviços' }}</p>        </div>      </div>    </div>    <div class="user-posts-section">      <h2 class="section-label">Minhas Publicações</h2>      <div *ngIf="isLoadingPosts()" class="state-box">        <div class="spinner"></div>        <p>Buscando suas publicações...</p>      </div>      <div *ngIf="!isLoadingPosts() && posts().length === 0" class="empty-state glass-card">        <div class="empty-art">          <span class="material-symbols-rounded">feed</span>        </div>        <h3>Você não fez nenhuma publicação ainda</h3>        <p>Compartilhe novidades dos seus pets no feed da página inicial!</p>      </div>      <div class="posts-list" *ngIf="!isLoadingPosts() && posts().length > 0">        <div class="post-card glass-card" *ngFor="let post of posts()">          <div class="post-card-header">            <div class="post-author-avatar">              <img *ngIf="post.autor_foto; else defaultAvatar" [src]="post.autor_foto" alt="Foto do autor">              <ng-template #defaultAvatar>                <div class="avatar-fallback">                  <span class="material-symbols-rounded">person</span>                </div>              </ng-template>            </div>            <div class="post-author-info">              <h3>{{ post.autor_nome }}</h3>              <div class="post-sub-info">                <span class="badge-role" [class.badge-tutor]="post.autor_tipo === 'tutor'">                  {{ post.autor_tipo === 'tutor' ? 'Tutor' : 'Cuidador' }}                </span>                <span class="time-dot">•</span>                <span class="time-label">{{ tempoRelativo(post.created_at) }}</span>              </div>            </div>            <button class="btn-edit-post-trigger" *ngIf="podeEditar(post) && editingPostId() !== post.id_post"              (click)="iniciarEdicaoPost(post)" title="Editar publicação">              <span class="material-symbols-rounded">edit</span>            </button>          </div>          <div class="post-card-body" *ngIf="editingPostId() === post.id_post">            <textarea [(ngModel)]="editTexto" class="composer-textarea edit-textarea mb-2" rows="2"></textarea>            <div class="composer-previews" *ngIf="editFotos().length > 0">              <div class="preview-thumb" *ngFor="let url of editFotos(); let i = index">                <img [src]="url" alt="Preview">                <button class="btn-remove-thumb" (click)="removerFotoEdit(i)" title="Remover">                  <span class="material-symbols-rounded">close</span>                </button>              </div>            </div>            <div class="composer-file-upload" *ngIf="editFotos().length < 4">              <label class="btn-upload-file">                <span class="material-symbols-rounded">add_a_photo</span>                <span>Adicionar fotos da galeria</span>                <input type="file" accept="image/*" multiple (change)="onFileSelected($event, true)"                  style="display: none;">              </label>            </div>            <div class="edit-actions-row">              <span class="photo-counter" [class.counter-max]="editFotos().length === 4">                <span class="material-symbols-rounded">image</span>                {{ editFotos().length }}/4 fotos              </span>              <div class="edit-buttons-group">                <button class="btn-action btn-danger" (click)="cancelarEdicaoPost()">Cancelar</button>                <button class="btn-action btn-success" (click)="salvarEdicaoPost(post)"                  [disabled]="!editTexto().trim()">Salvar</button>              </div>            </div>          </div>          <div class="post-card-body" *ngIf="editingPostId() !== post.id_post">            <p class="post-text">{{ post.descricao }}</p>            <div *ngIf="post.fotos && post.fotos.length > 0" class="instagram-carousel">              <div class="carousel-track" (scroll)="onCarouselScroll($event, post)" #carouselTrack>                <div class="carousel-slide" *ngFor="let foto of post.fotos; let idx = index">                  <img [src]="foto" alt="Foto {{ idx + 1 }} de {{ post.autor_nome }}" loading="lazy">                </div>              </div>              <button *ngIf="post.fotos.length > 1" class="carousel-nav prev" (click)="prevSlide(carouselTrack)"                aria-label="Foto anterior">                <span class="material-symbols-rounded">chevron_left</span>              </button>              <button *ngIf="post.fotos.length > 1" class="carousel-nav next" (click)="nextSlide(carouselTrack)"                aria-label="Próxima foto">                <span class="material-symbols-rounded">chevron_right</span>              </button>              <div class="carousel-indicators" *ngIf="post.fotos.length > 1">                <span *ngFor="let dot of post.fotos; let idx = index" class="indicator-dot"                  [class.active]="(post.activeSlideIndex || 0) === idx"></span>              </div>              <span class="carousel-badge" *ngIf="post.fotos.length > 1">                {{ (post.activeSlideIndex || 0) + 1 }}/{{ post.fotos.length }}              </span>            </div>          </div>          <div class="post-card-actions" *ngIf="editingPostId() !== post.id_post">            <button class="action-btn" [class.action-btn--active]="post.curtido_por_mim" (click)="curtirPost(post)">              <span class="material-symbols-rounded">{{ post.curtido_por_mim ? 'favorite' : 'favorite_border' }}</span>              <span>Curtir ({{ post.qtd_curtidas || 0 }})</span>            </button>            <button class="action-btn" [class.action-btn--comments]="activeCommentsPostId() === post.id_post"              (click)="toggleComentarios(post)">              <span class="material-symbols-rounded">chat_bubble_outline</span>              <span>Comentários</span>            </button>          </div>          <div class="comments-section"            *ngIf="activeCommentsPostId() === post.id_post && editingPostId() !== post.id_post">            <div class="divider"></div>            <div *ngIf="loadingComments().get(post.id_post!)" class="state-box-comments">              <div class="spinner spinner-small"></div>              <p>Carregando comentários...</p>            </div>            <div class="comment-input-box" *ngIf="supabase.currentUser() || supabase.currentCuidador()">              <input type="text" placeholder="Escreva um comentário..." [ngModel]="getCommentText(post.id_post!)"                (ngModelChange)="updateCommentText(post.id_post!, $event)" class="comment-input"                (keyup.enter)="comentar(post)">              <button class="btn-send-comment" (click)="comentar(post)"                [disabled]="!getCommentText(post.id_post!).trim()">                <span class="material-symbols-rounded">send</span>              </button>            </div>            <div class="comments-list" *ngIf="!loadingComments().get(post.id_post!)">              <div class="comment-item" *ngFor="let c of comentariosMap().get(post.id_post!) || []">                <div class="comment-avatar">                  <img *ngIf="c.autor_foto; else commentDefaultAvatar" [src]="c.autor_foto" alt="Foto do comentador">                  <ng-template #commentDefaultAvatar>                    <div class="avatar-fallback-small">                      <span class="material-symbols-rounded">person</span>                    </div>                  </ng-template>                </div>                <div class="comment-bubble">                  <div class="comment-bubble-header">                    <h4>{{ c.autor_nome }}</h4>                    <span class="comment-time">{{ tempoRelativo(c.created_at) }}</span>                  </div>                  <p class="comment-text">{{ c.conteudo }}</p>                </div>              </div>              <p class="no-comments-msg" *ngIf="(comentariosMap().get(post.id_post!) || []).length === 0">                Ainda não há comentários.              </p>            </div>          </div>        </div>      </div>    </div>    <button class="logout-btn" (click)="logout()">      <span class="material-symbols-rounded">logout</span>      Sair da conta    </button>  </div></div><ng-template #notLoggedIn>  <div class="profile-page profile-page--unlogged">    <div class="not-logged-hero">      <div class="lock-art">        <span class="material-symbols-rounded">pets</span>      </div>      <h2>Bem-vindo ao PetNeighbor</h2>      <p>Entre na sua conta ou cadastre-se para acessar seu perfil.</p>    </div>    <div class="page-body">      <button routerLink="/login" class="btn-primary">Fazer login</button>      <button routerLink="/cadastro-usuario" class="btn-outline" style="margin-top:0.75rem;">Criar conta</button>    </div>  </div></ng-template>

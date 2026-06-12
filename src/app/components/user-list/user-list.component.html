@@ -6,21 +6,17 @@
       <span *ngIf="isLoading()">...</span>
     </button>
   </div>
-
   <div class="content">
     <div *ngIf="isLoading()" class="loading-state">
       <div class="spinner"></div>
       <p>Carregando usuários...</p>
     </div>
-
     <div *ngIf="errorMessage()" class="error-banner">
       {{ errorMessage() }}
     </div>
-
     <div *ngIf="!isLoading() && users().length === 0" class="empty-state">
       <p>Nenhum usuário encontrado.</p>
     </div>
-
     <div class="table-container" *ngIf="!isLoading() && users().length > 0">
       <table>
         <thead>

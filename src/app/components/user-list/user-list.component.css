@@ -4,20 +4,17 @@
   margin-top: 2rem;
   padding: 2rem;
 }
-
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
 }
-
 .header h2 {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
 }
-
 .btn-refresh {
   background: var(--surface-light);
   border: 1px solid var(--border-color);
@@ -28,24 +25,20 @@
   font-size: 0.875rem;
   transition: all 0.3s ease;
 }
-
 .btn-refresh:hover {
   background: var(--surface-lighter);
   border-color: var(--primary-color);
 }
-
 .table-container {
   overflow-x: auto;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
 }
-
 th {
   padding: 1rem;
   font-size: 0.75rem;
@@ -54,30 +47,24 @@ th {
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border-color);
 }
-
 td {
   padding: 1rem;
   font-size: 0.875rem;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-color);
 }
-
 tr:last-child td {
   border-bottom: none;
 }
-
 tr:hover td {
   background: rgba(255, 255, 255, 0.03);
 }
-
 .user-name {
   font-weight: 600;
 }
-
 .user-email {
   color: var(--text-secondary);
 }
-
 .loading-state, .empty-state {
   display: flex;
   flex-direction: column;
@@ -86,7 +73,6 @@ tr:hover td {
   padding: 3rem;
   color: var(--text-secondary);
 }
-
 .spinner {
   width: 30px;
   height: 30px;
@@ -96,11 +82,9 @@ tr:hover td {
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
 .error-banner {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);

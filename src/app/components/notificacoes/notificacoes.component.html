@@ -1,54 +1,1 @@
-<div class="notif-page">
-
-  <header class="page-header">
-    <button class="back-btn" routerLink="/" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <div class="header-text">
-      <h1>Notificações</h1>
-      <p>{{ naoLidas() }} não lida(s)</p>
-    </div>
-    <button class="mark-all" *ngIf="naoLidas() > 0" (click)="marcarTodas()" aria-label="Marcar todas como lidas">
-      <span class="material-symbols-rounded">done_all</span>
-    </button>
-  </header>
-
-  <div class="page-body">
-
-    <ng-container *ngIf="isLoggedIn(); else loginRequired">
-
-      <div *ngIf="notificacoes().length === 0" class="empty-state glass-card">
-        <div class="empty-art"><span class="material-symbols-rounded">notifications_off</span></div>
-        <h3>Tudo em dia</h3>
-        <p>Você não tem notificações no momento.</p>
-      </div>
-
-      <div class="notif-list" *ngIf="notificacoes().length > 0">
-        <button class="notif-card" *ngFor="let n of notificacoes()"
-          [class.notif-card--unread]="!n.lida" (click)="marcarLida(n)">
-          <div class="notif-icon" [attr.data-tipo]="n.tipo">
-            <span class="material-symbols-rounded">{{ icone(n.tipo) }}</span>
-          </div>
-          <div class="notif-content">
-            <div class="notif-head">
-              <h3>{{ n.titulo }}</h3>
-              <span class="notif-time">{{ tempoRelativo(n.created_at) }}</span>
-            </div>
-            <p>{{ n.mensagem }}</p>
-          </div>
-          <span class="unread-dot" *ngIf="!n.lida"></span>
-        </button>
-      </div>
-
-    </ng-container>
-
-    <ng-template #loginRequired>
-      <div class="glass-card text-center" style="margin-top:1rem;">
-        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
-        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver suas notificações.</p>
-        <button routerLink="/login" class="btn-primary">Fazer login</button>
-      </div>
-    </ng-template>
-
-  </div>
-</div>
+<div class="notif-page">  <header class="page-header">    <button class="back-btn" routerLink="/" aria-label="Voltar">      <span class="material-symbols-rounded">arrow_back</span>    </button>    <div class="header-text">      <h1>Notificações</h1>      <p>{{ naoLidas() }} não lida(s)</p>    </div>    <button class="mark-all" *ngIf="naoLidas() > 0" (click)="marcarTodas()" aria-label="Marcar todas como lidas">      <span class="material-symbols-rounded">done_all</span>    </button>  </header>  <div class="page-body">    <ng-container *ngIf="isLoggedIn(); else loginRequired">      <div *ngIf="notificacoes().length === 0" class="empty-state glass-card">        <div class="empty-art"><span class="material-symbols-rounded">notifications_off</span></div>        <h3>Tudo em dia</h3>        <p>Você não tem notificações no momento.</p>      </div>      <div class="notif-list" *ngIf="notificacoes().length > 0">        <button class="notif-card" *ngFor="let n of notificacoes()"          [class.notif-card--unread]="!n.lida" (click)="marcarLida(n)">          <div class="notif-icon" [attr.data-tipo]="n.tipo">            <span class="material-symbols-rounded">{{ icone(n.tipo) }}</span>          </div>          <div class="notif-content">            <div class="notif-head">              <h3>{{ n.titulo }}</h3>              <span class="notif-time">{{ tempoRelativo(n.created_at) }}</span>            </div>            <p>{{ n.mensagem }}</p>          </div>          <span class="unread-dot" *ngIf="!n.lida"></span>        </button>      </div>    </ng-container>    <ng-template #loginRequired>      <div class="glass-card text-center" style="margin-top:1rem;">        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver suas notificações.</p>        <button routerLink="/login" class="btn-primary">Fazer login</button>      </div>    </ng-template>  </div></div>

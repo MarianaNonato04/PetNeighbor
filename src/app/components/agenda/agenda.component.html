@@ -1,77 +1,1 @@
-<div class="agenda-page">
-
-  <header class="page-header">
-    <div class="header-text">
-      <h1>Agenda</h1>
-      <p>Seus agendamentos de cuidados</p>
-    </div>
-    <span class="material-symbols-rounded header-icon">calendar_month</span>
-  </header>
-
-  <div class="page-body">
-
-    <ng-container *ngIf="isLoggedIn(); else loginRequired">
-
-      <div class="tabs">
-        <button class="tab" [class.tab--on]="filtro() === 'Próximos'" (click)="filtro.set('Próximos')">Próximos</button>
-        <button class="tab" [class.tab--on]="filtro() === 'Histórico'" (click)="filtro.set('Histórico')">Histórico</button>
-      </div>
-
-      <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando agenda...</p></div>
-
-      <div *ngIf="!isLoading() && agendamentosFiltrados().length === 0" class="empty-state glass-card">
-        <div class="empty-art"><span class="material-symbols-rounded">event_busy</span></div>
-        <h3>Nada por aqui</h3>
-        <p>{{ filtro() === 'Próximos' ? 'Você não tem agendamentos ativos.' : 'Sem histórico ainda.' }}</p>
-        <button routerLink="/explorar" class="btn-primary" style="margin-top:1.25rem;">
-          <span class="material-symbols-rounded" style="font-size:1.125rem;">search</span>
-          Encontrar cuidador
-        </button>
-      </div>
-
-      <div class="ag-list" *ngIf="!isLoading() && agendamentosFiltrados().length > 0">
-        <div class="ag-card glass-card" *ngFor="let a of agendamentosFiltrados()">
-          <div class="ag-top">
-            <div class="ag-servico-icon">
-              <span class="material-symbols-rounded">{{ iconeServico(a.tipo_servico) }}</span>
-            </div>
-            <div class="ag-headline">
-              <h3>{{ a.tipo_servico }}</h3>
-              <p>com {{ a.nome_cuidador }} • {{ a.nome_pet }}</p>
-            </div>
-            <span class="status-badge" [attr.data-status]="a.status">
-              <span class="material-symbols-rounded">{{ iconeStatus(a.status) }}</span>
-              {{ a.status }}
-            </span>
-          </div>
-
-          <div class="ag-meta">
-            <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data) }}</span>
-            <span class="ag-meta-item"><span class="material-symbols-rounded">schedule</span>{{ a.hora }}</span>
-            <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia }}</span>
-            <span class="ag-meta-item ag-price">R$ {{ a.preco }}</span>
-          </div>
-
-          <p class="ag-obs" *ngIf="a.observacoes">"{{ a.observacoes }}"</p>
-
-          <div class="ag-actions" *ngIf="a.status === 'Pendente' || a.status === 'Confirmado'">
-            <button class="ag-cancel" (click)="cancelar(a)">
-              <span class="material-symbols-rounded">close</span>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </ng-container>
-
-    <ng-template #loginRequired>
-      <div class="glass-card text-center" style="margin-top:1rem;">
-        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
-        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver sua agenda.</p>
-        <button routerLink="/login" class="btn-primary">Fazer login</button>
-      </div>
-    </ng-template>
-
-  </div>
-</div>
+<div class="agenda-page">  <header class="page-header">    <div class="header-text">      <h1>Agenda</h1>      <p>Seus agendamentos de cuidados</p>    </div>    <span class="material-symbols-rounded header-icon">calendar_month</span>  </header>  <div class="page-body">    <ng-container *ngIf="isLoggedIn(); else loginRequired">      <div class="tabs">        <button class="tab" [class.tab--on]="filtro() === 'Próximos'" (click)="filtro.set('Próximos')">Próximos</button>        <button class="tab" [class.tab--on]="filtro() === 'Histórico'" (click)="filtro.set('Histórico')">Histórico</button>      </div>      <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando agenda...</p></div>      <div *ngIf="!isLoading() && agendamentosFiltrados().length === 0" class="empty-state glass-card">        <div class="empty-art"><span class="material-symbols-rounded">event_busy</span></div>        <h3>Nada por aqui</h3>        <p>{{ filtro() === 'Próximos' ? 'Você não tem agendamentos ativos.' : 'Sem histórico ainda.' }}</p>        <button routerLink="/explorar" class="btn-primary" style="margin-top:1.25rem;">          <span class="material-symbols-rounded" style="font-size:1.125rem;">search</span>          Encontrar cuidador        </button>      </div>      <div class="ag-list" *ngIf="!isLoading() && agendamentosFiltrados().length > 0">        <div class="ag-card glass-card" *ngFor="let a of agendamentosFiltrados()">          <div class="ag-top">            <div class="ag-servico-icon">              <span class="material-symbols-rounded">{{ iconeServico(a.tipo_servico) }}</span>            </div>            <div class="ag-headline">              <h3>{{ a.tipo_servico }}</h3>              <p>com {{ a.nome_cuidador }} • {{ a.nome_pet }}</p>            </div>            <span class="status-badge" [attr.data-status]="a.status">              <span class="material-symbols-rounded">{{ iconeStatus(a.status) }}</span>              {{ a.status }}            </span>          </div>          <div class="ag-meta">            <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data) }}</span>            <span class="ag-meta-item"><span class="material-symbols-rounded">schedule</span>{{ a.hora }}</span>            <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia }}</span>            <span class="ag-meta-item ag-price">R$ {{ a.preco }}</span>          </div>          <p class="ag-obs" *ngIf="a.observacoes">"{{ a.observacoes }}"</p>          <div class="ag-actions" *ngIf="a.status === 'Pendente' || a.status === 'Confirmado'">            <button class="ag-cancel" (click)="cancelar(a)">              <span class="material-symbols-rounded">close</span>              Cancelar            </button>          </div>        </div>      </div>    </ng-container>    <ng-template #loginRequired>      <div class="glass-card text-center" style="margin-top:1rem;">        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver sua agenda.</p>        <button routerLink="/login" class="btn-primary">Fazer login</button>      </div>    </ng-template>  </div></div>

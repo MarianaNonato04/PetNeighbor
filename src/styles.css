@@ -110,6 +110,8 @@ h1, h2, h3 {
 
   /* Desktop overrides for form-cards on login/register */
   .auth-body {
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem 1.5rem;

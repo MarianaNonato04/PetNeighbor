@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService, User } from '../../services/user.service';
-
 @Component({
   selector: 'app-user-list',
   standalone: true,
@@ -11,15 +10,12 @@ import { UserService, User } from '../../services/user.service';
 })
 export class UserListComponent implements OnInit {
   private userService = inject(UserService);
-
   users = signal<User[]>([]);
   isLoading = signal(true);
   errorMessage = signal('');
-
   ngOnInit() {
     this.fetchUsers();
   }
-
   fetchUsers() {
     this.isLoading.set(true);
     this.userService.getUsers().subscribe({

@@ -1,115 +1,1 @@
-<div class="agendar-page">
-
-  <header class="page-header">
-    <button class="back-btn" routerLink="/explorar" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <div class="header-text">
-      <h1>Agendar serviço</h1>
-      <p *ngIf="cuidador() as c">com {{ c.nome }}</p>
-    </div>
-  </header>
-
-  <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando...</p></div>
-
-  <div class="page-body" *ngIf="!isLoading() && cuidador() as c">
-
-    <div class="glass-card no-pets" *ngIf="pets().length === 0">
-      <span class="material-symbols-rounded">pets</span>
-      <p>Você precisa cadastrar um pet antes de agendar.</p>
-      <button routerLink="/cadastro-pet" class="btn-primary mt-4">Cadastrar pet</button>
-    </div>
-
-    <form *ngIf="pets().length > 0" (ngSubmit)="confirmar()">
-
-      <div class="form-group">
-        <label>Para qual pet?</label>
-        <div class="pet-options">
-          <button type="button" class="pet-option" *ngFor="let p of pets()"
-            [class.pet-option--on]="petSelecionado() === p.id_pet" (click)="petSelecionado.set(p.id_pet!)">
-            <span class="material-symbols-rounded">pet_supplies</span>
-            {{ p.nome_pet }}
-          </button>
-        </div>
-      </div>
-
-      <div class="form-group mt-4">
-        <label>Serviços desejados</label>
-        <div class="servico-options">
-          <button type="button" class="servico-option" *ngFor="let s of servicosDisponiveis()"
-            [class.servico-option--on]="isServicoSelecionado(s)" (click)="toggleServico(s)">
-            <span class="material-symbols-rounded">{{
-              s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite'
-            }}</span>
-            <span class="servico-option-nome">{{ s }}</span>
-            <span class="servico-option-preco">R$ {{
-              s === 'Passeio' ? c.preco_passeio : s === 'Alimentação' ? c.preco_alimentacao : c.preco_companhia
-            }} / hora</span>
-            <span class="material-symbols-rounded select-indicator" style="font-size: 1.25rem; color: var(--color-terracota);">
-              {{ isServicoSelecionado(s) ? 'check_box' : 'check_box_outline_blank' }}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div class="form-row mt-4">
-        <div class="form-group">
-          <label for="data">Data</label>
-          <input id="data" type="date" class="input-field" [min]="hoje()"
-            [ngModel]="data()" (ngModelChange)="data.set($event)" name="data">
-        </div>
-        <div class="form-group">
-          <label for="hora">Horário</label>
-          <input id="hora" type="time" class="input-field"
-            [ngModel]="hora()" (ngModelChange)="hora.set($event)" name="hora">
-        </div>
-      </div>
-
-      <div class="form-group mt-4">
-        <label for="duracao">Duração do atendimento</label>
-        <div style="display:flex; align-items:center; gap:0.75rem;">
-          <input id="duracao" type="number" class="input-field" min="1" max="12" style="max-width: 120px;"
-            [ngModel]="duracao()" (ngModelChange)="duracao.set($event)" name="duracao">
-          <span style="font-size:0.9rem; font-weight: 600; color:var(--text-secondary);">hora(s)</span>
-        </div>
-        <span class="hint-msg">O valor final é calculado multiplicando a soma dos serviços pela quantidade de horas.</span>
-      </div>
-
-      <div class="form-group mt-4">
-        <label>Frequência</label>
-        <div class="recorrencia-options">
-          <button type="button" class="rec-option" *ngFor="let r of recorrencias"
-            [class.rec-option--on]="recorrencia() === r" (click)="recorrencia.set(r)">{{ r }}</button>
-        </div>
-        <span class="hint-msg">"Único" agenda um dia; "Diário"/"Semanal" repetem conforme disponibilidade.</span>
-      </div>
-
-      <div class="form-group mt-4">
-        <label for="obs">Observações</label>
-        <textarea id="obs" rows="2" class="input-field" placeholder="Instruções para o cuidador..."
-          [ngModel]="observacoes()" (ngModelChange)="observacoes.set($event)" name="obs"></textarea>
-      </div>
-
-      <div class="resumo-card">
-        <div style="display:flex; flex-direction:column; gap:0.25rem; align-items: flex-start;">
-          <span>Total estimado</span>
-          <small style="opacity: 0.85; font-size:0.75rem; text-align: left; font-weight: normal; line-height: 1.2;">
-            Soma dos serviços: R$ {{ precoSelecionado() }}/h <br>
-            Duração contratada: {{ duracao() }}h
-          </small>
-        </div>
-        <strong>R$ {{ precoTotal() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>
-      </div>
-
-      <div class="error-banner" *ngIf="errorMessage()" style="margin-top:1rem;">{{ errorMessage() }}</div>
-
-      <button type="submit" class="btn-primary" style="margin-top:1.25rem;" [disabled]="isSubmitting()">
-        <span *ngIf="!isSubmitting()">Confirmar agendamento</span>
-        <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">
-          <span class="btn-spinner"></span> Agendando...
-        </span>
-      </button>
-
-    </form>
-  </div>
-</div>
+<div class="agendar-page">  <header class="page-header">    <button class="back-btn" routerLink="/explorar" aria-label="Voltar">      <span class="material-symbols-rounded">arrow_back</span>    </button>    <div class="header-text">      <h1>Agendar serviço</h1>      <p *ngIf="cuidador() as c">com {{ c.nome }}</p>    </div>  </header>  <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando...</p></div>  <div class="page-body" *ngIf="!isLoading() && cuidador() as c">    <div class="glass-card no-pets" *ngIf="pets().length === 0">      <span class="material-symbols-rounded">pets</span>      <p>Você precisa cadastrar um pet antes de agendar.</p>      <button routerLink="/cadastro-pet" class="btn-primary mt-4">Cadastrar pet</button>    </div>    <form *ngIf="pets().length > 0" (ngSubmit)="confirmar()">      <div class="form-group">        <label>Para qual pet?</label>        <div class="pet-options">          <button type="button" class="pet-option" *ngFor="let p of pets()"            [class.pet-option--on]="petSelecionado() === p.id_pet" (click)="petSelecionado.set(p.id_pet!)">            <span class="material-symbols-rounded">pet_supplies</span>            {{ p.nome_pet }}          </button>        </div>      </div>      <div class="form-group mt-4">        <label>Serviços desejados</label>        <div class="servico-options">          <button type="button" class="servico-option" *ngFor="let s of servicosDisponiveis()"            [class.servico-option--on]="isServicoSelecionado(s)" (click)="toggleServico(s)">            <span class="material-symbols-rounded">{{              s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite'            }}</span>            <span class="servico-option-nome">{{ s }}</span>            <span class="servico-option-preco">R$ {{              s === 'Passeio' ? c.preco_passeio : s === 'Alimentação' ? c.preco_alimentacao : c.preco_companhia            }} / hora</span>            <span class="material-symbols-rounded select-indicator" style="font-size: 1.25rem; color: var(--color-terracota);">              {{ isServicoSelecionado(s) ? 'check_box' : 'check_box_outline_blank' }}            </span>          </button>        </div>      </div>      <div class="form-row mt-4">        <div class="form-group">          <label for="data">Data</label>          <input id="data" type="date" class="input-field" [min]="hoje()"            [ngModel]="data()" (ngModelChange)="data.set($event)" name="data">        </div>        <div class="form-group">          <label for="hora">Horário</label>          <input id="hora" type="time" class="input-field"            [ngModel]="hora()" (ngModelChange)="hora.set($event)" name="hora">        </div>      </div>      <div class="form-group mt-4">        <label for="duracao">Duração do atendimento</label>        <div style="display:flex; align-items:center; gap:0.75rem;">          <input id="duracao" type="number" class="input-field" min="1" max="12" style="max-width: 120px;"            [ngModel]="duracao()" (ngModelChange)="duracao.set($event)" name="duracao">          <span style="font-size:0.9rem; font-weight: 600; color:var(--text-secondary);">hora(s)</span>        </div>        <span class="hint-msg">O valor final é calculado multiplicando a soma dos serviços pela quantidade de horas.</span>      </div>      <div class="form-group mt-4">        <label>Frequência</label>        <div class="recorrencia-options">          <button type="button" class="rec-option" *ngFor="let r of recorrencias"            [class.rec-option--on]="recorrencia() === r" (click)="recorrencia.set(r)">{{ r }}</button>        </div>        <span class="hint-msg">"Único" agenda um dia; "Diário"/"Semanal" repetem conforme disponibilidade.</span>      </div>      <div class="form-group mt-4">        <label for="obs">Observações</label>        <textarea id="obs" rows="2" class="input-field" placeholder="Instruções para o cuidador..."          [ngModel]="observacoes()" (ngModelChange)="observacoes.set($event)" name="obs"></textarea>      </div>      <div class="resumo-card">        <div style="display:flex; flex-direction:column; gap:0.25rem; align-items: flex-start;">          <span>Total estimado</span>          <small style="opacity: 0.85; font-size:0.75rem; text-align: left; font-weight: normal; line-height: 1.2;">            Soma dos serviços: R$ {{ precoSelecionado() }}/h <br>            Duração contratada: {{ duracao() }}h          </small>        </div>        <strong>R$ {{ precoTotal() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>      </div>      <div class="error-banner" *ngIf="errorMessage()" style="margin-top:1rem;">{{ errorMessage() }}</div>      <button type="submit" class="btn-primary" style="margin-top:1.25rem;" [disabled]="isSubmitting()">        <span *ngIf="!isSubmitting()">Confirmar agendamento</span>        <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">          <span class="btn-spinner"></span> Agendando...        </span>      </button>    </form>  </div></div>

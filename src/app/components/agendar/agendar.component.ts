@@ -1,152 +1,1 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { SupabaseService } from '../../services/supabase.service';
-import {
-  Cuidador, Pet, TipoServico, Recorrencia, Agendamento
-} from '../../models/interfaces';
-
-@Component({
-  selector: 'app-agendar',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './agendar.component.html',
-  styleUrls: ['./agendar.component.css']
-})
-export class AgendarComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private supabase = inject(SupabaseService);
-
-  cuidador = signal<Cuidador | null>(null);
-  pets = signal<Pet[]>([]);
-  isLoading = signal(true);
-  isSubmitting = signal(false);
-  errorMessage = signal('');
-  recorrencias: Recorrencia[] = ['Único', 'Diário', 'Semanal'];
-
-  petSelecionado = signal<number | null>(null);
-  servicosSelecionados = signal<TipoServico[]>([]);
-  duracao = signal<number>(1);
-  data = signal<string>('');
-  hora = signal<string>('09:00');
-  recorrencia = signal<Recorrencia>('Único');
-  observacoes = signal<string>('');
-
-  servicosDisponiveis = computed<TipoServico[]>(() => this.cuidador()?.servicos ?? []);
-
-  precoSelecionado = computed<number>(() => {
-    const c = this.cuidador();
-    const selecionados = this.servicosSelecionados();
-    if (!c || selecionados.length === 0) return 0;
-    
-    let somaPorHora = 0;
-    selecionados.forEach(s => {
-      const preco = { 
-        'Passeio': c.preco_passeio, 
-        'Alimentação': c.preco_alimentacao, 
-        'Companhia': c.preco_companhia 
-      }[s] || 0;
-      somaPorHora += preco;
-    });
-    return somaPorHora;
-  });
-
-  precoTotal = computed<number>(() => {
-    return this.precoSelecionado() * this.duracao();
-  });
-
-  toggleServico(s: TipoServico) {
-    const list = this.servicosSelecionados();
-    if (list.includes(s)) {
-      this.servicosSelecionados.set(list.filter(x => x !== s));
-    } else {
-      this.servicosSelecionados.set([...list, s]);
-    }
-  }
-
-  isServicoSelecionado(s: TipoServico): boolean {
-    return this.servicosSelecionados().includes(s);
-  }
-
-  ngOnInit() {
-    const tutor = this.supabase.currentUser();
-    if (!tutor) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.data.set(new Date().toISOString().split('T')[0]);
-
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.supabase.getCuidador(id).subscribe({
-      next: data => {
-        const c = data?.[0] ?? null;
-        this.cuidador.set(c);
-        if (c?.servicos?.length) this.servicosSelecionados.set([c.servicos[0]]);
-        this.isLoading.set(false);
-      },
-      error: () => this.isLoading.set(false)
-    });
-
-    this.supabase.getPetsByUser(tutor.id_user!).subscribe({
-      next: pets => {
-        this.pets.set(pets || []);
-        if (pets?.length) this.petSelecionado.set(pets[0].id_pet!);
-      }
-    });
-  }
-
-  hoje(): string {
-    return new Date().toISOString().split('T')[0];
-  }
-
-  confirmar() {
-    this.errorMessage.set('');
-    const tutor = this.supabase.currentUser();
-    const c = this.cuidador();
-
-    if (!tutor || !c) return;
-    if (!this.petSelecionado()) { this.errorMessage.set('Cadastre ou selecione um pet.'); return; }
-    if (this.servicosSelecionados().length === 0) { this.errorMessage.set('Selecione pelo menos um serviço.'); return; }
-    if (!this.data()) { this.errorMessage.set('Escolha uma data.'); return; }
-    if (!this.duracao() || this.duracao() < 1) { this.errorMessage.set('A duração deve ser de pelo menos 1 hora.'); return; }
-
-    this.isSubmitting.set(true);
-    const agendamento: Agendamento = {
-      id_user: tutor.id_user!,
-      id_cuidador: c.id_cuidador!,
-      id_pet: this.petSelecionado()!,
-      tipo_servico: this.servicosSelecionados().join(', ') as any,
-      data: this.data(),
-      hora: this.hora(),
-      recorrencia: this.recorrencia(),
-      preco: this.precoTotal(),
-      observacoes: `${this.observacoes()}${this.observacoes() ? ' | ' : ''}Duração: ${this.duracao()}h`,
-      status: 'Pendente'
-    };
-
-    this.supabase.createAgendamento(agendamento).subscribe({
-      next: created => {
-
-        this.supabase.createNotificacao({
-          id_user: tutor.id_user!,
-          tipo: 'agendamento',
-          titulo: 'Solicitação enviada',
-          mensagem: `Seu pedido de ${agendamento.tipo_servico} com ${c.nome} foi enviado e aguarda confirmação.`,
-          lida: false,
-          id_agendamento: created?.[0]?.id_agendamento
-        }).subscribe({ error: e => console.error(e) });
-
-        this.isSubmitting.set(false);
-        this.router.navigate(['/agenda']);
-      },
-      error: err => {
-        console.error(err);
-        this.isSubmitting.set(false);
-        this.errorMessage.set('Não foi possível criar o agendamento. Tente novamente.');
-      }
-    });
-  }
-}
+import { Component, OnInit, signal, computed, inject } from '@angular/core';import { CommonModule } from '@angular/common';import { FormsModule } from '@angular/forms';import { ActivatedRoute, Router, RouterModule } from '@angular/router';import { SupabaseService } from '../../services/supabase.service';import {  Cuidador, Pet, TipoServico, Recorrencia, Agendamento} from '../../models/interfaces';@Component({  selector: 'app-agendar',  standalone: true,  imports: [CommonModule, FormsModule, RouterModule],  templateUrl: './agendar.component.html',  styleUrls: ['./agendar.component.css']})export class AgendarComponent implements OnInit {  private route = inject(ActivatedRoute);  private router = inject(Router);  private supabase = inject(SupabaseService);  cuidador = signal<Cuidador | null>(null);  pets = signal<Pet[]>([]);  isLoading = signal(true);  isSubmitting = signal(false);  errorMessage = signal('');  recorrencias: Recorrencia[] = ['Único', 'Diário', 'Semanal'];  petSelecionado = signal<number | null>(null);  servicosSelecionados = signal<TipoServico[]>([]);  duracao = signal<number>(1);  data = signal<string>('');  hora = signal<string>('09:00');  recorrencia = signal<Recorrencia>('Único');  observacoes = signal<string>('');  servicosDisponiveis = computed<TipoServico[]>(() => this.cuidador()?.servicos ?? []);  precoSelecionado = computed<number>(() => {    const c = this.cuidador();    const selecionados = this.servicosSelecionados();    if (!c || selecionados.length === 0) return 0;    let somaPorHora = 0;    selecionados.forEach(s => {      const preco = {         'Passeio': c.preco_passeio,         'Alimentação': c.preco_alimentacao,         'Companhia': c.preco_companhia       }[s] || 0;      somaPorHora += preco;    });    return somaPorHora;  });  precoTotal = computed<number>(() => {    return this.precoSelecionado() * this.duracao();  });  toggleServico(s: TipoServico) {    const list = this.servicosSelecionados();    if (list.includes(s)) {      this.servicosSelecionados.set(list.filter(x => x !== s));    } else {      this.servicosSelecionados.set([...list, s]);    }  }  isServicoSelecionado(s: TipoServico): boolean {    return this.servicosSelecionados().includes(s);  }  ngOnInit() {    const tutor = this.supabase.currentUser();    if (!tutor) {      this.router.navigate(['/login']);      return;    }    const agora = new Date();    const dia = String(agora.getDate()).padStart(2, '0');    const mes = String(agora.getMonth() + 1).padStart(2, '0');    const ano = agora.getFullYear();    this.data.set(`${ano}-${mes}-${dia}`);    const proximaHora = new Date(agora.getTime() + 60 * 60 * 1000);    if (proximaHora.getDate() !== agora.getDate()) {      const d = String(proximaHora.getDate()).padStart(2, '0');      const m = String(proximaHora.getMonth() + 1).padStart(2, '0');      const y = proximaHora.getFullYear();      this.data.set(`${y}-${m}-${d}`);    }    const horasStr = String(proximaHora.getHours()).padStart(2, '0');    this.hora.set(`${horasStr}:00`);    const id = Number(this.route.snapshot.paramMap.get('id'));    this.supabase.getCuidador(id).subscribe({      next: data => {        const c = data?.[0] ?? null;        this.cuidador.set(c);        if (c?.servicos?.length) this.servicosSelecionados.set([c.servicos[0]]);        this.isLoading.set(false);      },      error: () => this.isLoading.set(false)    });    this.supabase.getPetsByUser(tutor.id_user!).subscribe({      next: pets => {        this.pets.set(pets || []);        if (pets?.length) this.petSelecionado.set(pets[0].id_pet!);      }    });  }  hoje(): string {    const agora = new Date();    const dia = String(agora.getDate()).padStart(2, '0');    const mes = String(agora.getMonth() + 1).padStart(2, '0');    const ano = agora.getFullYear();    return `${ano}-${mes}-${dia}`;  }  confirmar() {    this.errorMessage.set('');    const tutor = this.supabase.currentUser();    const c = this.cuidador();    if (!tutor || !c) return;    if (!this.petSelecionado()) { this.errorMessage.set('Cadastre ou selecione um pet.'); return; }    const petSelecionadoObj = this.pets().find(p => p.id_pet === this.petSelecionado());    const nomePet = petSelecionadoObj?.nome_pet ?? 'Pet';    if (this.servicosSelecionados().length === 0) { this.errorMessage.set('Selecione pelo menos um serviço.'); return; }    if (!this.data()) { this.errorMessage.set('Escolha uma data.'); return; }    if (!this.hora() || !this.hora().includes(':')) { this.errorMessage.set('Escolha um horário válido.'); return; }    if (!this.duracao() || this.duracao() < 1) { this.errorMessage.set('A duração deve ser de pelo menos 1 hora.'); return; }    const [anoVal, mesVal, diaVal] = this.data().split('-').map(Number);    const [horasVal, minutosVal] = this.hora().split(':').map(Number);    const dataAgendada = new Date(anoVal, mesVal - 1, diaVal, horasVal, minutosVal);    const agoraVal = new Date();    if (dataAgendada.getTime() < agoraVal.getTime()) {      this.errorMessage.set('Não é possível agendar em uma data ou hora que já passou.');      return;    }    this.isSubmitting.set(true);    const agendamento: Agendamento = {      id_user: tutor.id_user!,      id_cuidador: c.id_cuidador!,      id_pet: this.petSelecionado()!,      tipo_servico: this.servicosSelecionados().join(', ') as any,      data: this.data(),      hora: this.hora(),      recorrencia: this.recorrencia(),      preco: this.precoTotal(),      observacoes: `${this.observacoes()}${this.observacoes() ? ' | ' : ''}Duração: ${this.duracao()}h`,      status: 'Pendente'    };    this.supabase.createAgendamento(agendamento).subscribe({      next: created => {        this.supabase.createNotificacao({          id_user: tutor.id_user!,          tipo: 'agendamento',          titulo: 'Solicitação enviada',          mensagem: `Seu pedido de ${agendamento.tipo_servico} com ${c.nome} foi enviado e aguarda confirmação.`,          lida: false,          id_agendamento: created?.[0]?.id_agendamento        }).subscribe({ error: e => console.error(e) });        this.supabase.getUsuarioByEmail(c.email).subscribe({          next: users => {            const caregiverUser = users?.[0];            if (caregiverUser && caregiverUser.id_user) {              this.supabase.createNotificacao({                id_user: caregiverUser.id_user,                tipo: 'agendamento',                titulo: 'Nova solicitação de agendamento 🗓️',                mensagem: `Você tem uma nova solicitação de ${agendamento.tipo_servico} para o pet ${nomePet}. Confirme sua presença no menu Cuide.`,                lida: false,                id_agendamento: created?.[0]?.id_agendamento              }).subscribe({ error: e => console.error('Erro ao notificar cuidador:', e) });            }          },          error: err => console.error('Erro ao buscar usuário do cuidador:', err)        });        this.isSubmitting.set(false);        this.router.navigate(['/agenda']);      },      error: err => {        console.error(err);        this.isSubmitting.set(false);        this.errorMessage.set('Não foi possível criar o agendamento. Tente novamente.');      }    });  }}

@@ -1,50 +1,1 @@
-import { haversineKm, getCurrentPosition, formatDistancia } from './geo.util';
-
-describe('GeoUtil', () => {
-  describe('haversineKm', () => {
-    it('should calculate distance between two coordinates correctly', () => {
-      const distance = haversineKm(-23.5505, -46.6333, -22.9068, -43.1729);
-      expect(distance).toBeCloseTo(357, -1);
-    });
-
-    it('should return 0 for same coordinates', () => {
-      const distance = haversineKm(-23.5505, -46.6333, -23.5505, -46.6333);
-      expect(distance).toBe(0);
-    });
-  });
-
-  describe('getCurrentPosition', () => {
-    it('should resolve coordinates when geolocation is supported', async () => {
-      const mockCoords = { latitude: -23.55, longitude: -46.63 };
-      const mockGeolocation = {
-        getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success) => {
-          success({ coords: mockCoords });
-        })
-      };
-
-      spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(mockGeolocation as any);
-
-      const pos = await getCurrentPosition();
-      expect(pos).toEqual(mockCoords);
-      expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();
-    });
-
-    it('should reject when geolocation is not supported', async () => {
-      spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(undefined as any);
-
-      await expectAsync(getCurrentPosition()).toBeRejectedWithError('Geolocalização não suportada neste navegador.');
-    });
-  });
-
-  describe('formatDistancia', () => {
-    it('should format distance under 1 km as meters', () => {
-      expect(formatDistancia(0.85)).toBe('850 m');
-      expect(formatDistancia(0.05)).toBe('50 m');
-    });
-
-    it('should format distance over 1 km as kilometers with comma', () => {
-      expect(formatDistancia(3.2)).toBe('3,2 km');
-      expect(formatDistancia(12.55)).toBe('12,6 km');
-    });
-  });
-});
+import { haversineKm, getCurrentPosition, formatDistancia } from './geo.util';describe('GeoUtil', () => {  describe('haversineKm', () => {    it('should calculate distance between two coordinates correctly', () => {      const distance = haversineKm(-23.5505, -46.6333, -22.9068, -43.1729);      expect(distance).toBeCloseTo(357, -1);    });    it('should return 0 for same coordinates', () => {      const distance = haversineKm(-23.5505, -46.6333, -23.5505, -46.6333);      expect(distance).toBe(0);    });  });  describe('getCurrentPosition', () => {    it('should resolve coordinates when geolocation is supported', async () => {      const mockCoords = { latitude: -23.55, longitude: -46.63 };      const mockGeolocation = {        getCurrentPosition: jasmine.createSpy('getCurrentPosition').and.callFake((success) => {          success({ coords: mockCoords });        })      };      spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(mockGeolocation as any);      const pos = await getCurrentPosition();      expect(pos).toEqual(mockCoords);      expect(mockGeolocation.getCurrentPosition).toHaveBeenCalled();    });    it('should reject when geolocation is not supported', async () => {      spyOnProperty(navigator, 'geolocation', 'get').and.returnValue(undefined as any);      await expectAsync(getCurrentPosition()).toBeRejectedWithError('Geolocalização não suportada neste navegador.');    });  });  describe('formatDistancia', () => {    it('should format distance under 1 km as meters', () => {      expect(formatDistancia(0.85)).toBe('850 m');      expect(formatDistancia(0.05)).toBe('50 m');    });    it('should format distance over 1 km as kilometers with comma', () => {      expect(formatDistancia(3.2)).toBe('3,2 km');      expect(formatDistancia(12.55)).toBe('12,6 km');    });  });});

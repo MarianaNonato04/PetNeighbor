@@ -1,49 +1,1 @@
-<div class="chat-page">
-
-  <header class="chat-header">
-    <button class="back-btn" routerLink="/conversas" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <div class="chat-avatar">
-      <img *ngIf="cuidador()?.foto_url" [src]="cuidador()?.foto_url" [alt]="cuidador()?.nome">
-      <span *ngIf="!cuidador()?.foto_url" class="material-symbols-rounded">account_circle</span>
-    </div>
-    <div class="chat-header-info">
-      <h1>{{ cuidador()?.nome || 'Conversa' }}</h1>
-      <p><span class="online-dot"></span> Tempo real</p>
-    </div>
-  </header>
-
-  <div class="chat-scroll" #scrollArea>
-    <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div></div>
-
-    <div *ngIf="!isLoading() && mensagens().length === 0" class="chat-empty">
-      <span class="material-symbols-rounded">forum</span>
-      <p>Inicie a conversa com {{ cuidador()?.nome }}</p>
-      <small>Combine detalhes do serviço, tire dúvidas e alinhe horários.</small>
-    </div>
-
-    <div class="msg-row" *ngFor="let m of mensagens()"
-      [class.msg-row--mine]="m.remetente === 'tutor'">
-      <div class="msg-bubble">
-        <p class="msg-text">{{ m.conteudo }}</p>
-        <span class="msg-time">{{ formatHora(m.created_at) }}</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="chat-composer">
-    <input
-      type="text"
-      class="composer-input"
-      placeholder="Mensagem..."
-      [ngModel]="novaMensagem()"
-      (ngModelChange)="novaMensagem.set($event)"
-      (keyup.enter)="enviar()"
-    >
-    <button class="send-btn" (click)="enviar()" [disabled]="!novaMensagem().trim() || enviando()" aria-label="Enviar">
-      <span class="material-symbols-rounded">send</span>
-    </button>
-  </div>
-
-</div>
+<div class="chat-page">  <header class="chat-header">    <button class="back-btn" routerLink="/conversas" aria-label="Voltar">      <span class="material-symbols-rounded">arrow_back</span>    </button>    <div class="chat-avatar">      <img *ngIf="cuidador()?.foto_url" [src]="cuidador()?.foto_url" [alt]="cuidador()?.nome">      <span *ngIf="!cuidador()?.foto_url" class="material-symbols-rounded">account_circle</span>    </div>    <div class="chat-header-info">      <h1>{{ cuidador()?.nome || 'Conversa' }}</h1>      <p><span class="online-dot"></span> Tempo real</p>    </div>  </header>  <div class="chat-scroll" #scrollArea>    <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div></div>    <div *ngIf="!isLoading() && mensagens().length === 0" class="chat-empty">      <span class="material-symbols-rounded">forum</span>      <p>Inicie a conversa com {{ cuidador()?.nome }}</p>      <small>Combine detalhes do serviço, tire dúvidas e alinhe horários.</small>    </div>    <div class="msg-row" *ngFor="let m of mensagens()"      [class.msg-row--mine]="m.remetente === role()">      <div class="msg-bubble">        <p class="msg-text">{{ m.conteudo }}</p>        <span class="msg-time">{{ formatHora(m.created_at) }}</span>      </div>    </div>  </div>  <div class="chat-composer">    <input      type="text"      class="composer-input"      placeholder="Mensagem..."      [ngModel]="novaMensagem()"      (ngModelChange)="novaMensagem.set($event)"      (keyup.enter)="enviar()"    >    <button class="send-btn" (click)="enviar()" [disabled]="!novaMensagem().trim() || enviando()" aria-label="Enviar">      <span class="material-symbols-rounded">send</span>    </button>  </div></div>

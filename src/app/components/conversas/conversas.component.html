@@ -1,66 +1,1 @@
-<div class="conversas-page">
-  <header class="page-header">
-    <button class="back-btn" routerLink="/" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <div class="header-text">
-      <h1>Minhas Conversas</h1>
-      <p *ngIf="isLoggedIn() && !isLoading()">{{ conversas().length }} chat(s) ativo(s)</p>
-    </div>
-  </header>
-
-  <div class="page-body">
-    <ng-container *ngIf="isLoggedIn(); else loginRequired">
-      
-      <div *ngIf="isLoading()" class="state-box">
-        <div class="spinner"></div>
-      </div>
-
-      <div *ngIf="!isLoading() && errorMessage()" class="error-banner glass-card">
-        <span class="material-symbols-rounded">error</span>
-        <p>{{ errorMessage() }}</p>
-      </div>
-
-      <div *ngIf="!isLoading() && !errorMessage() && conversas().length === 0" class="empty-state glass-card">
-        <div class="empty-art">
-          <span class="material-symbols-rounded">forum</span>
-        </div>
-        <h3>Nenhuma conversa ainda</h3>
-        <p>Você ainda não iniciou nenhuma conversa com cuidadores. Vá em Explorar para encontrar um cuidador e começar um bate-papo!</p>
-        <button routerLink="/explorar" class="btn-primary" style="margin-top:1.25rem;">
-          Explorar cuidadores
-        </button>
-      </div>
-
-      <div class="conversas-list" *ngIf="!isLoading() && !errorMessage() && conversas().length > 0">
-        <a class="conversa-card" *ngFor="let c of conversas()" [routerLink]="['/chat', c.idCuidador]">
-          <div class="conversa-avatar">
-            <img *ngIf="c.cuidadorFoto" [src]="c.cuidadorFoto" [alt]="c.cuidadorNome">
-            <span *ngIf="!c.cuidadorFoto" class="material-symbols-rounded">account_circle</span>
-          </div>
-          
-          <div class="conversa-content">
-            <div class="conversa-head">
-              <h3>{{ c.cuidadorNome }}</h3>
-              <span class="conversa-time">{{ tempoRelativo(c.ultimaMensagem.created_at) }}</span>
-            </div>
-            <p class="conversa-snippet">
-              <span class="remetente-prefix">{{ c.ultimaMensagem.remetente === 'tutor' ? 'Você: ' : '' }}</span>
-              {{ c.ultimaMensagem.conteudo }}
-            </p>
-          </div>
-          <span class="unread-dot" *ngIf="!c.ultimaMensagem.lida && c.ultimaMensagem.remetente === 'cuidador'"></span>
-        </a>
-      </div>
-
-    </ng-container>
-
-    <ng-template #loginRequired>
-      <div class="glass-card text-center" style="margin-top:1rem;">
-        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
-        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver suas conversas.</p>
-        <button routerLink="/login" class="btn-primary">Fazer login</button>
-      </div>
-    </ng-template>
-  </div>
-</div>
+<div class="conversas-page">  <header class="page-header">    <button class="back-btn" routerLink="/" aria-label="Voltar">      <span class="material-symbols-rounded">arrow_back</span>    </button>    <div class="header-text">      <h1>Minhas Conversas</h1>      <p *ngIf="isLoggedIn() && !isLoading()">{{ conversas().length }} chat(s) ativo(s)</p>    </div>  </header>  <div class="page-body">    <ng-container *ngIf="isLoggedIn(); else loginRequired">      <div *ngIf="isLoading()" class="state-box">        <div class="spinner"></div>      </div>      <div *ngIf="!isLoading() && errorMessage()" class="error-banner glass-card">        <span class="material-symbols-rounded">error</span>        <p>{{ errorMessage() }}</p>      </div>      <div *ngIf="!isLoading() && !errorMessage() && conversas().length === 0" class="empty-state glass-card">        <div class="empty-art">          <span class="material-symbols-rounded">forum</span>        </div>        <h3>Nenhuma conversa ainda</h3>        <p>Você ainda não iniciou nenhuma conversa com cuidadores. Vá em Explorar para encontrar um cuidador e começar um bate-papo!</p>        <button routerLink="/explorar" class="btn-primary" style="margin-top:1.25rem;">          Explorar cuidadores        </button>      </div>      <div class="conversas-list" *ngIf="!isLoading() && !errorMessage() && conversas().length > 0">        <a class="conversa-card" *ngFor="let c of conversas()" [routerLink]="['/chat', c.outroPartyId]" [queryParams]="{ role: c.outroPartyTipo === 'cuidador' ? 'tutor' : 'cuidador' }">          <div class="conversa-avatar">            <img *ngIf="c.foto" [src]="c.foto" [alt]="c.nome">            <span *ngIf="!c.foto" class="material-symbols-rounded">account_circle</span>          </div>          <div class="conversa-content">            <div class="conversa-head">              <h3>{{ c.nome }}</h3>              <span class="conversa-time">{{ tempoRelativo(c.ultimaMensagem.created_at) }}</span>            </div>            <p class="conversa-snippet">              <span class="remetente-prefix">{{ c.ultimaMensagem.remetente === (c.outroPartyTipo === 'cuidador' ? 'tutor' : 'cuidador') ? 'Você: ' : '' }}</span>              {{ c.ultimaMensagem.conteudo }}            </p>          </div>          <span class="unread-dot" *ngIf="c.isUnread"></span>        </a>      </div>    </ng-container>    <ng-template #loginRequired>      <div class="glass-card text-center" style="margin-top:1rem;">        <span class="material-symbols-rounded" style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>        <p style="margin-bottom:1rem;color:var(--text-secondary);">Faça login para ver suas conversas.</p>        <button routerLink="/login" class="btn-primary">Fazer login</button>      </div>    </ng-template>  </div></div>

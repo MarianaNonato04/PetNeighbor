@@ -1,0 +1,167 @@
+<div class="cuide-page">
+  <header class="page-header">
+    <div class="header-text">
+      <h1>Área do Cuidador</h1>
+      <p>Gerencie seus serviços e sua agenda de trabalho</p>
+    </div>
+    <span class="material-symbols-rounded header-icon">volunteer_activism</span>
+  </header>
+  <div class="page-body">
+    <div *ngIf="isLoading()" class="state-box">
+      <div class="spinner"></div>
+      <p>Carregando painel do cuidador...</p>
+    </div>
+    <div *ngIf="!isLoading()" class="dashboard-content">
+      <div class="cuidador-profile-card glass-card mb-4" *ngIf="cuidador() as c">
+        <div class="profile-avatar">
+          <img [src]="c.foto_url || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80'" alt="Foto de {{ c.nome }}">
+          <div class="online-badge"></div>
+        </div>
+        <div class="profile-details">
+          <h2>{{ c.nome }}</h2>
+          <p class="profile-city"><span class="material-symbols-rounded">location_on</span> {{ c.cidade }}</p>
+          <div class="badge-row">
+            <span class="badge" *ngFor="let s of c.servicos">{{ s }}</span>
+            <span class="verif-badge" *ngIf="c.verificado">
+              <span class="material-symbols-rounded">verified</span> Verificado
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="grid-layout">
+        <div class="calendar-card glass-card">
+          <div class="calendar-header">
+            <button class="nav-arrow" (click)="prevMonth()" aria-label="Mês anterior">
+              <span class="material-symbols-rounded">chevron_left</span>
+            </button>
+            <h2>{{ monthNames[currentMonth()] }} {{ currentYear() }}</h2>
+            <button class="nav-arrow" (click)="nextMonth()" aria-label="Próximo mês">
+              <span class="material-symbols-rounded">chevron_right</span>
+            </button>
+          </div>
+          <div class="calendar-weekdays">
+            <span class="weekday">Dom</span>
+            <span class="weekday">Seg</span>
+            <span class="weekday">Ter</span>
+            <span class="weekday">Qua</span>
+            <span class="weekday">Qui</span>
+            <span class="weekday">Sex</span>
+            <span class="weekday">Sáb</span>
+          </div>
+          <div class="calendar-days-grid">
+            <button 
+              *ngFor="let day of calendarDays()" 
+              class="day-cell"
+              [class.day-prev-next]="!day.isCurrentMonth"
+              [class.day-today]="day.isToday"
+              [class.day-selected]="selectedDateString() === day.dateString"
+              (click)="selectDay(day)"
+            >
+              <span class="day-num">{{ day.dayNumber }}</span>
+              <span *ngIf="day.hasAgendamento" class="booking-dot"></span>
+            </button>
+          </div>
+        </div>
+        <div class="booking-section">
+          <div class="booking-header">
+            <h3>{{ selectedDayLabel() }}</h3>
+            <button *ngIf="selectedDateString()" class="btn-clear" (click)="clearDateFilter()">
+              <span class="material-symbols-rounded">view_list</span> Ver todos
+            </button>
+          </div>
+          <div class="ag-list" *ngIf="agendamentosFiltrados().length > 0; else emptyBookings">
+            <div class="ag-card glass-card" *ngFor="let a of agendamentosFiltrados()">
+              <div class="ag-top">
+                <div class="ag-servico-icon">
+                  <span class="material-symbols-rounded">{{ iconeServico(a.tipo_servico) }}</span>
+                </div>
+                <div class="ag-headline">
+                  <h3>{{ a.tipo_servico }}</h3>
+                  <p>Tutor: <strong>{{ getTutorName(a.id_user) }}</strong> • Pet: <strong>{{ a.nome_pet }}</strong> ({{ getPetBreed(a.id_pet) }})</p>
+                </div>
+                <span class="status-badge" [attr.data-status]="a.status">
+                  <span class="material-symbols-rounded">{{ iconeStatus(a.status) }}</span>
+                  {{ a.status }}
+                </span>
+              </div>
+              <div class="ag-meta">
+                <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data) }}</span>
+                <span class="ag-meta-item"><span class="material-symbols-rounded">schedule</span>{{ a.hora }}</span>
+                <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia }}</span>
+                <span class="ag-meta-item ag-price">R$ {{ a.preco }}</span>
+              </div>
+              <p class="ag-obs" *ngIf="a.observacoes">"{{ a.observacoes }}"</p>
+              <div class="ag-actions">
+                <ng-container *ngIf="a.status === 'Pendente'">
+                  <button class="btn-action btn-danger" (click)="atualizarStatus(a, 'Cancelado')">
+                    <span class="material-symbols-rounded">close</span> Recusar
+                  </button>
+                  <button class="btn-action btn-success" (click)="atualizarStatus(a, 'Confirmado')">
+                    <span class="material-symbols-rounded">check</span> Aceitar
+                  </button>
+                </ng-container>
+                <button class="btn-action btn-start" *ngIf="a.status === 'Confirmado'" (click)="atualizarStatus(a, 'Em andamento')">
+                  <span class="material-symbols-rounded">play_arrow</span> Iniciar Serviço
+                </button>
+                <button class="btn-action btn-complete" *ngIf="a.status === 'Em andamento'" (click)="abrirConclusao(a)">
+                  <span class="material-symbols-rounded">task_alt</span> Concluir Serviço
+                </button>
+              </div>
+            </div>
+          </div>
+          <ng-template #emptyBookings>
+            <div class="empty-state glass-card">
+              <div class="empty-art">
+                <span class="material-symbols-rounded">event_busy</span>
+              </div>
+              <h3>Nenhum serviço agendado</h3>
+              <p>Não há atendimentos para o período ou data selecionada.</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" *ngIf="activeAgendamento() as a">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>Concluir Atendimento</h2>
+        <button class="btn-close" (click)="activeAgendamento.set(null)" aria-label="Fechar">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1.25rem; font-size: 0.9375rem; color: var(--text-secondary);">
+          Você está concluindo o serviço de <strong>{{ a.tipo_servico }}</strong> para o pet <strong>{{ a.nome_pet }}</strong>.
+        </p>
+        <div class="form-group">
+          <label for="modal-obs" style="font-size: 0.8125rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem; display: block; text-transform: uppercase; letter-spacing: 0.04em;">
+            Relatório de Atendimento:
+          </label>
+          <textarea 
+            id="modal-obs" 
+            rows="4" 
+            class="input-field" 
+            placeholder="Conte ao tutor como foi o atendimento, se o pet comeu, se comportou ou fez as necessidades..." 
+            [(ngModel)]="activeObservacoes"
+            name="modal-obs"
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" (click)="activeAgendamento.set(null)">
+          Cancelar
+        </button>
+        <button type="button" class="btn-modal-confirm" (click)="confirmarConclusao(a)" [disabled]="isSubmitting()">
+          <span *ngIf="!isSubmitting()" style="display:flex;align-items:center;gap:0.375rem;">
+            <span class="material-symbols-rounded" style="font-size: 1.125rem;">check_circle</span>
+            Concluir e Salvar
+          </span>
+          <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="btn-spinner"></span> Salvando...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

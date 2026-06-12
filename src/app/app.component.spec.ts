@@ -1,53 +1,1 @@
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-import { SupabaseService } from './services/supabase.service';
-import { NotificacaoStore } from './services/notificacao.store';
-import { RouterTestingModule } from '@angular/router/testing';
-import { signal } from '@angular/core';
-
-describe('AppComponent', () => {
-  let fixture: ComponentFixture<AppComponent>;
-  let component: AppComponent;
-  let mockSupabaseService: any;
-  let mockNotificacaoStore: any;
-  let currentUserSignal: any;
-
-  beforeEach(async () => {
-    currentUserSignal = signal<any>(null);
-    mockSupabaseService = {
-      currentUser: currentUserSignal
-    };
-
-    mockNotificacaoStore = jasmine.createSpyObj('NotificacaoStore', ['iniciar', 'parar']);
-
-    await TestBed.configureTestingModule({
-      imports: [AppComponent, RouterTestingModule],
-      providers: [
-        { provide: SupabaseService, useValue: mockSupabaseService },
-        { provide: NotificacaoStore, useValue: mockNotificacaoStore }
-      ]
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-  });
-
-  it('should create the app', () => {
-    expect(component).toBeTruthy();
-    expect(component.title).toEqual('PetNeighbor');
-  });
-
-  it('should start notifications when user is logged in', () => {
-    currentUserSignal.set({ id_user: 42, nome: 'Tutor' });
-    fixture.detectChanges();
-
-    expect(mockNotificacaoStore.iniciar).toHaveBeenCalledWith(42);
-  });
-
-  it('should stop notifications when user is logged out', () => {
-    currentUserSignal.set(null);
-    fixture.detectChanges();
-
-    expect(mockNotificacaoStore.parar).toHaveBeenCalled();
-  });
-});
+import { TestBed, ComponentFixture } from '@angular/core/testing';import { AppComponent } from './app.component';import { SupabaseService } from './services/supabase.service';import { NotificacaoStore } from './services/notificacao.store';import { RouterTestingModule } from '@angular/router/testing';import { signal } from '@angular/core';describe('AppComponent', () => {  let fixture: ComponentFixture<AppComponent>;  let component: AppComponent;  let mockSupabaseService: any;  let mockNotificacaoStore: any;  let currentUserSignal: any;  beforeEach(async () => {    currentUserSignal = signal<any>(null);    mockSupabaseService = {      currentUser: currentUserSignal    };    mockNotificacaoStore = jasmine.createSpyObj('NotificacaoStore', ['iniciar', 'parar']);    await TestBed.configureTestingModule({      imports: [AppComponent, RouterTestingModule],      providers: [        { provide: SupabaseService, useValue: mockSupabaseService },        { provide: NotificacaoStore, useValue: mockNotificacaoStore }      ]    }).compileComponents();    fixture = TestBed.createComponent(AppComponent);    component = fixture.componentInstance;  });  it('should create the app', () => {    expect(component).toBeTruthy();    expect(component.title).toEqual('PetNeighbor');  });  it('should start notifications when user is logged in', () => {    currentUserSignal.set({ id_user: 42, nome: 'Tutor' });    fixture.detectChanges();    expect(mockNotificacaoStore.iniciar).toHaveBeenCalledWith(42);  });  it('should stop notifications when user is logged out', () => {    currentUserSignal.set(null);    fixture.detectChanges();    expect(mockNotificacaoStore.parar).toHaveBeenCalled();  });});

@@ -1,108 +1,1 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { SupabaseService } from './supabase.service';
-import * as supabaseJs from '@supabase/supabase-js';
-import { Usuario, Pet, Cuidador } from '../models/interfaces';
-
-describe('SupabaseService', () => {
-  let service: SupabaseService;
-  let httpMock: HttpTestingController;
-  let mockSupabaseClient: any;
-  let mockChannel: any;
-
-  beforeEach(() => {
-    mockChannel = {
-      on: jasmine.createSpy('on').and.callFake(function(this: any) { return this; }),
-      subscribe: jasmine.createSpy('subscribe').and.callFake(function(this: any) { return this; })
-    };
-
-    mockSupabaseClient = {
-      channel: jasmine.createSpy('channel').and.returnValue(mockChannel),
-      removeChannel: jasmine.createSpy('removeChannel')
-    };
-
-    spyOn(supabaseJs, 'createClient').and.returnValue(mockSupabaseClient as any);
-
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [SupabaseService]
-    });
-
-    service = TestBed.inject(SupabaseService);
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => {
-    httpMock.verify();
-    localStorage.clear();
-  });
-
-  it('should be created and restore user from localStorage if present', () => {
-    expect(service).toBeTruthy();
-    expect(supabaseJs.createClient).toHaveBeenCalled();
-  });
-
-  it('should register usuario and set currentUser', () => {
-    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', idade: 25, email: 'tutor@example.com', senha: '123' };
-
-    service.registerUsuario(mockUser).subscribe(users => {
-      expect(users[0]).toEqual(mockUser);
-      expect(service.currentUser()).toEqual(mockUser);
-    });
-
-    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios');
-    expect(req.request.method).toBe('POST');
-    req.flush([mockUser]);
-  });
-
-  it('should login and set currentUser', () => {
-    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', idade: 25, email: 'tutor@example.com', senha: '123' };
-
-    service.login('tutor@example.com', '123').subscribe(users => {
-      expect(users[0]).toEqual(mockUser);
-      expect(service.currentUser()).toEqual(mockUser);
-    });
-
-    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios?email=eq.tutor@example.com&senha=eq.123');
-    expect(req.request.method).toBe('GET');
-    req.flush([mockUser]);
-  });
-
-  it('should logout and clear currentUser', () => {
-    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', email: 'tutor@example.com', idade: 25 };
-    service.currentUser.set(mockUser);
-
-    service.logout();
-    expect(service.currentUser()).toBeNull();
-    expect(localStorage.getItem('petneighbor_user')).toBeNull();
-  });
-
-  it('should register pet (POST)', () => {
-    const newPet: Pet = { nome: 'Rex', tipo: 'Cachorro', raca: 'Vira-lata', idade: 3, id_user: 1 };
-    
-    service.registerPet(newPet).subscribe(pets => {
-      expect(pets[0].nome).toBe('Rex');
-    });
-
-    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/pets');
-    expect(req.request.method).toBe('POST');
-    req.flush([{ id_pet: 1, ...newPet }]);
-  });
-
-  it('should subscribe to messages via realtime channel', () => {
-    const conversaId = 't1-c2';
-    const onInsert = jasmine.createSpy('onInsert');
-
-    service.subscribeMensagens(conversaId, onInsert);
-
-    expect(mockSupabaseClient.channel).toHaveBeenCalledWith(`mensagens:${conversaId}`);
-    expect(mockChannel.on).toHaveBeenCalled();
-    expect(mockChannel.subscribe).toHaveBeenCalled();
-  });
-
-  it('should remove channel', () => {
-    const dummyChannel = {} as any;
-    service.removeChannel(dummyChannel);
-    expect(mockSupabaseClient.removeChannel).toHaveBeenCalledWith(dummyChannel);
-  });
-});
+import { TestBed } from '@angular/core/testing';import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';import { SupabaseService } from './supabase.service';import * as supabaseJs from '@supabase/supabase-js';import { Usuario, Pet, Cuidador } from '../models/interfaces';describe('SupabaseService', () => {  let service: SupabaseService;  let httpMock: HttpTestingController;  let mockSupabaseClient: any;  let mockChannel: any;  beforeEach(() => {    mockChannel = {      on: jasmine.createSpy('on').and.callFake(function(this: any) { return this; }),      subscribe: jasmine.createSpy('subscribe').and.callFake(function(this: any) { return this; })    };    mockSupabaseClient = {      channel: jasmine.createSpy('channel').and.returnValue(mockChannel),      removeChannel: jasmine.createSpy('removeChannel')    };    spyOn(supabaseJs, 'createClient').and.returnValue(mockSupabaseClient as any);    TestBed.configureTestingModule({      imports: [HttpClientTestingModule],      providers: [SupabaseService]    });    service = TestBed.inject(SupabaseService);    httpMock = TestBed.inject(HttpTestingController);  });  afterEach(() => {    httpMock.verify();    localStorage.clear();  });  it('should be created and restore user from localStorage if present', () => {    expect(service).toBeTruthy();    expect(supabaseJs.createClient).toHaveBeenCalled();  });  it('should register usuario and set currentUser', () => {    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', idade: 25, email: 'tutor@example.com', senha: '123' };    service.registerUsuario(mockUser).subscribe(users => {      expect(users[0]).toEqual(mockUser);      expect(service.currentUser()).toEqual(mockUser);    });    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios');    expect(req.request.method).toBe('POST');    req.flush([mockUser]);  });  it('should login and set currentUser', () => {    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', idade: 25, email: 'tutor@example.com', senha: '123' };    service.login('tutor@example.com', '123').subscribe(users => {      expect(users[0]).toEqual(mockUser);      expect(service.currentUser()).toEqual(mockUser);    });    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/usuarios?email=eq.tutor@example.com&senha=eq.123');    expect(req.request.method).toBe('GET');    req.flush([mockUser]);  });  it('should logout and clear currentUser', () => {    const mockUser: Usuario = { id_user: 1, nome: 'Tutor Teste', email: 'tutor@example.com', idade: 25 };    service.currentUser.set(mockUser);    service.logout();    expect(service.currentUser()).toBeNull();    expect(localStorage.getItem('petneighbor_user')).toBeNull();  });  it('should register pet (POST)', () => {    const newPet: Pet = { nome: 'Rex', tipo: 'Cachorro', raca: 'Vira-lata', idade: 3, id_user: 1 };    service.registerPet(newPet).subscribe(pets => {      expect(pets[0].nome).toBe('Rex');    });    const req = httpMock.expectOne('https://hrfestijxvifjgtmcxan.supabase.co/rest/v1/pets');    expect(req.request.method).toBe('POST');    req.flush([{ id_pet: 1, ...newPet }]);  });  it('should subscribe to messages via realtime channel', () => {    const conversaId = 't1-c2';    const onInsert = jasmine.createSpy('onInsert');    service.subscribeMensagens(conversaId, onInsert);    expect(mockSupabaseClient.channel).toHaveBeenCalledWith(`mensagens:${conversaId}`);    expect(mockChannel.on).toHaveBeenCalled();    expect(mockChannel.subscribe).toHaveBeenCalled();  });  it('should remove channel', () => {    const dummyChannel = {} as any;    service.removeChannel(dummyChannel);    expect(mockSupabaseClient.removeChannel).toHaveBeenCalledWith(dummyChannel);  });});

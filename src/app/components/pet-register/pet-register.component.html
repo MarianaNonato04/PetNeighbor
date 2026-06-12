@@ -1,96 +1,1 @@
-<div class="pet-register-page">
-
-  <header class="page-header">
-    <button class="back-btn" routerLink="/meus-pets" aria-label="Voltar">
-      <span class="material-symbols-rounded">arrow_back</span>
-    </button>
-    <div class="header-text">
-      <h1>Novo Pet</h1>
-      <p>Cadastre seu amiguinho</p>
-    </div>
-    <div class="header-art">
-      <span class="material-symbols-rounded">pet_supplies</span>
-    </div>
-  </header>
-
-  <div class="page-body">
-
-    <div class="glass-card form-card" *ngIf="isUserLoggedIn(); else loginRequired">
-      <form [formGroup]="petForm" (ngSubmit)="onSubmit()">
-
-        <div class="form-row-text">
-          <div class="form-group">
-            <label for="nome_pet">Nome do pet</label>
-            <div class="input-wrapper">
-              <span class="input-icon material-symbols-rounded">emoji_nature</span>
-              <input type="text" id="nome_pet" formControlName="nome_pet" class="input-field input-with-icon"
-                placeholder="Ex: Thor, Mel, Luna...">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="especie">Qual é o animal? (Espécie)</label>
-            <div class="input-wrapper">
-              <span class="input-icon material-symbols-rounded">pets</span>
-              <input type="text" id="especie" formControlName="especie" class="input-field input-with-icon"
-                placeholder="Ex: Cachorro, Gato, Coelho...">
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="idade_pet">Idade (anos)</label>
-            <input type="number" id="idade_pet" formControlName="idade_pet" class="input-field" placeholder="0" min="0">
-          </div>
-          <div class="form-group">
-            <label for="peso">Peso (kg)</label>
-            <input type="number" id="peso" formControlName="peso" class="input-field" placeholder="0" min="0">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="porte">Porte</label>
-          <select id="porte" formControlName="porte" class="input-field">
-            <option value="Pequeno">Pequeno</option>
-            <option value="Médio">Médio</option>
-            <option value="Grande">Grande</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="describ_pet">Sobre o pet</label>
-          <textarea id="describ_pet" formControlName="describ_pet" class="input-field" rows="3"
-            placeholder="Personalidade, cuidados especiais, o que ele ama..."></textarea>
-        </div>
-
-        <div class="success-banner" *ngIf="successMessage()" style="margin-top:0.5rem;">
-          {{ successMessage() }}
-        </div>
-        <div class="error-banner" *ngIf="errorMessage()" style="margin-top:0.5rem;">
-          {{ errorMessage() }}
-        </div>
-
-        <button type="submit" class="btn-primary" style="margin-top:1.5rem;" [disabled]="isSubmitting()">
-          <span *ngIf="!isSubmitting()">
-            <span class="material-symbols-rounded" style="font-size:1.125rem;">check_circle</span>
-            Salvar pet
-          </span>
-          <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">
-            <span class="btn-spinner"></span> Salvando...
-          </span>
-        </button>
-
-      </form>
-    </div>
-
-    <ng-template #loginRequired>
-      <div class="glass-card text-center">
-        <span class="material-symbols-rounded"
-          style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>
-        <p style="margin-bottom:1rem;color:var(--text-secondary);">Você precisa estar logado para cadastrar um pet.</p>
-        <button routerLink="/cadastro-usuario" class="btn-primary">Criar conta</button>
-      </div>
-    </ng-template>
-
-  </div>
-</div>
+<div class="pet-register-page">  <header class="page-header">    <button class="back-btn" routerLink="/meus-pets" aria-label="Voltar">      <span class="material-symbols-rounded">arrow_back</span>    </button>    <div class="header-text">      <h1>Novo Pet</h1>      <p>Cadastre seu amiguinho</p>    </div>    <div class="header-art">      <span class="material-symbols-rounded">pet_supplies</span>    </div>  </header>  <div class="page-body">    <div class="glass-card form-card" *ngIf="isUserLoggedIn(); else loginRequired">      <form [formGroup]="petForm" (ngSubmit)="onSubmit()">        <div class="form-row-text">          <div class="form-group">            <label for="nome_pet">Nome do pet</label>            <div class="input-wrapper">              <span class="input-icon material-symbols-rounded">emoji_nature</span>              <input type="text" id="nome_pet" formControlName="nome_pet" class="input-field input-with-icon"                placeholder="Ex: Thor, Mel, Luna...">            </div>          </div>          <div class="form-group">            <label for="especie">Qual é o animal? (Espécie)</label>            <div class="input-wrapper">              <span class="input-icon material-symbols-rounded">pets</span>              <input type="text" id="especie" formControlName="especie" class="input-field input-with-icon"                placeholder="Ex: Cachorro, Gato, Coelho...">            </div>          </div>        </div>        <div class="form-row">          <div class="form-group">            <label for="idade_pet">Idade (anos)</label>            <input type="number" id="idade_pet" formControlName="idade_pet" class="input-field" placeholder="0" min="0">          </div>          <div class="form-group">            <label for="peso">Peso (kg)</label>            <input type="number" id="peso" formControlName="peso" class="input-field" placeholder="0" min="0">          </div>        </div>        <div class="form-group">          <label for="porte">Porte</label>          <select id="porte" formControlName="porte" class="input-field">            <option value="Pequeno">Pequeno</option>            <option value="Médio">Médio</option>            <option value="Grande">Grande</option>          </select>        </div>        <div class="form-group">          <label for="describ_pet">Sobre o pet</label>          <textarea id="describ_pet" formControlName="describ_pet" class="input-field" rows="3"            placeholder="Personalidade, cuidados especiais, o que ele ama..."></textarea>        </div>        <div class="success-banner" *ngIf="successMessage()" style="margin-top:0.5rem;">          {{ successMessage() }}        </div>        <div class="error-banner" *ngIf="errorMessage()" style="margin-top:0.5rem;">          {{ errorMessage() }}        </div>        <button type="submit" class="btn-primary" style="margin-top:1.5rem;" [disabled]="isSubmitting()">          <span *ngIf="!isSubmitting()">            <span class="material-symbols-rounded" style="font-size:1.125rem;">check_circle</span>            Salvar pet          </span>          <span *ngIf="isSubmitting()" style="display:flex;align-items:center;gap:0.5rem;">            <span class="btn-spinner"></span> Salvando...          </span>        </button>      </form>    </div>    <ng-template #loginRequired>      <div class="glass-card text-center">        <span class="material-symbols-rounded"          style="font-size:3rem;color:var(--color-terracota);opacity:0.6;display:block;margin-bottom:1rem;">lock</span>        <p style="margin-bottom:1rem;color:var(--text-secondary);">Você precisa estar logado para cadastrar um pet.</p>        <button routerLink="/cadastro-usuario" class="btn-primary">Criar conta</button>      </div>    </ng-template>  </div></div>

@@ -1,62 +1,1 @@
-import { Component, effect, inject, signal } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';
-import { SupabaseService } from './services/supabase.service';
-import { NotificacaoStore } from './services/notificacao.store';
-import { filter } from 'rxjs';
-
-@Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, BottomNavComponent],
-  template: `
-    <div class="app-container" [class.nav-hidden]="isNavHidden()">
-      <main class="main-content">
-        <router-outlet></router-outlet>
-      </main>
-
-      <app-bottom-nav></app-bottom-nav>
-    </div>
-  `,
-  styles: [`
-    .main-content {
-      flex: 1;
-      padding-bottom: 5.5rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-container.nav-hidden .main-content {
-      padding-bottom: 0;
-    }
-  `]
-})
-export class AppComponent {
-  title = 'PetNeighbor';
-
-  private supabase = inject(SupabaseService);
-  private notificacoes = inject(NotificacaoStore);
-  private router = inject(Router);
-
-  isNavHidden = signal(false);
-  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat'];
-
-  constructor() {
-    this.atualizarRota(this.router.url);
-    this.router.events
-      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe(e => this.atualizarRota(e.urlAfterRedirects));
-
-    effect(() => {
-      const user = this.supabase.currentUser();
-      if (user?.id_user) {
-        this.notificacoes.iniciar(user.id_user);
-      } else {
-        this.notificacoes.parar();
-      }
-    }, { allowSignalWrites: true });
-  }
-
-  private atualizarRota(url: string) {
-    this.isNavHidden.set(this.rotasOcultas.some(r => url.startsWith(r)));
-  }
-}
+import { Component, effect, inject, signal } from '@angular/core';import { RouterOutlet, Router, NavigationEnd } from '@angular/router';import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';import { SupabaseService } from './services/supabase.service';import { NotificacaoStore } from './services/notificacao.store';import { ChatStore } from './services/chat.store';import { filter } from 'rxjs';@Component({  selector: 'app-root',  standalone: true,  imports: [RouterOutlet, BottomNavComponent],  template: `    <div class="app-container" [class.nav-hidden]="isNavHidden()">      <main class="main-content">        <router-outlet></router-outlet>      </main>      <app-bottom-nav></app-bottom-nav>    </div>  `,  styles: [`    .main-content {      flex: 1;      padding-bottom: 5.5rem;      display: flex;      flex-direction: column;    }    .app-container.nav-hidden .main-content {      padding-bottom: 0;    }  `]})export class AppComponent {  title = 'PetNeighbor';  private supabase = inject(SupabaseService);  private notificacoes = inject(NotificacaoStore);  private chatStore = inject(ChatStore);  private router = inject(Router);  isNavHidden = signal(false);  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat'];  constructor() {    this.atualizarRota(this.router.url);    this.router.events      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))      .subscribe(e => this.atualizarRota(e.urlAfterRedirects));    effect(() => {      const user = this.supabase.currentUser();      if (user?.id_user) {        this.notificacoes.iniciar(user.id_user);        this.chatStore.iniciar(user.id_user);      } else {        this.notificacoes.parar();        this.chatStore.parar();      }    }, { allowSignalWrites: true });  }  private atualizarRota(url: string) {    this.isNavHidden.set(this.rotasOcultas.some(r => url.startsWith(r)));  }}

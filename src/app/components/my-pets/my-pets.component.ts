@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
 import { Pet } from '../../models/interfaces';
 import { RouterModule } from '@angular/router';
-
 @Component({
   selector: 'app-my-pets',
   standalone: true,
@@ -13,15 +12,12 @@ import { RouterModule } from '@angular/router';
 })
 export class MyPetsComponent implements OnInit {
   private supabase = inject(SupabaseService);
-
   pets = signal<Pet[]>([]);
   isLoading = signal(true);
   isUserLoggedIn = computed(() => this.supabase.currentUser() !== null);
-
   ngOnInit() {
     this.fetchPets();
   }
-
   fetchPets() {
     const user = this.supabase.currentUser();
     if (user && user.id_user) {
