@@ -14,7 +14,7 @@
     <div *ngIf="!isLoading()" class="dashboard-content">
       <div class="cuidador-profile-card glass-card mb-4" *ngIf="cuidador() as c">
         <div class="profile-avatar">
-          <img [src]="c.foto_url || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80'" alt="Foto de {{ c.nome }}">
+          <span class="material-symbols-rounded">person</span>
           <div class="online-badge"></div>
         </div>
         <div class="profile-details">
@@ -49,14 +49,9 @@
             <span class="weekday">Sáb</span>
           </div>
           <div class="calendar-days-grid">
-            <button 
-              *ngFor="let day of calendarDays()" 
-              class="day-cell"
-              [class.day-prev-next]="!day.isCurrentMonth"
-              [class.day-today]="day.isToday"
-              [class.day-selected]="selectedDateString() === day.dateString"
-              (click)="selectDay(day)"
-            >
+            <button *ngFor="let day of calendarDays()" class="day-cell" [class.day-prev-next]="!day.isCurrentMonth"
+              [class.day-today]="day.isToday" [class.day-selected]="selectedDateString() === day.dateString"
+              (click)="selectDay(day)">
               <span class="day-num">{{ day.dayNumber }}</span>
               <span *ngIf="day.hasAgendamento" class="booking-dot"></span>
             </button>
@@ -77,7 +72,8 @@
                 </div>
                 <div class="ag-headline">
                   <h3>{{ a.tipo_servico }}</h3>
-                  <p>Tutor: <strong>{{ getTutorName(a.id_user) }}</strong> • Pet: <strong>{{ a.nome_pet }}</strong> ({{ getPetBreed(a.id_pet) }})</p>
+                  <p>Tutor: <strong>{{ getTutorName(a.id_user) }}</strong> • Pet: <strong>{{ a.nome_pet }}</strong> ({{
+                    getPetBreed(a.id_pet) }})</p>
                 </div>
                 <span class="status-badge" [attr.data-status]="a.status">
                   <span class="material-symbols-rounded">{{ iconeStatus(a.status) }}</span>
@@ -85,9 +81,11 @@
                 </span>
               </div>
               <div class="ag-meta">
-                <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data) }}</span>
+                <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data)
+                  }}</span>
                 <span class="ag-meta-item"><span class="material-symbols-rounded">schedule</span>{{ a.hora }}</span>
-                <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia }}</span>
+                <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia
+                  }}</span>
                 <span class="ag-meta-item ag-price">R$ {{ a.preco }}</span>
               </div>
               <p class="ag-obs" *ngIf="a.observacoes">"{{ a.observacoes }}"</p>
@@ -100,7 +98,8 @@
                     <span class="material-symbols-rounded">check</span> Aceitar
                   </button>
                 </ng-container>
-                <button class="btn-action btn-start" *ngIf="a.status === 'Confirmado'" (click)="atualizarStatus(a, 'Em andamento')">
+                <button class="btn-action btn-start" *ngIf="a.status === 'Confirmado'"
+                  (click)="atualizarStatus(a, 'Em andamento')">
                   <span class="material-symbols-rounded">play_arrow</span> Iniciar Serviço
                 </button>
                 <button class="btn-action btn-complete" *ngIf="a.status === 'Em andamento'" (click)="abrirConclusao(a)">
@@ -132,20 +131,17 @@
       </div>
       <div class="modal-body">
         <p style="margin-bottom: 1.25rem; font-size: 0.9375rem; color: var(--text-secondary);">
-          Você está concluindo o serviço de <strong>{{ a.tipo_servico }}</strong> para o pet <strong>{{ a.nome_pet }}</strong>.
+          Você está concluindo o serviço de <strong>{{ a.tipo_servico }}</strong> para o pet <strong>{{ a.nome_pet
+            }}</strong>.
         </p>
         <div class="form-group">
-          <label for="modal-obs" style="font-size: 0.8125rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem; display: block; text-transform: uppercase; letter-spacing: 0.04em;">
+          <label for="modal-obs"
+            style="font-size: 0.8125rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.5rem; display: block; text-transform: uppercase; letter-spacing: 0.04em;">
             Relatório de Atendimento:
           </label>
-          <textarea 
-            id="modal-obs" 
-            rows="4" 
-            class="input-field" 
-            placeholder="Conte ao tutor como foi o atendimento, se o pet comeu, se comportou ou fez as necessidades..." 
-            [(ngModel)]="activeObservacoes"
-            name="modal-obs"
-          ></textarea>
+          <textarea id="modal-obs" rows="4" class="input-field"
+            placeholder="Conte ao tutor como foi o atendimento, se o pet comeu, se comportou ou fez as necessidades..."
+            [(ngModel)]="activeObservacoes" name="modal-obs"></textarea>
         </div>
       </div>
       <div class="modal-footer">
