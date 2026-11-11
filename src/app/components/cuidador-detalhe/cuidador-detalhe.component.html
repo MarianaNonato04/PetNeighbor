@@ -46,8 +46,14 @@
             }}</span>
           </div>
           <span class="servico-nome">{{ s }}</span>
-          <span class="servico-preco">R$ {{ precoDe(c, s) }}</span>
+          <span class="servico-preco">R$ {{ precoDe(c, s) }} / hora</span>
         </div>
+      </div>
+
+      <div class="glass-card mapa-card" *ngIf="mapaUrl() as url">
+        <h2 class="section-label">Região de atuação</h2>
+        <iframe [src]="url" [title]="'Mapa da região de ' + c.cidade" loading="lazy" referrerpolicy="no-referrer"></iframe>
+        <p class="mapa-nota">Mostramos só o bairro ou a cidade, nunca o endereço.</p>
       </div>
     </div>
 

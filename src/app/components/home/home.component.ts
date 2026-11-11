@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { NotificacaoStore } from '../../services/notificacao.store';
-import { Agendamento, Cuidador, Pet, TipoServico } from '../../models/interfaces';
+import { ChatStore } from '../../services/chat.store';
+import { FeedComponent } from '../feed/feed.component';
+import { Agendamento, Pet, TipoServico } from '../../models/interfaces';
 import { hojeLocal } from '../../utils/date.util';
-import { fotoSegura } from '../../utils/foto.util';
+import { iconeServico } from '../../utils/servico.util';
 import { logError } from '../../utils/logger.util';
 
 export function proximoAgendamento(ags: Agendamento[], hoje = hojeLocal()): Agendamento | null {
@@ -17,7 +19,7 @@ export function proximoAgendamento(ags: Agendamento[], hoje = hojeLocal()): Agen
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FeedComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -25,7 +27,7 @@ export class HomeComponent {
   supabase = inject(SupabaseService);
   private store = inject(NotificacaoStore);
   naoLidas = this.store.naoLidas;
-  fotoSegura = fotoSegura;
+  mensagensNaoLidas = inject(ChatStore).naoLidas;
 
   readonly passos = [
     { icone: 'travel_explore', titulo: 'Encontre um cuidador', texto: 'Veja quem atende perto de você, os serviços e os preços.' },
@@ -41,7 +43,6 @@ export class HomeComponent {
 
   proximo = signal<Agendamento | null>(null);
   pets = signal<Pet[]>([]);
-  cuidadores = signal<Cuidador[]>([]);
   carregando = signal(false);
 
   constructor() {
@@ -49,7 +50,6 @@ export class HomeComponent {
       const id = this.supabase.currentUser()?.id_user;
       this.proximo.set(null);
       this.pets.set([]);
-      this.cuidadores.set([]);
       if (id) this.carregar(id);
     });
   }
@@ -64,10 +64,6 @@ export class HomeComponent {
       next: pets => this.pets.set(pets),
       error: err => logError(err)
     });
-    this.supabase.getCuidadores().subscribe({
-      next: cs => this.cuidadores.set(cs.slice(0, 3)),
-      error: err => logError(err)
-    });
   }
 
   formatData(iso: string): string {
@@ -75,7 +71,5 @@ export class HomeComponent {
     return `${d}/${m}/${y}`;
   }
 
-  iconeServico(s: string): string {
-    return this.servicos.find(x => x.nome === s)?.icone ?? 'pets';
-  }
+  readonly iconeServico = iconeServico;
 }

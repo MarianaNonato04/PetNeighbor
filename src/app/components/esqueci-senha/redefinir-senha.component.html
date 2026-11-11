@@ -1,0 +1,53 @@
+<div class="auth-page">
+  <div class="auth-hero">
+    <div class="auth-hero-inner">
+      <div class="auth-logo"><span class="material-symbols-rounded">password</span></div>
+      <h1>Nova senha</h1>
+      <p>Escolha uma senha que você não usa em outros sites</p>
+    </div>
+    <div class="auth-hero-wave">
+      <svg viewBox="0 0 430 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,20 C80,40 160,0 215,20 C270,40 350,0 430,20 L430,40 L0,40 Z" fill="var(--bg-color)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="auth-body">
+    <div class="auth-card glass-card">
+      <div class="aviso" *ngIf="!disponivel" role="status">
+        <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+        <p>A recuperação de senha por e-mail chega em breve.</p>
+      </div>
+
+      <h2 class="auth-card-title">Criar senha nova</h2>
+      <form [formGroup]="form" (ngSubmit)="salvar()">
+        <div class="form-group">
+          <label for="senha">Nova senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">lock</span>
+            <input type="password" id="senha" formControlName="senha" autocomplete="new-password" [attr.maxlength]="limites.senhaMax"
+              class="input-field input-with-icon" placeholder="Mínimo {{ limites.senhaMin }} caracteres"
+              [class.invalid]="form.controls.senha.touched && form.controls.senha.invalid">
+          </div>
+          <span class="error-msg" *ngIf="form.controls.senha.touched && form.controls.senha.invalid">
+            A senha precisa ter de {{ limites.senhaMin }} a {{ limites.senhaMax }} caracteres
+          </span>
+        </div>
+        <div class="form-group">
+          <label for="confirmacao">Repita a senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">lock</span>
+            <input type="password" id="confirmacao" formControlName="confirmacao" autocomplete="new-password" [attr.maxlength]="limites.senhaMax"
+              class="input-field input-with-icon" [class.invalid]="form.controls.confirmacao.touched && form.hasError('diferentes')">
+          </div>
+          <span class="error-msg" *ngIf="form.controls.confirmacao.touched && form.hasError('diferentes')">As senhas não são iguais</span>
+        </div>
+        <div class="error-banner mt-3" *ngIf="erro()" role="alert">{{ erro() }}</div>
+        <button type="submit" class="btn-primary" style="margin-top:1.5rem;" [disabled]="!disponivel || salvando()">
+          {{ salvando() ? 'Salvando...' : 'Salvar nova senha' }}
+        </button>
+      </form>
+      <p class="auth-switch-text" style="margin-top:1.25rem;"><a routerLink="/login">Voltar para o login</a></p>
+    </div>
+  </div>
+</div>

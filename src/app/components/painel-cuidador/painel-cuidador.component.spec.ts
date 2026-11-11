@@ -69,7 +69,7 @@ describe('PainelCuidadorComponent', () => {
 
     component.executar(pendente, confirmar);
 
-    expect(supabase.atualizarStatusComoCuidador).toHaveBeenCalledWith(1, 3, 'Confirmado');
+    expect(supabase.atualizarStatusComoCuidador).toHaveBeenCalledWith(1, 3, 'Confirmado', undefined);
     expect(component.agendamentos()[0].status).toBe('Confirmado');
     const notif = supabase.createNotificacao.calls.mostRecent().args[0];
     expect(notif.id_user).toBe(10);

@@ -32,6 +32,29 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="especie">Espécie</label>
+          <div class="input-wrapper">
+            <span class="input-icon material-symbols-rounded">pets</span>
+            <input
+              type="text"
+              id="especie"
+              formControlName="especie" [attr.maxlength]="limites.especie"
+              class="input-field input-with-icon"
+              placeholder="Ex: Cachorro, Gato, Coelho..."
+              list="especies"
+            >
+            <datalist id="especies">
+              <option value="Cachorro"></option>
+              <option value="Gato"></option>
+              <option value="Coelho"></option>
+              <option value="Pássaro"></option>
+              <option value="Peixe"></option>
+              <option value="Hamster"></option>
+            </datalist>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="idade_pet">Idade (anos)</label>

@@ -126,3 +126,8 @@
 .auth-switch-text a:hover {
   text-decoration: underline;
 }
+
+.esqueci { align-self: flex-end; margin-top: 0.25rem; font-size: var(--text-sm); font-weight: 600; color: var(--fill-terracota); }
+.aviso { display: flex; gap: 0.625rem; align-items: flex-start; margin-bottom: 1.25rem; padding: 0.875rem 1rem; border-radius: var(--radius-md);
+  background: rgba(165, 90, 61, 0.08); color: var(--text-primary); font-size: var(--text-sm); line-height: 1.45; }
+.aviso .material-symbols-rounded { color: var(--fill-terracota); }

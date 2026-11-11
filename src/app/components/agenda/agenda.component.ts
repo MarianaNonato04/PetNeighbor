@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { Agendamento, StatusAgendamento } from '../../models/interfaces';
+import { iconeServico } from '../../utils/servico.util';
 import { logError } from '../../utils/logger.util';
 
 @Component({
@@ -84,9 +85,7 @@ export class AgendaComponent implements OnInit {
     }[status];
   }
 
-  iconeServico(s: string): string {
-    return s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite';
-  }
+  readonly iconeServico = iconeServico;
 
   formatData(iso: string): string {
     const [y, m, d] = iso.split('-');

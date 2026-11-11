@@ -1,4 +1,4 @@
-import { hojeLocal } from './date.util';
+import { hojeLocal, horaAtual } from './date.util';
 import { fotoSegura } from './foto.util';
 import { environment } from '../../environments/environment';
 import { arredondarCoord } from '../services/geo.util';
@@ -32,5 +32,11 @@ describe('arredondarCoord', () => {
   it('arredonda para 3 casas decimais', () => {
     expect(arredondarCoord(-23.589512)).toBe(-23.59);
     expect(arredondarCoord(-46.634049)).toBe(-46.634);
+  });
+});
+
+describe('horaAtual', () => {
+  it('formata a hora local com dois dígitos', () => {
+    expect(horaAtual(new Date(2026, 10, 10, 9, 5))).toBe('09:05');
   });
 });

@@ -1,0 +1,162 @@
+<section class="feed">
+  <h2 class="feed-titulo">{{ titulo }}</h2>
+
+  <div class="composer glass-card" *ngIf="permitirPublicar && autor()">
+    <div class="composer-topo">
+      <span class="avatar">
+        <img *ngIf="fotoAutor() as foto" [src]="foto" alt="">
+        <span *ngIf="!fotoAutor()" class="material-symbols-rounded" aria-hidden="true">person</span>
+      </span>
+      <label class="sr-only" for="novo-post">Nova publicação</label>
+      <textarea id="novo-post" rows="2" class="composer-texto" [attr.maxlength]="limites.post"
+        placeholder="Compartilhe novidades do seu pet com a vizinhança..."
+        [ngModel]="texto()" (ngModelChange)="texto.set($event)"></textarea>
+    </div>
+
+    <div class="papel" *ngIf="temDoisPerfis()" role="group" aria-label="Publicar como">
+      <span>Publicar como:</span>
+      <button type="button" [class.on]="papel() === 'tutor'" (click)="trocarPapel('tutor')">Tutor</button>
+      <button type="button" [class.on]="papel() === 'cuidador'" (click)="trocarPapel('cuidador')">Cuidador</button>
+    </div>
+
+    <div class="previas" *ngIf="fotos().length">
+      <div class="previa" *ngFor="let f of fotos(); let i = index">
+        <img [src]="f.preview" alt="Foto selecionada {{ i + 1 }}">
+        <button type="button" (click)="removerFoto(i)" aria-label="Remover foto {{ i + 1 }}">
+          <span class="material-symbols-rounded" aria-hidden="true">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="composer-rodape">
+      <label class="btn-foto" *ngIf="fotos().length < limites.fotosPorPost">
+        <span class="material-symbols-rounded" aria-hidden="true">add_a_photo</span>
+        Fotos ({{ fotos().length }}/{{ limites.fotosPorPost }})
+        <input type="file" accept="image/*" multiple (change)="adicionarFotos($event)" hidden>
+      </label>
+      <button type="button" class="btn-publicar" (click)="publicar()" [disabled]="!texto().trim() || publicando()">
+        <span class="material-symbols-rounded" aria-hidden="true">send</span>
+        {{ publicando() ? 'Publicando...' : 'Publicar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="error-banner" *ngIf="erro()" role="alert">{{ erro() }}</div>
+
+  <div *ngIf="carregando()" class="estado"><div class="spinner"></div><p>Buscando publicações...</p></div>
+
+  <div *ngIf="!carregando() && !erro() && posts().length === 0" class="estado glass-card">
+    <span class="material-symbols-rounded" aria-hidden="true">feed</span>
+    <p>Nenhuma publicação ainda.</p>
+  </div>
+
+  <div class="posts">
+    <article class="post glass-card" *ngFor="let post of posts()">
+      <header class="post-topo">
+        <span class="avatar">
+          <img *ngIf="fotoPostSegura(post.autor_foto) as foto" [src]="foto" alt="">
+          <span *ngIf="!fotoPostSegura(post.autor_foto)" class="material-symbols-rounded" aria-hidden="true">person</span>
+        </span>
+        <div class="post-autor">
+          <h3>{{ post.autor_nome }}</h3>
+          <p>
+            <span class="selo" [class.selo--cuidador]="post.autor_tipo === 'cuidador'">{{ post.autor_tipo === 'cuidador' ? 'Cuidador' : 'Tutor' }}</span>
+            · {{ tempoRelativo(post.created_at) }}
+          </p>
+        </div>
+        <div class="menu" *ngIf="podeEditar(post) && editandoId() !== post.id_post">
+          <button type="button" class="menu-btn" (click)="menuAberto.set(menuAberto() === post.id_post ? null : post.id_post!)"
+            aria-label="Opções da publicação" [attr.aria-expanded]="menuAberto() === post.id_post">
+            <span class="material-symbols-rounded" aria-hidden="true">more_vert</span>
+          </button>
+          <div class="menu-lista" *ngIf="menuAberto() === post.id_post">
+            <button type="button" (click)="iniciarEdicao(post)"><span class="material-symbols-rounded" aria-hidden="true">edit</span>Editar</button>
+            <button type="button" class="perigo" (click)="excluir(post)"><span class="material-symbols-rounded" aria-hidden="true">delete</span>Excluir</button>
+          </div>
+        </div>
+      </header>
+
+      <ng-container *ngIf="editandoId() === post.id_post; else conteudo">
+        <label class="sr-only" [for]="'editar-' + post.id_post">Editar texto</label>
+        <textarea [id]="'editar-' + post.id_post" rows="3" class="composer-texto editar" [attr.maxlength]="limites.post"
+          [ngModel]="editTexto()" (ngModelChange)="editTexto.set($event)"></textarea>
+        <div class="previas" *ngIf="editFotos().length">
+          <div class="previa" *ngFor="let url of editFotos(); let i = index">
+            <img *ngIf="fotoPostSegura(url) as foto" [src]="foto" alt="Foto {{ i + 1 }}">
+            <div *ngIf="!url" class="spinner"></div>
+            <button type="button" *ngIf="url" (click)="editFotos.set(editFotos().filter((_, idx) => idx !== i))" aria-label="Remover foto {{ i + 1 }}">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+          </div>
+        </div>
+        <div class="composer-rodape">
+          <label class="btn-foto" *ngIf="editFotos().length < limites.fotosPorPost">
+            <span class="material-symbols-rounded" aria-hidden="true">add_a_photo</span> Fotos
+            <input type="file" accept="image/*" multiple (change)="adicionarFotos($event, true)" hidden>
+          </label>
+          <div class="editar-acoes">
+            <button type="button" class="btn-texto" (click)="editandoId.set(null)">Cancelar</button>
+            <button type="button" class="btn-publicar" (click)="salvarEdicao(post)" [disabled]="!editTexto().trim() || editFotos().includes('')">Salvar</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #conteudo>
+        <p class="post-texto">{{ post.descricao }}</p>
+        <div class="carrossel" *ngIf="post.fotos.length">
+          <div class="trilho" #trilho (scroll)="aoRolarCarrossel($event, post)">
+            <ng-container *ngFor="let url of post.fotos; let i = index">
+              <img *ngIf="fotoPostSegura(url) as foto" [src]="foto" alt="Foto {{ i + 1 }} de {{ post.autor_nome }}" loading="lazy">
+            </ng-container>
+          </div>
+          <ng-container *ngIf="post.fotos.length > 1">
+            <button type="button" class="seta seta--esq" (click)="mover(trilho, -1)" aria-label="Foto anterior">
+              <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+            </button>
+            <button type="button" class="seta seta--dir" (click)="mover(trilho, 1)" aria-label="Próxima foto">
+              <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+            </button>
+            <span class="contador">{{ slide(post) + 1 }}/{{ post.fotos.length }}</span>
+          </ng-container>
+        </div>
+
+        <div class="acoes">
+          <button type="button" class="acao" [class.acao--on]="curtido(post)" (click)="curtir(post)" [disabled]="!autor()"
+            [attr.aria-pressed]="curtido(post)" [title]="autor() ? '' : 'Entre para curtir'">
+            <span class="material-symbols-rounded" aria-hidden="true">{{ curtido(post) ? 'favorite' : 'favorite_border' }}</span>
+            {{ post.qtd_curtidas ?? 0 }}
+          </button>
+          <button type="button" class="acao" [class.acao--aberta]="comentariosAbertos() === post.id_post" (click)="alternarComentarios(post)"
+            [attr.aria-expanded]="comentariosAbertos() === post.id_post">
+            <span class="material-symbols-rounded" aria-hidden="true">chat_bubble_outline</span>
+            Comentários
+          </button>
+        </div>
+
+        <div class="comentarios" *ngIf="comentariosAbertos() === post.id_post">
+          <div *ngIf="carregandoComentarios()" class="estado"><div class="spinner"></div></div>
+          <div class="comentario" *ngFor="let c of comentarios().get(post.id_post!) ?? []">
+            <span class="avatar avatar--p">
+              <img *ngIf="fotoPostSegura(c.autor_foto) as foto" [src]="foto" alt="">
+              <span *ngIf="!fotoPostSegura(c.autor_foto)" class="material-symbols-rounded" aria-hidden="true">person</span>
+            </span>
+            <div class="bolha">
+              <p class="bolha-topo"><strong>{{ c.autor_nome }}</strong> <span>{{ tempoRelativo(c.created_at) }}</span></p>
+              <p>{{ c.conteudo }}</p>
+            </div>
+          </div>
+          <p class="sem-comentarios" *ngIf="!carregandoComentarios() && !(comentarios().get(post.id_post!)?.length)">Ainda não há comentários.</p>
+          <div class="novo-comentario" *ngIf="autor(); else entrar">
+            <label class="sr-only" [for]="'comentario-' + post.id_post">Escreva um comentário</label>
+            <input [id]="'comentario-' + post.id_post" type="text" placeholder="Escreva um comentário..." [attr.maxlength]="limites.comentario"
+              [ngModel]="rascunho(post.id_post!)" (ngModelChange)="setRascunho(post.id_post!, $event)" (keyup.enter)="comentar(post)">
+            <button type="button" (click)="comentar(post)" [disabled]="!rascunho(post.id_post!).trim()" aria-label="Enviar comentário">
+              <span class="material-symbols-rounded" aria-hidden="true">send</span>
+            </button>
+          </div>
+          <ng-template #entrar><a routerLink="/login" class="entrar">Entre para comentar</a></ng-template>
+        </div>
+      </ng-template>
+    </article>
+  </div>
+</section>

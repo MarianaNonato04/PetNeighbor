@@ -1,0 +1,51 @@
+<div class="auth-page">
+  <div class="auth-hero">
+    <div class="auth-hero-inner">
+      <div class="auth-logo"><span class="material-symbols-rounded">lock_reset</span></div>
+      <h1>Esqueci minha senha</h1>
+      <p>Enviamos um link para você criar uma senha nova</p>
+    </div>
+    <div class="auth-hero-wave">
+      <svg viewBox="0 0 430 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,20 C80,40 160,0 215,20 C270,40 350,0 430,20 L430,40 L0,40 Z" fill="var(--bg-color)"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="auth-body">
+    <div class="auth-card glass-card">
+      <div class="aviso" *ngIf="!disponivel" role="status">
+        <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+        <p>A recuperação de senha por e-mail chega em breve. Por enquanto, fale com a equipe do projeto.</p>
+      </div>
+
+      <ng-container *ngIf="!enviado(); else pronto">
+        <h2 class="auth-card-title">Qual é o seu e-mail?</h2>
+        <form [formGroup]="form" (ngSubmit)="enviar()">
+          <div class="form-group">
+            <label for="email">E-mail da conta</label>
+            <div class="input-wrapper">
+              <span class="input-icon material-symbols-rounded">mail</span>
+              <input type="email" id="email" formControlName="email" maxlength="254" autocomplete="email"
+                class="input-field input-with-icon" placeholder="seu@email.com"
+                [class.invalid]="form.controls.email.touched && form.controls.email.invalid">
+            </div>
+            <span class="error-msg" *ngIf="form.controls.email.touched && form.controls.email.invalid">Informe um e-mail válido</span>
+          </div>
+          <div class="error-banner mt-3" *ngIf="erro()" role="alert">{{ erro() }}</div>
+          <button type="submit" class="btn-primary" style="margin-top:1.5rem;" [disabled]="!disponivel || enviando()">
+            {{ enviando() ? 'Enviando...' : 'Enviar link' }}
+          </button>
+        </form>
+      </ng-container>
+
+      <ng-template #pronto>
+        <div class="success-banner" role="status">
+          Se existir uma conta com esse e-mail, você vai receber um link para criar uma senha nova. O link vale por 1 hora.
+        </div>
+      </ng-template>
+
+      <p class="auth-switch-text" style="margin-top:1.25rem;"><a routerLink="/login">Voltar para o login</a></p>
+    </div>
+  </div>
+</div>

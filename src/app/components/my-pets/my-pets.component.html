@@ -38,7 +38,7 @@
           </div>
           <div class="pet-info">
             <div class="pet-name-row">
-              <h3 class="pet-name">{{ pet.nome_pet }}</h3>
+              <h3 class="pet-name">{{ pet.nome_pet }} <span class="pet-especie" *ngIf="pet.especie">({{ pet.especie }})</span></h3>
               <span class="porte-chip">{{ pet.porte }}</span>
             </div>
             <div class="pet-meta">

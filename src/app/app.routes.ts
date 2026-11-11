@@ -20,12 +20,15 @@ export const routes: Routes = [
   { path: 'agendar/:id', canActivate: [authGuard], loadComponent: () => import('./components/agendar/agendar.component').then(m => m.AgendarComponent) },
   { path: 'agenda', loadComponent: () => import('./components/agenda/agenda.component').then(m => m.AgendaComponent) },
 
+  { path: 'conversas', canActivate: [authGuard], loadComponent: () => import('./components/conversas/conversas.component').then(m => m.ConversasComponent) },
   { path: 'chat/:id', canActivate: [authGuard], loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent) },
   
   { path: 'area-cuidador/login', data: { papel: 'cuidador' }, loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent) },
   { path: 'area-cuidador', canActivate: [cuidadorGuard], loadComponent: () => import('./components/painel-cuidador/painel-cuidador.component').then(m => m.PainelCuidadorComponent) },
   { path: 'area-cuidador/chat/:id', canActivate: [cuidadorGuard], data: { papel: 'cuidador' }, loadComponent: () => import('./components/chat/chat.component').then(m => m.ChatComponent) },
 
+  { path: 'esqueci-senha', loadComponent: () => import('./components/esqueci-senha/esqueci-senha.component').then(m => m.EsqueciSenhaComponent) },
+  { path: 'redefinir-senha', loadComponent: () => import('./components/esqueci-senha/redefinir-senha.component').then(m => m.RedefinirSenhaComponent) },
   { path: 'privacidade', loadComponent: () => import('./components/privacidade/privacidade.component').then(m => m.PrivacidadeComponent) },
 
   { path: 'notificacoes', loadComponent: () => import('./components/notificacoes/notificacoes.component').then(m => m.NotificacoesComponent) },

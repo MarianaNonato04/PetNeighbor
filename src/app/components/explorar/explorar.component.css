@@ -53,6 +53,8 @@
   gap: 1rem;
 }
 
+.filtros, .resultados { display: flex; flex-direction: column; gap: 1rem; min-width: 0; }
+
 .chips-row {
   display: flex;
   gap: 0.5rem;
@@ -343,6 +345,9 @@
 .cuidador-cidade .material-symbols-rounded { font-size: var(--text-sm); }
 
 @media (min-width: 900px) {
-  .cuidador-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); align-items: start; }
-  .price-filter { max-width: 480px; }
+  .page-body { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+  .filtros { position: sticky; top: 88px; }
+  .filtros .chips-row { flex-wrap: wrap; overflow: visible; }
+  .cuidador-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+  .cuidador-count { grid-column: 1 / -1; }
 }

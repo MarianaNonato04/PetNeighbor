@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { SupabaseService } from './services/supabase.service';
 import { NotificacaoStore } from './services/notificacao.store';
+import { ChatStore } from './services/chat.store';
 import { RouterTestingModule } from '@angular/router/testing';
 import { signal } from '@angular/core';
 
@@ -24,7 +25,8 @@ describe('AppComponent', () => {
       imports: [AppComponent, RouterTestingModule],
       providers: [
         { provide: SupabaseService, useValue: mockSupabaseService },
-        { provide: NotificacaoStore, useValue: mockNotificacaoStore }
+        { provide: NotificacaoStore, useValue: mockNotificacaoStore },
+        { provide: ChatStore, useValue: jasmine.createSpyObj('ChatStore', ['iniciar', 'parar']) }
       ]
     }).compileComponents();
 

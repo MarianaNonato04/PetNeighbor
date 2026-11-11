@@ -215,4 +215,6 @@
 
 @media (min-width: 900px) {
   .pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); align-items: start; }
+  .pet-list > .btn-secondary { grid-column: 1 / -1; justify-self: start; width: auto; padding-inline: 1.5rem; }
 }
+.pet-especie { font-family: 'Outfit', sans-serif; font-size: var(--text-sm); font-weight: 500; color: var(--text-secondary); }

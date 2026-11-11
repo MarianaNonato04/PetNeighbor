@@ -1,0 +1,35 @@
+<div class="agenda-page">
+  <header class="page-header">
+    <div class="header-text">
+      <h1>Conversas</h1>
+      <p>Suas mensagens com os cuidadores</p>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div class="error-banner" *ngIf="erro()" role="alert">{{ erro() }}</div>
+    <div *ngIf="carregando()" class="state-box"><div class="spinner"></div><p>Carregando...</p></div>
+
+    <div *ngIf="!carregando() && !erro() && conversas().length === 0" class="empty-state glass-card">
+      <div class="empty-art"><span class="material-symbols-rounded">forum</span></div>
+      <h3>Nenhuma conversa ainda</h3>
+      <p>Abra o perfil de um cuidador e toque em "Conversar".</p>
+      <a routerLink="/explorar" class="btn-primary" style="margin-top:1rem;max-width:240px;">Explorar cuidadores</a>
+    </div>
+
+    <div class="painel-conversas" *ngIf="conversas().length > 0">
+      <a class="painel-conversa glass-card" *ngFor="let c of conversas()" [routerLink]="['/chat', c.id_cuidador]">
+        <span class="conversa-avatar">
+          <img *ngIf="c.foto" [src]="c.foto" alt="">
+          <span *ngIf="!c.foto" class="material-symbols-rounded painel-conversa-avatar" aria-hidden="true">account_circle</span>
+        </span>
+        <div class="painel-conversa-texto">
+          <p class="painel-conversa-nome">{{ c.nome }}</p>
+          <p class="painel-conversa-ultima"><span *ngIf="c.remetente === 'tutor'">Você: </span>{{ c.ultima }}</p>
+        </div>
+        <span class="painel-conversa-hora">{{ tempoRelativo(c.created_at) }}</span>
+        <span class="painel-contador" *ngIf="c.naoLidas > 0" [attr.aria-label]="c.naoLidas + ' mensagens não lidas'">{{ c.naoLidas }}</span>
+      </a>
+    </div>
+  </div>
+</div>

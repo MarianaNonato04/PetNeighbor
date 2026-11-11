@@ -2,6 +2,7 @@ import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BottomNavComponent } from './components/bottom-nav/bottom-nav.component';
 import { SupabaseService } from './services/supabase.service';
+import { ChatStore } from './services/chat.store';
 import { NotificacaoStore } from './services/notificacao.store';
 
 @Component({
@@ -24,6 +25,9 @@ import { NotificacaoStore } from './services/notificacao.store';
       display: flex;
       flex-direction: column;
     }
+    @media (min-width: 900px) {
+      .main-content { padding-bottom: 0; }
+    }
   `]
 })
 export class AppComponent {
@@ -31,6 +35,7 @@ export class AppComponent {
 
   private supabase = inject(SupabaseService);
   private notificacoes = inject(NotificacaoStore);
+  private chat = inject(ChatStore);
 
   constructor() {
 
@@ -38,8 +43,10 @@ export class AppComponent {
       const user = this.supabase.currentUser();
       if (user?.id_user) {
         this.notificacoes.iniciar(user.id_user);
+        this.chat.iniciar(user.id_user);
       } else {
         this.notificacoes.parar();
+        this.chat.parar();
       }
     });
   }

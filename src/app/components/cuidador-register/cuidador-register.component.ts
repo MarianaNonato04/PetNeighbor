@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { Cuidador, TipoServico, SERVICOS } from '../../models/interfaces';
 import { getCurrentPosition, arredondarCoord } from '../../services/geo.util';
+import { emailDuplicado } from '../../utils/erro.util';
 import { logError } from '../../utils/logger.util';
 import { LIMITES } from '../../utils/limits';
 
@@ -127,7 +128,7 @@ export class CuidadorRegisterComponent {
       error: err => {
         logError(err);
         this.isSubmitting.set(false);
-        this.errorMessage.set('Erro ao cadastrar. Verifique os dados e tente novamente.');
+        this.errorMessage.set(emailDuplicado(err) ? 'Este e-mail já está cadastrado.' : 'Erro ao cadastrar. Verifique os dados e tente novamente.');
       }
     });
   }

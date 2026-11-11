@@ -15,8 +15,39 @@
 
     <div class="page-body">
 
-      <div class="glass-card info-section">
-        <h2 class="section-label">Conta</h2>
+      <div class="stats">
+        <a class="stat glass-card" routerLink="/meus-pets">
+          <span class="stat-num">{{ qtdPets() ?? '–' }}</span><span class="stat-label">Pets</span>
+        </a>
+        <a class="stat glass-card" routerLink="/agenda">
+          <span class="stat-num">{{ qtdAgendamentos() ?? '–' }}</span><span class="stat-label">Agendamentos</span>
+        </a>
+      </div>
+
+      <form class="glass-card info-section edicao" *ngIf="editando()" (ngSubmit)="salvarPerfil()">
+        <h2 class="section-label">Editar perfil</h2>
+        <div class="form-group">
+          <label for="edit-nome">Nome</label>
+          <input id="edit-nome" name="nome" class="input-field" [(ngModel)]="editNome" [attr.maxlength]="limites.nome" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-idade">Idade</label>
+          <input id="edit-idade" name="idade" type="number" class="input-field" [(ngModel)]="editIdade" min="1" [attr.max]="limites.idadeMax" required>
+        </div>
+        <div class="error-banner mt-3" *ngIf="erroEdicao()" role="alert">{{ erroEdicao() }}</div>
+        <div class="edicao-acoes">
+          <button type="button" class="btn-cancelar" (click)="editando.set(false)">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="salvando()">{{ salvando() ? 'Salvando...' : 'Salvar' }}</button>
+        </div>
+      </form>
+
+      <div class="glass-card info-section" *ngIf="!editando()">
+        <div class="secao-topo">
+          <h2 class="section-label">Conta</h2>
+          <button type="button" class="btn-editar" (click)="iniciarEdicao()">
+            <span class="material-symbols-rounded" aria-hidden="true">edit</span> Editar
+          </button>
+        </div>
 
         <div class="info-row">
           <div class="info-icon info-icon--orange">
@@ -103,6 +134,10 @@
           <span class="action-label">Política de Privacidade</span>
           <span class="material-symbols-rounded action-arrow">chevron_right</span>
         </button>
+      </div>
+
+      <div class="meus-posts">
+        <app-feed titulo="Minhas publicações" [filtro]="{ idUser: u.id_user }"></app-feed>
       </div>
 
       <button class="logout-btn" (click)="logout()">

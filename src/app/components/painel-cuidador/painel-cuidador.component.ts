@@ -1,11 +1,15 @@
 import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { hojeLocal } from '../../utils/date.util';
 import { Router, RouterModule } from '@angular/router';
 import { SupabaseService, Cancelar } from '../../services/supabase.service';
 import { Agendamento, Notificacao, StatusAgendamento } from '../../models/interfaces';
+import { LIMITES } from '../../utils/limits';
+import { iconeServico } from '../../utils/servico.util';
 import { logError } from '../../utils/logger.util';
 
-type Aba = 'Pedidos' | 'Ativos' | 'Histórico' | 'Conversas';
+type Aba = 'Pedidos' | 'Ativos' | 'Calendário' | 'Histórico' | 'Conversas';
 
 interface AcaoStatus {
   rotulo: string;
@@ -49,7 +53,7 @@ const TEXTO_NOTIFICACAO: Partial<Record<StatusAgendamento, string>> = {
 @Component({
   selector: 'app-painel-cuidador',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './painel-cuidador.component.html',
   styleUrls: ['../agenda/agenda.component.css', './painel-cuidador.component.css']
 })
@@ -71,16 +75,38 @@ export class PainelCuidadorComponent implements OnInit, OnDestroy {
 
   private cancelarAssinatura?: Cancelar;
 
+  readonly meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  mesVisivel = signal(primeiroDoMes(new Date()));
+  diaSelecionado = signal(hojeLocal());
+  calendario = computed(() => gerarCalendario(this.mesVisivel(), new Set(
+    this.agendamentos().filter(a => a.status !== 'Cancelado').map(a => a.data)
+  )));
+
+  readonly limites = LIMITES;
+  concluindoId = signal<number | null>(null);
+  obsConclusao = '';
+
   agendamentosDaAba = computed<Agendamento[]>(() => {
-    const filtros: Record<Exclude<Aba, 'Conversas'>, StatusAgendamento[]> = {
+    const filtros: Record<'Pedidos' | 'Ativos' | 'Histórico', StatusAgendamento[]> = {
       'Pedidos': ['Pendente'],
       'Ativos': ['Confirmado', 'Em andamento'],
       'Histórico': ['Concluído', 'Cancelado']
     };
     const aba = this.aba();
     if (aba === 'Conversas') return [];
+    if (aba === 'Calendário') return this.agendamentos().filter(a => a.data === this.diaSelecionado());
     return this.agendamentos().filter(a => filtros[aba].includes(a.status));
   });
+
+  mudarMes(delta: number) {
+    const m = this.mesVisivel();
+    this.mesVisivel.set(new Date(m.getFullYear(), m.getMonth() + delta, 1));
+  }
+
+  escolherDia(dia: DiaCalendario) {
+    this.diaSelecionado.set(dia.data);
+    if (!dia.doMes) this.mesVisivel.set(primeiroDoMes(new Date(dia.data + 'T12:00')));
+  }
 
   pendentes = computed(() => this.agendamentos().filter(a => a.status === 'Pendente').length);
   mensagensNaoLidas = computed(() => this.conversas().reduce((t, c) => t + c.naoLidas, 0));
@@ -139,18 +165,29 @@ export class PainelCuidadorComponent implements OnInit, OnDestroy {
     return ACOES[a.status] ?? [];
   }
 
-  executar(a: Agendamento, acao: AcaoStatus) {
+  executar(a: Agendamento, acao: AcaoStatus, observacoes?: string) {
     const c = this.cuidador();
     if (!c?.id_cuidador || !a.id_agendamento || this.atualizando()) return;
+    if (acao.novoStatus === 'Concluído' && observacoes === undefined) {
+      this.obsConclusao = a.observacoes ?? '';
+      this.concluindoId.set(a.id_agendamento);
+      return;
+    }
+    if (observacoes && observacoes.length > LIMITES.observacoes) {
+      this.erro.set(`As observações podem ter no máximo ${LIMITES.observacoes} caracteres.`);
+      return;
+    }
     this.atualizando.set(a.id_agendamento);
 
-    this.supabase.atualizarStatusComoCuidador(a.id_agendamento, c.id_cuidador, acao.novoStatus).subscribe({
+    this.supabase.atualizarStatusComoCuidador(a.id_agendamento, c.id_cuidador, acao.novoStatus, observacoes).subscribe({
       next: () => {
         this.agendamentos.update(list =>
-          list.map(x => x.id_agendamento === a.id_agendamento ? { ...x, status: acao.novoStatus } : x)
+          list.map(x => x.id_agendamento === a.id_agendamento
+            ? { ...x, status: acao.novoStatus, ...(observacoes === undefined ? {} : { observacoes }) } : x)
         );
         this.atualizando.set(null);
-        this.notificarTutor(a, acao.novoStatus);
+        this.concluindoId.set(null);
+        this.notificarTutor(a, acao.novoStatus, observacoes);
       },
       error: err => {
         logError(err);
@@ -160,14 +197,15 @@ export class PainelCuidadorComponent implements OnInit, OnDestroy {
     });
   }
 
-  private notificarTutor(a: Agendamento, status: StatusAgendamento) {
+  private notificarTutor(a: Agendamento, status: StatusAgendamento, observacoes?: string) {
     const verbo = TEXTO_NOTIFICACAO[status];
     if (!verbo) return;
     this.supabase.createNotificacao({
       id_user: a.id_user,
       tipo: 'agendamento',
       titulo: `Agendamento ${status.toLowerCase()}`,
-      mensagem: `${this.cuidador()?.nome ?? 'O cuidador'} ${verbo} o ${a.tipo_servico} de ${a.nome_pet} em ${this.formatData(a.data)}.`,
+      mensagem: `${this.cuidador()?.nome ?? 'O cuidador'} ${verbo} o ${a.tipo_servico} de ${a.nome_pet} em ${this.formatData(a.data)}.`
+        + (observacoes ? ` Observações: ${observacoes}` : ''),
       lida: false,
       id_agendamento: a.id_agendamento
     }).subscribe({ error: e => logError(e) });
@@ -204,9 +242,7 @@ export class PainelCuidadorComponent implements OnInit, OnDestroy {
     }[status];
   }
 
-  iconeServico(s: string): string {
-    return s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite';
-  }
+  readonly iconeServico = iconeServico;
 
   formatData(iso: string): string {
     const [y, m, d] = iso.split('-');
@@ -242,4 +278,19 @@ export function agruparConversas(
     });
   }
   return [...vistas.values()];
+}
+
+export interface DiaCalendario { data: string; numero: number; doMes: boolean; hoje: boolean; temServico: boolean; }
+
+export function primeiroDoMes(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+export function gerarCalendario(mes: Date, datasComServico: Set<string>, hoje = hojeLocal()): DiaCalendario[] {
+  const inicio = new Date(mes.getFullYear(), mes.getMonth(), 1 - mes.getDay());
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + i);
+    const data = hojeLocal(d);
+    return { data, numero: d.getDate(), doMes: d.getMonth() === mes.getMonth(), hoje: data === hoje, temServico: datasComServico.has(data) };
+  });
 }

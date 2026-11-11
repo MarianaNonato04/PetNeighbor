@@ -44,16 +44,20 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "10kb",
-                  "maximumError": "12kb"
+                  "maximumWarning": "20kb",
+                  "maximumError": "40kb"
                 }
               ],
               "optimization": {
                 "scripts": true,
-                "styles": { "minify": true, "inlineCritical": false },
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
                 "fonts": true
               },
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/PetNeighbor/"
             },
             "development": {
               "buildOptimizer": false,
@@ -91,6 +95,9 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

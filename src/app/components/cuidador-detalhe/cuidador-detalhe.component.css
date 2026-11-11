@@ -81,6 +81,7 @@
 }
 
 @media (min-width: 900px) {
+
   .detalhe-hero {
     align-items: flex-start;
     text-align: left;
@@ -199,3 +200,24 @@
   flex-direction: column;
   align-items: center;
 }
+
+@media (min-width: 900px) {
+  .back-btn { left: var(--gutter); top: 1.5rem; }
+  .detalhe-hero { padding-top: 4.5rem; }
+  .action-bar {
+    position: sticky;
+    left: auto;
+    transform: none;
+    max-width: none;
+    justify-content: flex-end;
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    padding: 1rem var(--gutter);
+    background: linear-gradient(to top, var(--bg-color) 65%, transparent);
+  }
+  .action-bar .btn-primary, .action-bar .btn-outline-action { flex: 0 0 auto; width: auto; padding-inline: 1.5rem; }
+}
+
+.mapa-card iframe { display: block; width: 100%; height: 240px; border: 0; border-radius: var(--radius-md); margin-top: 0.5rem; }
+.mapa-nota { margin-top: 0.5rem; font-size: var(--text-xs); color: var(--text-secondary); }

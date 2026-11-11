@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { Router, RouterModule } from '@angular/router';
+import { emailDuplicado } from '../../utils/erro.util';
 import { logError } from '../../utils/logger.util';
 import { LIMITES } from '../../utils/limits';
 
@@ -28,7 +29,7 @@ export class RegisterComponent {
   constructor() {
     this.registerForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(LIMITES.nome)]],
-      idade: ['', [Validators.required, Validators.min(0), Validators.max(LIMITES.idadeMax)]],
+      idade: ['', [Validators.required, Validators.min(1), Validators.max(LIMITES.idadeMax)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(LIMITES.email)]],
       senha: ['', [Validators.required, Validators.minLength(LIMITES.senhaMin), Validators.maxLength(LIMITES.senhaMax)]],
       
@@ -52,7 +53,7 @@ export class RegisterComponent {
         error: (err) => {
           logError(err);
           this.isSubmitting.set(false);
-          this.errorMessage.set('Erro ao criar conta. Tente outro e-mail.');
+          this.errorMessage.set(emailDuplicado(err) ? 'Este e-mail já está cadastrado.' : 'Erro ao criar conta. Tente novamente.');
         }
       });
     } else {

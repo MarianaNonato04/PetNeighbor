@@ -36,6 +36,7 @@
         Pedidos<span class="painel-contador" *ngIf="pendentes() > 0">{{ pendentes() }}</span>
       </button>
       <button class="tab" [class.tab--on]="aba() === 'Ativos'" (click)="aba.set('Ativos')">Ativos</button>
+      <button class="tab" [class.tab--on]="aba() === 'Calendário'" (click)="aba.set('Calendário')">Calendário</button>
       <button class="tab" [class.tab--on]="aba() === 'Histórico'" (click)="aba.set('Histórico')">Histórico</button>
       <button class="tab" [class.tab--on]="aba() === 'Conversas'" (click)="aba.set('Conversas')">
         Chat<span class="painel-contador" *ngIf="mensagensNaoLidas() > 0">{{ mensagensNaoLidas() }}</span>
@@ -47,10 +48,31 @@
     <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando...</p></div>
 
     <ng-container *ngIf="!isLoading() && aba() !== 'Conversas'">
+      <section class="calendario glass-card" *ngIf="aba() === 'Calendário'" aria-label="Calendário de serviços">
+        <div class="cal-topo">
+          <button type="button" class="cal-nav" (click)="mudarMes(-1)" aria-label="Mês anterior">
+            <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+          </button>
+          <h2>{{ meses[mesVisivel().getMonth()] }} {{ mesVisivel().getFullYear() }}</h2>
+          <button type="button" class="cal-nav" (click)="mudarMes(1)" aria-label="Próximo mês">
+            <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+          </button>
+        </div>
+        <div class="cal-grade">
+          <span class="cal-semana" *ngFor="let d of ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']">{{ d }}</span>
+          <button type="button" class="cal-dia" *ngFor="let dia of calendario()" (click)="escolherDia(dia)"
+            [class.cal-dia--fora]="!dia.doMes" [class.cal-dia--hoje]="dia.hoje" [class.cal-dia--on]="dia.data === diaSelecionado()"
+            [attr.aria-label]="dia.data + (dia.temServico ? ', com serviço' : '')" [attr.aria-pressed]="dia.data === diaSelecionado()">
+            {{ dia.numero }}<span class="cal-ponto" *ngIf="dia.temServico"></span>
+          </button>
+        </div>
+        <p class="cal-dia-titulo">Serviços em {{ formatData(diaSelecionado()) }}</p>
+      </section>
+
       <div *ngIf="agendamentosDaAba().length === 0" class="empty-state glass-card">
         <div class="empty-art"><span class="material-symbols-rounded">event_busy</span></div>
         <h3>Nada por aqui</h3>
-        <p>{{ aba() === 'Pedidos' ? 'Nenhum pedido novo no momento.' : aba() === 'Ativos' ? 'Nenhum serviço confirmado.' : 'Sem histórico ainda.' }}</p>
+        <p>{{ aba() === 'Pedidos' ? 'Nenhum pedido novo no momento.' : aba() === 'Ativos' ? 'Nenhum serviço confirmado.' : aba() === 'Calendário' ? 'Nenhum serviço neste dia.' : 'Sem histórico ainda.' }}</p>
       </div>
 
       <div class="ag-list" *ngIf="agendamentosDaAba().length > 0">
@@ -91,6 +113,18 @@
               {{ acao.rotulo }}
             </button>
           </div>
+
+          <form class="conclusao" *ngIf="concluindoId() === a.id_agendamento" (ngSubmit)="executar(a, { rotulo: 'Concluir', icone: 'task_alt', novoStatus: 'Concluído' }, obsConclusao.trim())">
+            <label [for]="'obs-' + a.id_agendamento">Observações do atendimento</label>
+            <textarea [id]="'obs-' + a.id_agendamento" name="obs" rows="3" class="input-field" [(ngModel)]="obsConclusao"
+              [attr.maxlength]="limites.observacoes" placeholder="Como foi o serviço? O tutor recebe esse resumo."></textarea>
+            <div class="conclusao-acoes">
+              <button type="button" class="painel-btn painel-btn--ghost" (click)="concluindoId.set(null)">Cancelar</button>
+              <button type="submit" class="painel-btn painel-btn--primary" [disabled]="atualizando() === a.id_agendamento">
+                <span class="material-symbols-rounded" aria-hidden="true">task_alt</span> Confirmar conclusão
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </ng-container>

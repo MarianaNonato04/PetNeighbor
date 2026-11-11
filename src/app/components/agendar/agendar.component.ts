@@ -6,9 +6,20 @@ import { SupabaseService } from '../../services/supabase.service';
 import {
   Cuidador, Pet, TipoServico, Recorrencia, Agendamento
 } from '../../models/interfaces';
-import { hojeLocal } from '../../utils/date.util';
+import { hojeLocal, horaAtual } from '../../utils/date.util';
 import { logError } from '../../utils/logger.util';
 import { LIMITES } from '../../utils/limits';
+
+const PRECOS: Record<TipoServico, keyof Cuidador> = { 'Passeio': 'preco_passeio', 'Alimentação': 'preco_alimentacao', 'Companhia': 'preco_companhia' };
+
+export function precoPorHora(c: Cuidador | null, servicos: TipoServico[]): number {
+  return c ? servicos.reduce((soma, s) => soma + Number(c[PRECOS[s]] ?? 0), 0) : 0;
+}
+
+export function proximaHoraCheia(agora = new Date()): [string, string] {
+  const d = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), agora.getHours() + 1, 0);
+  return [hojeLocal(d), horaAtual(d)];
+}
 
 @Component({
   selector: 'app-agendar',
@@ -31,7 +42,8 @@ export class AgendarComponent implements OnInit {
   readonly limites = LIMITES;
 
   petSelecionado = signal<number | null>(null);
-  servicoSelecionado = signal<TipoServico | null>(null);
+  servicosSelecionados = signal<TipoServico[]>([]);
+  duracao = signal<number>(1);
   data = signal<string>('');
   hora = signal<string>('09:00');
   recorrencia = signal<Recorrencia>('Único');
@@ -39,26 +51,28 @@ export class AgendarComponent implements OnInit {
 
   servicosDisponiveis = computed<TipoServico[]>(() => this.cuidador()?.servicos ?? []);
 
-  precoSelecionado = computed<number>(() => {
-    const c = this.cuidador();
-    const s = this.servicoSelecionado();
-    if (!c || !s) return 0;
-    return { 'Passeio': c.preco_passeio, 'Alimentação': c.preco_alimentacao, 'Companhia': c.preco_companhia }[s];
-  });
+  precoPorHora = computed(() => precoPorHora(this.cuidador(), this.servicosSelecionados()));
+  precoTotal = computed(() => this.precoPorHora() * this.duracao());
+
+  alternarServico(s: TipoServico) {
+    this.servicosSelecionados.update(l => (l.includes(s) ? l.filter(x => x !== s) : [...l, s]));
+  }
 
   ngOnInit() {
     
     const tutor = this.supabase.currentUser();
     if (!tutor) return;
 
-    this.data.set(hojeLocal());
+    const [data, hora] = proximaHoraCheia();
+    this.data.set(data);
+    this.hora.set(hora);
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.supabase.getCuidador(id).subscribe({
       next: data => {
         const c = data?.[0] ?? null;
         this.cuidador.set(c);
-        if (c?.servicos?.length) this.servicoSelecionado.set(c.servicos[0]);
+        if (c?.servicos?.length) this.servicosSelecionados.set([c.servicos[0]]);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
@@ -83,9 +97,11 @@ export class AgendarComponent implements OnInit {
 
     if (!tutor || !c) return;
     if (!this.petSelecionado()) { this.errorMessage.set('Cadastre ou selecione um pet.'); return; }
-    if (!this.servicoSelecionado()) { this.errorMessage.set('Selecione um serviço.'); return; }
+    if (this.servicosSelecionados().length === 0) { this.errorMessage.set('Selecione pelo menos um serviço.'); return; }
+    if (!Number.isInteger(this.duracao()) || this.duracao() < 1 || this.duracao() > 12) { this.errorMessage.set('A duração deve ser de 1 a 12 horas.'); return; }
     if (!this.data()) { this.errorMessage.set('Escolha uma data.'); return; }
     if (this.data() < hojeLocal()) { this.errorMessage.set('A data não pode estar no passado.'); return; }
+    if (this.data() === hojeLocal() && this.hora() <= horaAtual()) { this.errorMessage.set('Escolha um horário que ainda não passou.'); return; }
     if (this.observacoes().length > LIMITES.observacoes) {
       this.errorMessage.set(`As observações podem ter no máximo ${LIMITES.observacoes} caracteres.`);
       return;
@@ -96,12 +112,12 @@ export class AgendarComponent implements OnInit {
       id_user: tutor.id_user!,
       id_cuidador: c.id_cuidador!,
       id_pet: this.petSelecionado()!,
-      tipo_servico: this.servicoSelecionado()!,
+      tipo_servico: this.servicosSelecionados().join(', '),
       data: this.data(),
       hora: this.hora(),
       recorrencia: this.recorrencia(),
-      preco: this.precoSelecionado(),
-      observacoes: this.observacoes().trim(),
+      preco: this.precoTotal(),
+      observacoes: [this.observacoes().trim(), `Duração: ${this.duracao()}h`].filter(Boolean).join(' | '),
       status: 'Pendente'
     };
 

@@ -19,11 +19,12 @@ export class NotificacaoStore {
     this.userIdAtivo = userId;
 
     this.supabase.getNotificacoes(userId).subscribe({
-      next: data => this.notificacoes.set(data || []),
+      next: data => this.notificacoes.set((data || []).filter(n => n.tipo !== 'mensagem')),
       error: err => logError(err)
     });
 
     this.cancelarAssinatura = this.supabase.subscribeNotificacoes(userId, nova => {
+      if (nova.tipo === 'mensagem') return;
       this.notificacoes.update(list =>
         list.some(n => n.id_notificacao === nova.id_notificacao) ? list : [nova, ...list]
       );

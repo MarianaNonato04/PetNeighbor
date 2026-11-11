@@ -34,17 +34,18 @@
       </div>
 
       <div class="form-group mt-4">
-        <label>Serviço</label>
+        <label>Serviços desejados</label>
         <div class="servico-options">
           <button type="button" class="servico-option" *ngFor="let s of servicosDisponiveis()"
-            [class.servico-option--on]="servicoSelecionado() === s" (click)="servicoSelecionado.set(s)">
+            [class.servico-option--on]="servicosSelecionados().includes(s)" (click)="alternarServico(s)"
+            [attr.aria-pressed]="servicosSelecionados().includes(s)">
             <span class="material-symbols-rounded">{{
               s === 'Passeio' ? 'directions_walk' : s === 'Alimentação' ? 'restaurant' : 'favorite'
             }}</span>
             <span class="servico-option-nome">{{ s }}</span>
             <span class="servico-option-preco">R$ {{
               s === 'Passeio' ? c.preco_passeio : s === 'Alimentação' ? c.preco_alimentacao : c.preco_companhia
-            }}</span>
+            }} / hora</span>
           </button>
         </div>
       </div>
@@ -60,6 +61,16 @@
           <input id="hora" type="time" class="input-field"
             [ngModel]="hora()" (ngModelChange)="hora.set($event)" name="hora">
         </div>
+      </div>
+
+      <div class="form-group mt-4">
+        <label for="duracao">Duração do atendimento</label>
+        <div class="duracao">
+          <input id="duracao" type="number" class="input-field" min="1" max="12" step="1"
+            [ngModel]="duracao()" (ngModelChange)="duracao.set(+$event)" name="duracao">
+          <span>hora(s)</span>
+        </div>
+        <span class="hint-msg">O total é a soma dos serviços por hora multiplicada pela duração.</span>
       </div>
 
       <div class="form-group mt-4">
@@ -79,8 +90,11 @@
       </div>
 
       <div class="resumo-card">
-        <span>Total estimado</span>
-        <strong>R$ {{ precoSelecionado() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>
+        <div class="resumo-detalhe">
+          <span>Total estimado</span>
+          <small>R$ {{ precoPorHora() }}/h × {{ duracao() }}h</small>
+        </div>
+        <strong>R$ {{ precoTotal() }}<small *ngIf="recorrencia() !== 'Único'"> / sessão</small></strong>
       </div>
 
       <div class="error-banner" *ngIf="errorMessage()" style="margin-top:1rem;">{{ errorMessage() }}</div>

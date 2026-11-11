@@ -2,7 +2,7 @@ import { Injectable, InjectionToken, inject, signal } from '@angular/core';
 import { Observable, from, map, tap } from 'rxjs';
 import type { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 import {
-  Usuario, Pet, Cuidador, Agendamento, Mensagem, Notificacao, StatusAgendamento
+  Usuario, Pet, Cuidador, Agendamento, Mensagem, Notificacao, StatusAgendamento, Post, Comentario, AutorTipo
 } from '../models/interfaces';
 import { environment } from '../../environments/environment';
 
@@ -188,6 +188,12 @@ export class SupabaseService {
     );
   }
 
+  atualizarPerfil(idUser: number, dados: Pick<Usuario, 'nome' | 'idade'>): Observable<Usuario[]> {
+    return this.run<Usuario>(c => c.from('usuarios').update(dados).eq('id_user', idUser).select(this.USUARIO_COLS)).pipe(
+      tap(rows => { if (rows.length > 0) this.setCurrentUser(rows[0]); })
+    );
+  }
+
   getUsuarioNome(id: number): Observable<Pick<Usuario, 'id_user' | 'nome'>[]> {
     return this.run(c => c.from('usuarios').select('id_user, nome').eq('id_user', id));
   }
@@ -266,9 +272,10 @@ export class SupabaseService {
   }
 
   
-  atualizarStatusComoCuidador(id: number, idCuidador: number, status: StatusAgendamento): Observable<Agendamento[]> {
+  atualizarStatusComoCuidador(id: number, idCuidador: number, status: StatusAgendamento, observacoes?: string): Observable<Agendamento[]> {
+    const dados = observacoes === undefined ? { status } : { status, observacoes };
     return this.run<Agendamento>(c =>
-      c.from('agendamentos').update({ status }).eq('id_agendamento', id).eq('id_cuidador', idCuidador).select()
+      c.from('agendamentos').update(dados).eq('id_agendamento', id).eq('id_cuidador', idCuidador).select()
     );
   }
 
@@ -302,6 +309,24 @@ export class SupabaseService {
       c.from('mensagens').update({ lida: true })
         .eq('conversa_id', conversaId).eq('remetente', remetente).eq('lida', false).select('id_mensagem')
     );
+  }
+
+  getConversasDoTutor(idUser: number): Observable<(Mensagem & { nome_cuidador: string; foto_cuidador: string | null })[]> {
+    return this.run<Mensagem & { cuidadores?: { nome: string; foto_url: string | null } | null }>(c =>
+      c.from('mensagens').select('*, cuidadores(nome, foto_url)').eq('id_user', idUser).order('created_at', { ascending: false })
+    ).pipe(map(rows => rows.map(({ cuidadores, ...m }) => ({
+      ...m, nome_cuidador: cuidadores?.nome ?? 'Cuidador', foto_cuidador: cuidadores?.foto_url ?? null
+    }))));
+  }
+
+  contarNaoLidasDoTutor(idUser: number): Observable<number> {
+    return this.run<{ id_mensagem: number }>(c =>
+      c.from('mensagens').select('id_mensagem').eq('id_user', idUser).eq('remetente', 'cuidador').eq('lida', false)
+    ).pipe(map(rows => rows.length));
+  }
+
+  subscribeMensagensDoTutor(idUser: number, onInsert: (msg: Mensagem) => void): Cancelar {
+    return this.assinar(`mensagens-tutor:${idUser}`, 'mensagens', `id_user=eq.${idUser}`, onInsert);
   }
 
   subscribeMensagens(conversaId: string, onInsert: (msg: Mensagem) => void): Cancelar {
@@ -346,4 +371,125 @@ export class SupabaseService {
   subscribeNotificacoesCuidador(idCuidador: number, onInsert: (n: Notificacao) => void): Cancelar {
     return this.assinar(`notificacoes-cuidador:${idCuidador}`, 'notificacoes', `id_cuidador=eq.${idCuidador}`, onInsert);
   }
+
+  getPosts(filtro?: { idUser?: number; idCuidador?: number }): Observable<Post[]> {
+    return this.run<PostComJoin>(c => {
+      let q = c.from('posts').select(POST_COLS);
+      if (filtro?.idUser) q = q.eq('autor_tipo', 'tutor').eq('id_user', filtro.idUser);
+      if (filtro?.idCuidador) q = q.eq('autor_tipo', 'cuidador').eq('id_cuidador', filtro.idCuidador);
+      return q.order('created_at', { ascending: false }).limit(30);
+    }).pipe(map(rows => rows.map(mapearPost)));
+  }
+
+  criarPost(post: Post): Observable<Post[]> {
+    return this.run<PostComJoin>(c => c.from('posts').insert(post).select(POST_COLS)).pipe(map(rows => rows.map(mapearPost)));
+  }
+
+  editarPost(post: Post, dados: Pick<Post, 'descricao' | 'fotos'>): Observable<Post[]> {
+    return this.run<Post>(c => doAutor(c.from('posts').update(dados).eq('id_post', post.id_post!), post).select('id_post'));
+  }
+
+  excluirPost(post: Post): Observable<Post[]> {
+    return this.run<Post>(c => doAutor(c.from('posts').delete().eq('id_post', post.id_post!), post).select('id_post')).pipe(
+      tap(() => this.removerFotos(post.fotos))
+    );
+  }
+
+  idsCurtidos(autor: Autor): Observable<number[]> {
+    return this.run<{ id_post: number }>(c => doAutor(c.from('curtidas').select('id_post'), autor)).pipe(
+      map(rows => rows.map(r => r.id_post))
+    );
+  }
+
+  curtir(idPost: number, autor: Autor): Observable<unknown[]> {
+    return this.run(c => c.from('curtidas').insert({ id_post: idPost, ...colunasDoAutor(autor) }).select('id_curtida'));
+  }
+
+  descurtir(idPost: number, autor: Autor): Observable<unknown[]> {
+    return this.run(c => doAutor(c.from('curtidas').delete().eq('id_post', idPost), autor).select('id_curtida'));
+  }
+
+  getComentarios(idPost: number): Observable<Comentario[]> {
+    return this.run<ComentarioComJoin>(c =>
+      c.from('comentarios').select(COMENTARIO_COLS).eq('id_post', idPost).order('created_at', { ascending: true })
+    ).pipe(map(rows => rows.map(mapearComentario)));
+  }
+
+  comentar(comentario: Comentario): Observable<Comentario[]> {
+    return this.run<ComentarioComJoin>(c => c.from('comentarios').insert(comentario).select(COMENTARIO_COLS)).pipe(
+      map(rows => rows.map(mapearComentario))
+    );
+  }
+
+  async solicitarRecuperacaoSenha(email: string): Promise<void> {
+    const c = await this.client;
+    const destino = `${location.origin}${location.pathname}#/redefinir-senha`;
+    const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: destino });
+    if (error) throw error;
+  }
+
+  async redefinirSenha(novaSenha: string): Promise<void> {
+    const c = await this.client;
+    const codigo = new URLSearchParams(location.search).get('code');
+    if (codigo) {
+      const { error } = await c.auth.exchangeCodeForSession(codigo);
+      if (error) throw error;
+    }
+    const { error } = await c.auth.updateUser({ password: novaSenha });
+    if (error) throw error;
+  }
+
+  async enviarFotoPost(foto: Blob): Promise<string> {
+    const c = await this.client;
+    const caminho = `${crypto.randomUUID()}.jpg`;
+    const { error } = await c.storage.from(BUCKET_POSTS).upload(caminho, foto, { contentType: 'image/jpeg' });
+    if (error) throw error;
+    return c.storage.from(BUCKET_POSTS).getPublicUrl(caminho).data.publicUrl;
+  }
+
+  removerFotos(urls: string[]) {
+    const prefixo = `${environment.fotoUrlPrefix}${BUCKET_POSTS}/`;
+    const caminhos = urls.filter(u => u.startsWith(prefixo)).map(u => u.slice(prefixo.length));
+    if (caminhos.length) this.client.then(c => c.storage.from(BUCKET_POSTS).remove(caminhos));
+  }
+}
+
+export const BUCKET_POSTS = 'posts';
+
+export type Autor = { autor_tipo: AutorTipo; id_user?: number | null; id_cuidador?: number | null };
+
+export function colunasDoAutor(autor: Autor) {
+  return autor.autor_tipo === 'tutor'
+    ? { autor_tipo: 'tutor' as const, id_user: autor.id_user ?? null, id_cuidador: null }
+    : { autor_tipo: 'cuidador' as const, id_user: null, id_cuidador: autor.id_cuidador ?? null };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function doAutor(q: any, autor: Autor): any {
+  return autor.autor_tipo === 'tutor'
+    ? q.eq('autor_tipo', 'tutor').eq('id_user', autor.id_user)
+    : q.eq('autor_tipo', 'cuidador').eq('id_cuidador', autor.id_cuidador);
+}
+
+const POST_COLS = 'id_post, id_user, id_cuidador, autor_tipo, descricao, fotos, created_at, usuarios(nome), cuidadores(nome, foto_url), curtidas(count)';
+const COMENTARIO_COLS = 'id_comentario, id_post, id_user, id_cuidador, autor_tipo, conteudo, created_at, usuarios(nome), cuidadores(nome, foto_url)';
+
+type AutorJoin = { usuarios?: { nome: string } | null; cuidadores?: { nome: string; foto_url: string | null } | null };
+type PostComJoin = Post & AutorJoin & { curtidas?: { count: number }[] };
+type ComentarioComJoin = Comentario & AutorJoin;
+
+function autorDe(tipo: AutorTipo, { usuarios, cuidadores }: AutorJoin) {
+  const cuidador = tipo === 'cuidador';
+  return {
+    autor_nome: (cuidador ? cuidadores?.nome : usuarios?.nome) ?? (cuidador ? 'Cuidador' : 'Tutor'),
+    autor_foto: cuidador ? cuidadores?.foto_url ?? null : null
+  };
+}
+
+export function mapearPost({ usuarios, cuidadores, curtidas, ...p }: PostComJoin): Post {
+  return { ...p, fotos: p.fotos ?? [], ...autorDe(p.autor_tipo, { usuarios, cuidadores }), qtd_curtidas: curtidas?.[0]?.count ?? 0 };
+}
+
+function mapearComentario({ usuarios, cuidadores, ...c }: ComentarioComJoin): Comentario {
+  return { ...c, ...autorDe(c.autor_tipo, { usuarios, cuidadores }) };
 }

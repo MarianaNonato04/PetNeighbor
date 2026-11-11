@@ -55,6 +55,7 @@
             </button>
           </div>
           <span class="error-msg" *ngIf="hasError('senha', 'required')">Senha é obrigatória</span>
+          <a routerLink="/esqueci-senha" class="esqueci">Esqueci minha senha</a>
         </div>
 
         <div class="error-banner" *ngIf="errorMessage()" style="margin-top:1rem;">

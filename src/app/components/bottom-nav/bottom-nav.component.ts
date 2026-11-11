@@ -13,7 +13,7 @@ import { filter } from 'rxjs';
 export class BottomNavComponent {
   private router = inject(Router);
 
-  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat', '/area-cuidador'];
+  private rotasOcultas = ['/login', '/cadastro-usuario', '/chat', '/area-cuidador', '/esqueci-senha', '/redefinir-senha'];
 
   visivel = signal(true);
 

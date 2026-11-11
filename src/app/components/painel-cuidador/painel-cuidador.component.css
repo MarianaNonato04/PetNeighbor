@@ -93,3 +93,25 @@
 .painel-aviso-texto { font-size: var(--text-sm); margin: 0.15rem 0 0; color: var(--text-secondary); }
 
 .page-header { background: var(--header-salvia); }
+
+.calendario { padding: 1rem; margin-bottom: 1rem; }
+.cal-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.cal-topo h2 { font-size: var(--text-lg); }
+.cal-nav { width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(46, 42, 38, 0.05); display: grid; place-items: center; cursor: pointer; }
+.cal-grade { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.25rem; text-align: center; }
+.cal-semana { font-size: var(--text-xs); font-weight: 700; color: var(--text-secondary); padding-bottom: 0.25rem; }
+.cal-dia {
+  position: relative; aspect-ratio: 1; max-height: 52px; border: none; border-radius: var(--radius-sm); background: none;
+  font: inherit; font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); cursor: pointer;
+}
+.cal-dia:hover { background: rgba(46, 42, 38, 0.05); }
+.cal-dia--fora { color: rgba(46, 42, 38, 0.35); }
+.cal-dia--hoje { box-shadow: inset 0 0 0 1.5px var(--fill-salvia); }
+.cal-dia--on { background: var(--fill-salvia); color: #fff; }
+.cal-dia--on:hover { background: var(--fill-salvia-hover); }
+.cal-ponto { position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--fill-terracota); }
+.cal-dia--on .cal-ponto { background: #fff; }
+.cal-dia-titulo { margin-top: 0.75rem; font-weight: 600; font-size: var(--text-sm); color: var(--text-secondary); }
+.conclusao { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--card-border); }
+.conclusao label { font-size: var(--text-sm); font-weight: 600; }
+.conclusao-acoes { display: flex; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap; }

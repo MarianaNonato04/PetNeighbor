@@ -28,6 +28,7 @@ export class PetRegisterComponent {
   constructor() {
     this.petForm = this.fb.group({
       nome_pet: ['', [Validators.required, Validators.maxLength(LIMITES.nome)]],
+      especie: ['', [Validators.required, Validators.maxLength(LIMITES.especie)]],
       idade_pet: ['', [Validators.required, Validators.min(0), Validators.max(LIMITES.idadePetMax)]],
       porte: ['Pequeno', [Validators.required, Validators.pattern(/^(Pequeno|Médio|Grande)$/)]],
       peso: ['', [Validators.required, Validators.min(0.1), Validators.max(LIMITES.pesoMax)]],
@@ -43,6 +44,8 @@ export class PetRegisterComponent {
 
       const petData = {
         ...this.petForm.value,
+        nome_pet: this.petForm.value.nome_pet.trim(),
+        especie: this.petForm.value.especie.trim(),
         id_user: user.id_user
       };
 

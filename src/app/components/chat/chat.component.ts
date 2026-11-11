@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { SupabaseService, Cancelar } from '../../services/supabase.service';
+import { ChatStore } from '../../services/chat.store';
 import { Mensagem } from '../../models/interfaces';
 import { logError } from '../../utils/logger.util';
 import { fotoSegura } from '../../utils/foto.util';
@@ -23,6 +24,7 @@ type Papel = 'tutor' | 'cuidador';
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private route = inject(ActivatedRoute);
   private supabase = inject(SupabaseService);
+  private chatStore = inject(ChatStore);
 
   @ViewChild('scrollArea') scrollArea?: ElementRef<HTMLDivElement>;
 
@@ -75,6 +77,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     this.conversaId = this.supabase.buildConversaId(this.idUser, this.idCuidador);
+    this.chatStore.conversaAberta.set(this.conversaId);
 
     this.supabase.getMensagens(this.conversaId).subscribe({
       next: msgs => {
@@ -105,6 +108,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnDestroy() {
     this.cancelarAssinatura?.();
+    this.chatStore.conversaAberta.set(null);
   }
 
   ehMinha(m: Mensagem): boolean {
@@ -113,7 +117,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   private marcarLidas() {
     const outroLado = this.papel === 'tutor' ? 'cuidador' : 'tutor';
-    this.supabase.marcarMensagensLidas(this.conversaId, outroLado).subscribe({ error: e => logError(e) });
+    this.supabase.marcarMensagensLidas(this.conversaId, outroLado).subscribe({
+      next: () => this.chatStore.recarregar(),
+      error: e => logError(e)
+    });
   }
 
   enviar() {

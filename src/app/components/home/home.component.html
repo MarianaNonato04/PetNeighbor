@@ -12,6 +12,10 @@
       </div>
     </div>
     <div class="app-bar-actions">
+      <button class="icon-btn" routerLink="/conversas" aria-label="Conversas" *ngIf="supabase.currentUser()">
+        <span class="material-symbols-rounded">chat</span>
+        <span class="notif-badge" *ngIf="mensagensNaoLidas() > 0">{{ mensagensNaoLidas() > 9 ? '9+' : mensagensNaoLidas() }}</span>
+      </button>
       <button class="icon-btn" routerLink="/notificacoes" aria-label="Notificações">
         <span class="material-symbols-rounded">notifications</span>
         <span class="notif-badge" *ngIf="naoLidas() > 0">{{ naoLidas() > 9 ? '9+' : naoLidas() }}</span>
@@ -22,19 +26,8 @@
     </div>
   </header>
 
-  <section class="hero-section">
+  <section class="hero-section" *ngIf="!supabase.currentUser()">
     <div class="hero-card">
-      <ng-container *ngIf="supabase.currentUser(); else heroConvite">
-        <h2 class="hero-title">Encontre o cuidador ideal</h2>
-        <p class="hero-desc">Vizinhos de confiança prontos para passear, alimentar e fazer companhia ao seu pet.</p>
-        <div class="hero-actions">
-          <a class="hero-btn" routerLink="/explorar">
-            Explorar cuidadores
-            <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
-          </a>
-        </div>
-      </ng-container>
-      <ng-template #heroConvite>
         <h2 class="hero-title">Cuidadores de confiança na sua vizinhança</h2>
         <p class="hero-desc">Crie sua conta para agendar passeios, alimentação e companhia para o seu pet.</p>
         <div class="hero-actions">
@@ -44,7 +37,6 @@
           </a>
           <a class="hero-link" routerLink="/login">Já tenho conta</a>
         </div>
-      </ng-template>
     </div>
   </section>
 
@@ -88,24 +80,6 @@
       </div>
     </section>
 
-    <section class="section-block" *ngIf="cuidadores().length > 0">
-      <div class="section-head">
-        <h2 class="section-title">Novos cuidadores</h2>
-        <a routerLink="/explorar" class="section-link">Ver todos</a>
-      </div>
-      <div class="cuidadores-grid">
-        <a *ngFor="let c of cuidadores()" [routerLink]="['/cuidador', c.id_cuidador]" class="cuidador-mini glass-card">
-          <span class="cuidador-mini-avatar">
-            <img *ngIf="fotoSegura(c.foto_url) as foto" [src]="foto" alt="">
-            <span *ngIf="!fotoSegura(c.foto_url)" class="material-symbols-rounded" aria-hidden="true">account_circle</span>
-          </span>
-          <span class="cuidador-mini-info">
-            <span class="cuidador-mini-nome">{{ c.nome }}</span>
-            <span class="cuidador-mini-meta">{{ c.cidade }} • {{ c.servicos.join(', ') }}</span>
-          </span>
-        </a>
-      </div>
-    </section>
 
   </ng-container>
 
@@ -145,5 +119,13 @@
       </a>
     </section>
   </ng-template>
+
+  <section class="section-block">
+    @defer (on viewport) {
+      <app-feed></app-feed>
+    } @placeholder {
+      <div class="feed-placeholder"><div class="spinner"></div></div>
+    }
+  </section>
 
 </div>

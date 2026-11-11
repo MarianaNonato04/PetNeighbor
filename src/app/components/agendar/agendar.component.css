@@ -185,3 +185,9 @@
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
 }
+
+.duracao { display: flex; align-items: center; gap: 0.75rem; }
+.duracao .input-field { max-width: 110px; }
+.duracao span { font-size: var(--text-sm); font-weight: 600; color: var(--text-secondary); }
+.resumo-detalhe { display: flex; flex-direction: column; gap: 0.125rem; }
+.resumo-detalhe small { font-size: var(--text-xs); opacity: 0.85; }

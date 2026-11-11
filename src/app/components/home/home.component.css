@@ -307,44 +307,11 @@
   text-overflow: ellipsis;
 }
 
-.cuidadores-grid { display: grid; gap: 0.625rem; }
 
-.cuidador-mini {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  padding: 0.875rem 1rem;
-  text-decoration: none;
-  color: inherit;
-  transition: var(--transition);
-}
 
-.cuidador-mini:hover { border-color: rgba(86, 120, 90, 0.35); }
 
-.cuidador-mini-avatar {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  overflow: hidden;
-  background: rgba(86, 120, 90, 0.12);
-  color: var(--fill-salvia);
-}
 
-.cuidador-mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.cuidador-mini-avatar .material-symbols-rounded { font-size: var(--text-2xl); }
-.cuidador-mini-info { display: flex; flex-direction: column; min-width: 0; }
-.cuidador-mini-nome { font-weight: 600; font-size: var(--text-base); }
 
-.cuidador-mini-meta {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 .passos { list-style: none; display: grid; gap: 1rem; }
 .passo { display: flex; align-items: flex-start; gap: 0.875rem; }
@@ -403,9 +370,10 @@
 
 @media (min-width: 900px) {
   .passos { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-  .cuidadores-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 380px) {
   .servicos-grid { grid-template-columns: 1fr; }
 }
+
+.feed-placeholder { min-height: 160px; display: grid; place-items: center; }
