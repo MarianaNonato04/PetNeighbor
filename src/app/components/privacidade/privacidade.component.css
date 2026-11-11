@@ -1,0 +1,26 @@
+.priv-voltar {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.priv-texto { line-height: 1.6; font-size: var(--text-base); }
+.priv-texto h2 { font-size: var(--text-base); margin: 1.5rem 0 0.5rem; color: var(--fill-terracota-hover); }
+.priv-texto p { margin: 0 0 0.75rem; color: var(--text-primary); }
+.priv-texto ul { margin: 0 0 0.75rem; padding-left: 1.25rem; }
+.priv-texto li { margin-bottom: 0.375rem; }
+.priv-aviso {
+  background: var(--color-areia);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+}
+.priv-data { font-size: var(--text-sm); color: var(--text-secondary) !important; margin-top: 1.5rem !important; }
+
+.page-header, .page-body { padding-left: var(--gutter-narrow); padding-right: var(--gutter-narrow); }

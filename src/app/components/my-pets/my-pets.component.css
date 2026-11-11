@@ -5,8 +5,8 @@
 }
 
 .page-header {
-  background: linear-gradient(135deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
-  padding: 3rem 1.25rem 1.5rem;
+  background: var(--header-terracota);
+  padding: 3rem var(--gutter) 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,13 +14,13 @@
 }
 
 .header-text h1 {
-  font-size: 1.625rem;
+  font-size: var(--text-title);
   color: white;
   letter-spacing: -0.02em;
 }
 
 .header-text p {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: rgba(255,255,255,0.8);
   margin-top: 0.125rem;
 }
@@ -47,14 +47,14 @@
 
 .page-body {
   flex: 1;
-  padding: 1.25rem;
+  padding: 1.25rem var(--gutter);
 }
 
 .state-box {
   text-align: center;
   padding: 3rem 1rem;
   color: var(--text-secondary);
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
 }
 
 .empty-state {
@@ -77,18 +77,18 @@
 }
 
 .empty-art .material-symbols-rounded {
-  font-size: 2.5rem;
-  color: var(--color-terracota);
+  font-size: var(--text-3xl);
+  color: var(--fill-terracota);
   opacity: 0.7;
 }
 
 .empty-state h3 {
-  font-size: 1.1875rem;
+  font-size: var(--text-lg);
   margin-bottom: 0.375rem;
 }
 
 .empty-state p {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
 }
 
@@ -123,8 +123,8 @@
 }
 
 .pet-avatar .material-symbols-rounded {
-  font-size: 1.75rem;
-  color: var(--color-terracota);
+  font-size: var(--text-xl);
+  color: var(--fill-terracota);
 }
 
 .pet-info {
@@ -141,16 +141,16 @@
 }
 
 .pet-name {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .porte-chip {
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   background: rgba(122,158,120,0.15);
-  color: var(--color-salvia);
+  color: var(--fill-salvia);
   padding: 2px 10px;
   border-radius: var(--radius-full);
   border: 1px solid rgba(122,158,120,0.2);
@@ -168,19 +168,19 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
   font-weight: 500;
 }
 
 .meta-tag .material-symbols-rounded {
-  font-size: 0.875rem;
-  color: var(--color-terracota);
+  font-size: var(--text-sm);
+  color: var(--fill-terracota);
   opacity: 0.8;
 }
 
 .pet-desc {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
   line-height: 1.45;
   font-style: italic;
@@ -191,14 +191,14 @@
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, var(--color-salvia) 0%, #6A9068 100%);
+  background: var(--fill-salvia);
   color: white;
   border: none;
   padding: 0.9375rem 1.5rem;
   border-radius: var(--radius-md);
   font-family: inherit;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -211,4 +211,8 @@
 .btn-secondary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(122,158,120,0.4);
+}
+
+@media (min-width: 900px) {
+  .pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); align-items: start; }
 }

@@ -5,7 +5,7 @@
 }
 
 .profile-hero {
-  background: linear-gradient(150deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
+  background: var(--header-terracota);
   padding: 3rem 1.5rem 2.5rem;
   display: flex;
   flex-direction: column;
@@ -37,18 +37,18 @@
 }
 
 .avatar .material-symbols-rounded {
-  font-size: 2.5rem;
+  font-size: var(--text-3xl);
   color: white;
 }
 
 .user-name {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   color: white;
   letter-spacing: -0.02em;
 }
 
 .user-email {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: rgba(255,255,255,0.75);
 }
 
@@ -56,7 +56,7 @@
   display: inline-block;
   background: rgba(255,255,255,0.2);
   color: white;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 4px 14px;
   border-radius: var(--radius-full);
@@ -66,14 +66,14 @@
 
 .page-body {
   flex: 1;
-  padding: 1.25rem;
+  padding: 1.25rem var(--gutter-narrow);
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
 }
 
 .section-label {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -103,12 +103,12 @@
 }
 
 .info-icon .material-symbols-rounded {
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
 }
 
 .info-icon--orange {
   background: rgba(201,123,94,0.12);
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
 }
 
 .info-icon--blue {
@@ -118,7 +118,7 @@
 
 .info-icon--green {
   background: rgba(122,158,120,0.12);
-  color: var(--color-salvia);
+  color: var(--fill-salvia);
 }
 
 .info-content {
@@ -126,7 +126,7 @@
 }
 
 .info-label {
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -135,7 +135,7 @@
 }
 
 .info-value {
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--text-primary);
   white-space: nowrap;
@@ -174,14 +174,14 @@
 
 .action-label {
   flex: 1;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .action-arrow {
   color: #C5BEB8;
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
 }
 
 .logout-btn {
@@ -190,9 +190,9 @@
   background: transparent;
   border: 1.5px solid rgba(201,123,94,0.3);
   border-radius: var(--radius-md);
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -204,11 +204,11 @@
 
 .logout-btn:hover {
   background: rgba(201,123,94,0.06);
-  border-color: var(--color-terracota);
+  border-color: var(--fill-terracota);
 }
 
 .not-logged-hero {
-  background: linear-gradient(150deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
+  background: var(--header-terracota);
   padding: 3.5rem 2rem 3rem;
   display: flex;
   flex-direction: column;
@@ -229,17 +229,17 @@
 }
 
 .lock-art .material-symbols-rounded {
-  font-size: 2.5rem;
+  font-size: var(--text-3xl);
   color: white;
 }
 
 .not-logged-hero h2 {
-  font-size: 1.375rem;
+  font-size: var(--text-xl);
   color: white;
 }
 
 .not-logged-hero p {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: rgba(255,255,255,0.8);
   max-width: 26ch;
   line-height: 1.5;
@@ -251,9 +251,9 @@
   background: transparent;
   border: 1.5px solid rgba(201,123,94,0.3);
   border-radius: var(--radius-md);
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
@@ -261,5 +261,5 @@
 
 .btn-outline:hover {
   background: rgba(201,123,94,0.06);
-  border-color: var(--color-terracota);
+  border-color: var(--fill-terracota);
 }

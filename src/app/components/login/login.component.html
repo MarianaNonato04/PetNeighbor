@@ -6,11 +6,11 @@
         <span class="material-symbols-rounded">pet_supplies</span>
       </div>
       <h1>PetNeighbor</h1>
-      <p>Bem-vindo de volta!</p>
+      <p>{{ papel === 'cuidador' ? 'Área do cuidador' : 'Bem-vindo de volta!' }}</p>
     </div>
     <div class="auth-hero-wave">
       <svg viewBox="0 0 430 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,20 C80,40 160,0 215,20 C270,40 350,0 430,20 L430,40 L0,40 Z" fill="var(--color-areia)"/>
+        <path d="M0,20 C80,40 160,0 215,20 C270,40 350,0 430,20 L430,40 L0,40 Z" fill="var(--bg-color)"/>
       </svg>
     </div>
   </div>
@@ -18,7 +18,7 @@
   <div class="auth-body">
     <div class="auth-card glass-card">
 
-      <h2 class="auth-card-title">Entrar na conta</h2>
+      <h2 class="auth-card-title">{{ papel === 'cuidador' ? 'Entrar como cuidador' : 'Entrar na conta' }}</h2>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
@@ -28,7 +28,7 @@
             <input
               type="email"
               id="email"
-              formControlName="email"
+              formControlName="email" maxlength="254"
               class="input-field input-with-icon"
               placeholder="seu@email.com"
               [class.invalid]="hasError('email', 'required') || hasError('email', 'email')"
@@ -45,7 +45,7 @@
             <input
               [type]="showPassword() ? 'text' : 'password'"
               id="senha"
-              formControlName="senha"
+              formControlName="senha" maxlength="72"
               class="input-field input-with-icon"
               placeholder="Sua senha"
               [class.invalid]="hasError('senha', 'required')"
@@ -69,8 +69,24 @@
         </button>
       </form>
 
+      <ng-container *ngIf="papel === 'tutor'; else linksCuidador">
+        <p class="auth-switch-text">
+          Não tem conta? <a routerLink="/cadastro-usuario">Criar conta</a>
+        </p>
+        <p class="auth-switch-text">
+          É cuidador? <a routerLink="/area-cuidador/login">Entrar na área do cuidador</a>
+        </p>
+      </ng-container>
+      <ng-template #linksCuidador>
+        <p class="auth-switch-text">
+          Ainda não é cuidador? <a routerLink="/seja-cuidador">Cadastre-se</a>
+        </p>
+        <p class="auth-switch-text">
+          É tutor? <a routerLink="/login">Entrar como tutor</a>
+        </p>
+      </ng-template>
       <p class="auth-switch-text">
-        Não tem conta? <a routerLink="/cadastro-usuario">Criar conta</a>
+        <a routerLink="/privacidade">Política de Privacidade</a>
       </p>
 
     </div>

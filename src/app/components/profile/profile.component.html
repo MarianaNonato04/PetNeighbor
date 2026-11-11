@@ -83,11 +83,36 @@
           <span class="action-label">Seja um cuidador</span>
           <span class="material-symbols-rounded action-arrow">chevron_right</span>
         </button>
+
+        <div class="divider"></div>
+
+        <button class="action-row" routerLink="/area-cuidador">
+          <div class="info-icon info-icon--green">
+            <span class="material-symbols-rounded">badge</span>
+          </div>
+          <span class="action-label">Área do cuidador</span>
+          <span class="material-symbols-rounded action-arrow">chevron_right</span>
+        </button>
+
+        <div class="divider"></div>
+
+        <button class="action-row" routerLink="/privacidade">
+          <div class="info-icon info-icon--blue">
+            <span class="material-symbols-rounded">shield_person</span>
+          </div>
+          <span class="action-label">Política de Privacidade</span>
+          <span class="material-symbols-rounded action-arrow">chevron_right</span>
+        </button>
       </div>
 
       <button class="logout-btn" (click)="logout()">
         <span class="material-symbols-rounded">logout</span>
         Sair da conta
+      </button>
+
+      <div class="error-banner" *ngIf="erroExclusao()" role="alert">{{ erroExclusao() }}</div>
+      <button class="excluir-conta-btn" (click)="excluirConta()" [disabled]="excluindo()">
+        {{ excluindo() ? 'Excluindo...' : 'Excluir minha conta' }}
       </button>
 
     </div>
@@ -104,6 +129,7 @@
     <div class="page-body">
       <button routerLink="/login" class="btn-primary">Fazer login</button>
       <button routerLink="/cadastro-usuario" class="btn-outline" style="margin-top:0.75rem;">Criar conta</button>
+      <button routerLink="/area-cuidador/login" class="btn-outline" style="margin-top:0.75rem;">Sou cuidador</button>
     </div>
   </ng-template>
 

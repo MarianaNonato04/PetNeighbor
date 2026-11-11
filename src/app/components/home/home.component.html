@@ -24,89 +24,126 @@
 
   <section class="hero-section">
     <div class="hero-card">
-      <div class="hero-content">
-        <span class="hero-tag">Novidade</span>
+      <ng-container *ngIf="supabase.currentUser(); else heroConvite">
         <h2 class="hero-title">Encontre o cuidador ideal</h2>
-        <p class="hero-desc">Vizinhos de confiança prontos para cuidar do seu pet.</p>
-        <button class="hero-btn" routerLink="/explorar">
-          Explorar agora
-          <span class="material-symbols-rounded">arrow_forward</span>
-        </button>
-      </div>
-      <div class="hero-art">
-        <span class="material-symbols-rounded hero-icon-bg">volunteer_activism</span>
-      </div>
+        <p class="hero-desc">Vizinhos de confiança prontos para passear, alimentar e fazer companhia ao seu pet.</p>
+        <div class="hero-actions">
+          <a class="hero-btn" routerLink="/explorar">
+            Explorar cuidadores
+            <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+      </ng-container>
+      <ng-template #heroConvite>
+        <h2 class="hero-title">Cuidadores de confiança na sua vizinhança</h2>
+        <p class="hero-desc">Crie sua conta para agendar passeios, alimentação e companhia para o seu pet.</p>
+        <div class="hero-actions">
+          <a class="hero-btn" routerLink="/cadastro-usuario">
+            Criar conta
+            <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+          </a>
+          <a class="hero-link" routerLink="/login">Já tenho conta</a>
+        </div>
+      </ng-template>
     </div>
   </section>
 
-  <section class="stats-section">
-    <div class="stat-item glass-card">
-      <div class="stat-icon stat-icon--orange">
-        <span class="material-symbols-rounded">favorite</span>
-      </div>
-      <div>
-        <p class="stat-value">124</p>
-        <p class="stat-label">Pets felizes</p>
-      </div>
-    </div>
-    <div class="stat-item glass-card">
-      <div class="stat-icon stat-icon--green">
-        <span class="material-symbols-rounded">group</span>
-      </div>
-      <div>
-        <p class="stat-value">48</p>
-        <p class="stat-label">Vizinhos</p>
-      </div>
-    </div>
-    <div class="stat-item glass-card">
-      <div class="stat-icon stat-icon--blue">
-        <span class="material-symbols-rounded">verified</span>
-      </div>
-      <div>
-        <p class="stat-value">4.9</p>
-        <p class="stat-label">Avaliação</p>
-      </div>
-    </div>
-  </section>
+  <ng-container *ngIf="supabase.currentUser(); else blocosVisitante">
 
-  <section class="section-block">
-    <h2 class="section-title">Acesso rápido</h2>
-    <div class="quick-actions">
-      <a routerLink="/meus-pets" class="quick-card">
-        <div class="quick-icon quick-icon--terracota">
-          <span class="material-symbols-rounded">pet_supplies</span>
+    <section class="section-block">
+      <div class="section-head">
+        <h2 class="section-title">Próximo agendamento</h2>
+        <a routerLink="/agenda" class="section-link">Ver agenda</a>
+      </div>
+      <a *ngIf="proximo() as a; else semAgendamento" routerLink="/agenda" class="proximo-card glass-card">
+        <span class="proximo-icone material-symbols-rounded" aria-hidden="true">{{ iconeServico(a.tipo_servico) }}</span>
+        <div class="proximo-info">
+          <p class="proximo-titulo">{{ a.tipo_servico }} com {{ a.nome_cuidador }}</p>
+          <p class="proximo-meta">{{ a.nome_pet }} • {{ formatData(a.data) }} às {{ a.hora }}</p>
         </div>
-        <span class="quick-label">Meus Pets</span>
+        <span class="proximo-status" [attr.data-status]="a.status">{{ a.status }}</span>
       </a>
-      <a routerLink="/cadastro-pet" class="quick-card">
-        <div class="quick-icon quick-icon--salvia">
-          <span class="material-symbols-rounded">add_circle</span>
+      <ng-template #semAgendamento>
+        <div class="vazio-card glass-card">
+          <p>{{ carregando() ? 'Carregando...' : 'Nenhum agendamento marcado.' }}</p>
+          <a *ngIf="!carregando()" routerLink="/explorar" class="section-link">Encontrar um cuidador</a>
         </div>
-        <span class="quick-label">Novo Pet</span>
-      </a>
-      <a routerLink="/agenda" class="quick-card">
-        <div class="quick-icon quick-icon--areia">
-          <span class="material-symbols-rounded">calendar_month</span>
-        </div>
-        <span class="quick-label">Agenda</span>
-      </a>
-      <a routerLink="/perfil" class="quick-card">
-        <div class="quick-icon quick-icon--terracota">
-          <span class="material-symbols-rounded">manage_accounts</span>
-        </div>
-        <span class="quick-label">Perfil</span>
-      </a>
-    </div>
-  </section>
+      </ng-template>
+    </section>
 
-  <section class="section-block" *ngIf="!supabase.currentUser()">
-    <div class="cta-card glass-card">
-      <span class="material-symbols-rounded cta-icon">celebration</span>
-      <h3>Faça parte da comunidade!</h3>
-      <p>Crie sua conta e conecte-se com cuidadores de pets na sua vizinhança.</p>
-      <button routerLink="/cadastro-usuario" class="btn-primary mt-4">Criar minha conta</button>
-      <a routerLink="/login" class="cta-login-link">Já tenho conta</a>
-    </div>
-  </section>
+    <section class="section-block">
+      <div class="section-head">
+        <h2 class="section-title">Meus pets</h2>
+        <a routerLink="/meus-pets" class="section-link" *ngIf="pets().length > 0">Ver todos</a>
+      </div>
+      <div class="pets-row">
+        <a *ngFor="let p of pets()" routerLink="/meus-pets" class="pet-chip">
+          <span class="pet-chip-avatar material-symbols-rounded" aria-hidden="true">pets</span>
+          <span class="pet-chip-nome">{{ p.nome_pet }}</span>
+        </a>
+        <a routerLink="/cadastro-pet" class="pet-chip pet-chip--novo">
+          <span class="pet-chip-avatar material-symbols-rounded" aria-hidden="true">add</span>
+          <span class="pet-chip-nome">{{ pets().length ? 'Novo pet' : 'Cadastrar pet' }}</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section-block" *ngIf="cuidadores().length > 0">
+      <div class="section-head">
+        <h2 class="section-title">Novos cuidadores</h2>
+        <a routerLink="/explorar" class="section-link">Ver todos</a>
+      </div>
+      <div class="cuidadores-grid">
+        <a *ngFor="let c of cuidadores()" [routerLink]="['/cuidador', c.id_cuidador]" class="cuidador-mini glass-card">
+          <span class="cuidador-mini-avatar">
+            <img *ngIf="fotoSegura(c.foto_url) as foto" [src]="foto" alt="">
+            <span *ngIf="!fotoSegura(c.foto_url)" class="material-symbols-rounded" aria-hidden="true">account_circle</span>
+          </span>
+          <span class="cuidador-mini-info">
+            <span class="cuidador-mini-nome">{{ c.nome }}</span>
+            <span class="cuidador-mini-meta">{{ c.cidade }} • {{ c.servicos.join(', ') }}</span>
+          </span>
+        </a>
+      </div>
+    </section>
+
+  </ng-container>
+
+  <ng-template #blocosVisitante>
+    <section class="section-block">
+      <h2 class="section-title">Como funciona</h2>
+      <ol class="passos">
+        <li *ngFor="let p of passos; let i = index" class="passo">
+          <span class="passo-icone material-symbols-rounded" aria-hidden="true">{{ p.icone }}</span>
+          <div>
+            <p class="passo-titulo">{{ i + 1 }}. {{ p.titulo }}</p>
+            <p class="passo-texto">{{ p.texto }}</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="section-block">
+      <h2 class="section-title">Serviços</h2>
+      <div class="servicos-grid">
+        <a *ngFor="let s of servicos" routerLink="/explorar" [queryParams]="{ servico: s.nome }" class="servico-card glass-card">
+          <span class="servico-icone material-symbols-rounded" aria-hidden="true">{{ s.icone }}</span>
+          <span class="servico-nome">{{ s.nome }}</span>
+          <span class="servico-texto">{{ s.texto }}</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <a routerLink="/seja-cuidador" class="cuidador-convite">
+        <span class="material-symbols-rounded" aria-hidden="true">volunteer_activism</span>
+        <span>
+          <span class="convite-titulo">Gosta de animais?</span>
+          <span class="convite-texto">Cadastre-se como cuidador e atenda pets da sua vizinhança.</span>
+        </span>
+        <span class="material-symbols-rounded convite-seta" aria-hidden="true">chevron_right</span>
+      </a>
+    </section>
+  </ng-template>
 
 </div>

@@ -41,6 +41,6 @@ export class AppComponent {
       } else {
         this.notificacoes.parar();
       }
-    }, { allowSignalWrites: true });
+    });
   }
 }

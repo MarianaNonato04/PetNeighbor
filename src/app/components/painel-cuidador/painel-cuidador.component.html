@@ -1,0 +1,125 @@
+<div class="agenda-page">
+
+  <header class="page-header">
+    <div class="header-text">
+      <h1>Olá, {{ cuidador()?.nome?.split(' ')?.[0] }}</h1>
+      <p>Área do cuidador</p>
+    </div>
+    <button class="painel-sair" (click)="sair()" aria-label="Sair da área do cuidador">
+      <span class="material-symbols-rounded">logout</span>
+    </button>
+  </header>
+
+  <div class="page-body">
+
+    <div class="painel-perfil glass-card">
+      <div class="painel-perfil-info">
+        <span class="material-symbols-rounded">{{ cuidador()?.verificado ? 'verified' : 'hourglass_top' }}</span>
+        <p>{{ cuidador()?.verificado ? 'Perfil verificado' : 'Perfil aguardando verificação' }}</p>
+      </div>
+      <a [routerLink]="['/cuidador', cuidador()?.id_cuidador]" class="painel-link">Ver perfil público</a>
+    </div>
+
+    <section class="painel-avisos glass-card" *ngIf="avisos().length > 0" aria-live="polite">
+      <div class="painel-avisos-topo">
+        <h2><span class="material-symbols-rounded">notifications</span> Novidades</h2>
+        <button class="painel-link" (click)="limparAvisos()">Marcar como lidas</button>
+      </div>
+      <div class="painel-aviso" *ngFor="let n of avisos()">
+        <p class="painel-aviso-titulo">{{ n.titulo }}</p>
+        <p class="painel-aviso-texto">{{ n.mensagem }}</p>
+      </div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab" [class.tab--on]="aba() === 'Pedidos'" (click)="aba.set('Pedidos')">
+        Pedidos<span class="painel-contador" *ngIf="pendentes() > 0">{{ pendentes() }}</span>
+      </button>
+      <button class="tab" [class.tab--on]="aba() === 'Ativos'" (click)="aba.set('Ativos')">Ativos</button>
+      <button class="tab" [class.tab--on]="aba() === 'Histórico'" (click)="aba.set('Histórico')">Histórico</button>
+      <button class="tab" [class.tab--on]="aba() === 'Conversas'" (click)="aba.set('Conversas')">
+        Chat<span class="painel-contador" *ngIf="mensagensNaoLidas() > 0">{{ mensagensNaoLidas() }}</span>
+      </button>
+    </div>
+
+    <div class="error-banner" *ngIf="erro()" style="margin-bottom:1rem;">{{ erro() }}</div>
+
+    <div *ngIf="isLoading()" class="state-box"><div class="spinner"></div><p>Carregando...</p></div>
+
+    <ng-container *ngIf="!isLoading() && aba() !== 'Conversas'">
+      <div *ngIf="agendamentosDaAba().length === 0" class="empty-state glass-card">
+        <div class="empty-art"><span class="material-symbols-rounded">event_busy</span></div>
+        <h3>Nada por aqui</h3>
+        <p>{{ aba() === 'Pedidos' ? 'Nenhum pedido novo no momento.' : aba() === 'Ativos' ? 'Nenhum serviço confirmado.' : 'Sem histórico ainda.' }}</p>
+      </div>
+
+      <div class="ag-list" *ngIf="agendamentosDaAba().length > 0">
+        <div class="ag-card glass-card" *ngFor="let a of agendamentosDaAba()">
+          <div class="ag-top">
+            <div class="ag-servico-icon">
+              <span class="material-symbols-rounded">{{ iconeServico(a.tipo_servico) }}</span>
+            </div>
+            <div class="ag-headline">
+              <h3>{{ a.tipo_servico }}</h3>
+              <p>{{ a.nome_tutor }} • {{ a.nome_pet }}</p>
+            </div>
+            <span class="status-badge" [attr.data-status]="a.status">
+              <span class="material-symbols-rounded">{{ iconeStatus(a.status) }}</span>
+              {{ a.status }}
+            </span>
+          </div>
+
+          <div class="ag-meta">
+            <span class="ag-meta-item"><span class="material-symbols-rounded">event</span>{{ formatData(a.data) }}</span>
+            <span class="ag-meta-item"><span class="material-symbols-rounded">schedule</span>{{ a.hora }}</span>
+            <span class="ag-meta-item"><span class="material-symbols-rounded">repeat</span>{{ a.recorrencia }}</span>
+            <span class="ag-meta-item ag-price">R$ {{ a.preco }}</span>
+          </div>
+
+          <p class="ag-obs" *ngIf="a.observacoes">"{{ a.observacoes }}"</p>
+
+          <div class="ag-actions painel-acoes">
+            <a class="painel-btn painel-btn--ghost" [routerLink]="['/area-cuidador/chat', a.id_user]">
+              <span class="material-symbols-rounded">chat</span>
+              Conversar
+            </a>
+            <button *ngFor="let acao of acoes(a)" class="painel-btn"
+              [class.ag-cancel]="acao.perigo" [class.painel-btn--primary]="!acao.perigo"
+              [disabled]="atualizando() === a.id_agendamento"
+              (click)="executar(a, acao)">
+              <span class="material-symbols-rounded">{{ acao.icone }}</span>
+              {{ acao.rotulo }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!isLoading() && aba() === 'Conversas'">
+      <div *ngIf="conversas().length === 0" class="empty-state glass-card">
+        <div class="empty-art"><span class="material-symbols-rounded">forum</span></div>
+        <h3>Nenhuma conversa</h3>
+        <p>Quando um tutor enviar mensagem, ela aparece aqui.</p>
+      </div>
+
+      <div class="painel-conversas" *ngIf="conversas().length > 0">
+        <a class="painel-conversa glass-card" *ngFor="let c of conversas()" [routerLink]="['/area-cuidador/chat', c.id_user]">
+          <span class="material-symbols-rounded painel-conversa-avatar">account_circle</span>
+          <div class="painel-conversa-texto">
+            <p class="painel-conversa-nome">{{ c.nome_tutor }}</p>
+            <p class="painel-conversa-ultima">
+              <span *ngIf="c.remetente === 'cuidador'">Você: </span>{{ c.ultima }}
+            </p>
+          </div>
+          <span class="painel-conversa-hora">{{ formatQuando(c.created_at) }}</span>
+          <span class="painel-contador" *ngIf="c.naoLidas > 0" [attr.aria-label]="c.naoLidas + ' mensagens não lidas'">{{ c.naoLidas }}</span>
+        </a>
+      </div>
+    </ng-container>
+
+    <button class="excluir-conta-btn" (click)="excluirConta()" [disabled]="excluindo()">
+      {{ excluindo() ? 'Excluindo...' : 'Excluir minha conta de cuidador' }}
+    </button>
+
+  </div>
+</div>

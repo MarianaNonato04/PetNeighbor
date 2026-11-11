@@ -1,0 +1,80 @@
+<div class="agenda-page">
+
+  <header class="page-header">
+    <button class="priv-voltar" (click)="voltar()" aria-label="Voltar">
+      <span class="material-symbols-rounded">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Privacidade</h1>
+      <p>Como tratamos seus dados (LGPD)</p>
+    </div>
+    <span class="material-symbols-rounded header-icon">shield_person</span>
+  </header>
+
+  <div class="page-body">
+    <article class="glass-card priv-texto">
+
+      <p class="priv-aviso">
+        O PetNeighbor é um projeto acadêmico. Esta política explica, de forma simples, quais dados
+        pessoais o app coleta, para quê e quais são os seus direitos, conforme a Lei Geral de Proteção
+        de Dados (Lei nº 13.709/2018).
+      </p>
+
+      <h2>1. Dados que coletamos</h2>
+      <ul>
+        <li><strong>Tutores:</strong> nome, idade, e-mail e senha; dados dos pets (nome, idade, peso, porte e descrição).</li>
+        <li><strong>Cuidadores:</strong> nome, e-mail, senha, cidade/bairro, descrição, serviços e preços,
+          documento (CPF/RG) e localização aproximada.</li>
+        <li><strong>Uso do app:</strong> agendamentos, mensagens do chat e notificações.</li>
+      </ul>
+
+      <h2>2. Para que usamos</h2>
+      <ul>
+        <li>Criar e manter sua conta e permitir o login.</li>
+        <li>Mostrar cuidadores próximos e calcular a distância até você.</li>
+        <li>Permitir agendamentos e a conversa entre tutor e cuidador.</li>
+        <li>Validar o cadastro de cuidadores (documento), por segurança dos tutores e dos pets.</li>
+      </ul>
+
+      <h2>3. Localização</h2>
+      <p>
+        A localização do tutor é usada só no seu aparelho, para ordenar os cuidadores por distância,
+        e <strong>não é salva</strong>. A localização do cuidador é salva <strong>arredondada (cerca de 100 m)</strong>,
+        para não expor o endereço exato. Você pode negar a permissão de localização no navegador.
+      </p>
+
+      <h2>4. Documento do cuidador</h2>
+      <p>
+        O documento (CPF/RG) serve apenas para a verificação do cadastro e não é exibido em nenhuma tela do app.
+      </p>
+
+      <h2>5. Compartilhamento</h2>
+      <p>
+        Não vendemos nem compartilhamos seus dados com terceiros para publicidade. Os dados ficam armazenados
+        no Supabase, serviço de banco de dados usado pelo app. Seu nome e as informações do perfil de cuidador
+        ficam visíveis para os outros usuários quando necessário para o serviço (por exemplo, no Explorar e no chat).
+      </p>
+
+      <h2>6. Por quanto tempo guardamos</h2>
+      <p>Enquanto sua conta existir. Ao excluir a conta (no Perfil ou na Área do cuidador), os dados pessoais, pets, agendamentos e mensagens são apagados.</p>
+
+      <h2>7. Seus direitos</h2>
+      <p>Você pode, a qualquer momento:</p>
+      <ul>
+        <li>confirmar se tratamos seus dados e acessá-los;</li>
+        <li>corrigir dados incompletos ou desatualizados;</li>
+        <li>excluir a conta e os seus dados pelo próprio app;</li>
+        <li>revogar o consentimento dado no cadastro.</li>
+      </ul>
+      <p>Para exercer esses direitos, entre em contato com a equipe do projeto pela página do repositório no GitHub.</p>
+
+      <h2>8. Segurança</h2>
+      <p>
+        Adotamos medidas para proteger seus dados, como limitar quais informações são enviadas ao navegador.
+        Por ser um projeto acadêmico em desenvolvimento, <strong>não use uma senha que você usa em outros serviços</strong>.
+      </p>
+
+      <p class="priv-data">Última atualização: {{ atualizadoEm }}</p>
+    </article>
+  </div>
+</div>

@@ -25,7 +25,7 @@
             <input
               type="text"
               id="nome_pet"
-              formControlName="nome_pet"
+              formControlName="nome_pet" [attr.maxlength]="limites.nome"
               class="input-field input-with-icon"
               placeholder="Ex: Thor, Mel, Luna..."
             >
@@ -42,6 +42,7 @@
               class="input-field"
               placeholder="0"
               min="0"
+              [attr.max]="limites.idadePetMax"
             >
           </div>
           <div class="form-group">
@@ -53,6 +54,8 @@
               class="input-field"
               placeholder="0"
               min="0"
+              step="0.1"
+              [attr.max]="limites.pesoMax"
             >
           </div>
         </div>
@@ -70,7 +73,7 @@
           <label for="describ_pet">Sobre o pet</label>
           <textarea
             id="describ_pet"
-            formControlName="describ_pet"
+            formControlName="describ_pet" [attr.maxlength]="limites.descricaoPet"
             class="input-field"
             rows="3"
             placeholder="Personalidade, cuidados especiais, o que ele ama..."

@@ -5,8 +5,8 @@
 }
 
 .page-header {
-  background: linear-gradient(135deg, var(--color-salvia) 0%, #5E8A5C 100%);
-  padding: 3rem 1.25rem 1.5rem;
+  background: var(--header-salvia);
+  padding: 3rem var(--gutter-narrow) 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -33,8 +33,8 @@
 .back-btn:hover { background: rgba(255,255,255,0.3); }
 
 .header-text { flex: 1; }
-.header-text h1 { font-size: 1.5rem; color: white; letter-spacing: -0.02em; }
-.header-text p { font-size: 0.875rem; color: rgba(255,255,255,0.8); margin-top: 0.125rem; }
+.header-text h1 { font-size: var(--text-title); color: white; letter-spacing: -0.02em; }
+.header-text p { font-size: var(--text-sm); color: rgba(255,255,255,0.8); margin-top: 0.125rem; }
 
 .header-art {
   position: absolute;
@@ -46,7 +46,7 @@
 
 .header-art .material-symbols-rounded { font-size: 6rem; color: white; }
 
-.page-body { flex: 1; padding: 1.25rem; }
+.page-body { flex: 1; padding: 1.25rem var(--gutter-narrow); }
 .form-card { padding: 1.5rem; }
 
 .input-wrapper { position: relative; display: flex; align-items: center; }
@@ -54,16 +54,16 @@
   position: absolute;
   left: 0.875rem;
   color: #B5AFA9;
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   pointer-events: none;
   transition: var(--transition);
 }
 .input-with-icon { padding-left: 2.75rem; }
-.input-wrapper:focus-within .input-icon { color: var(--color-salvia); }
-.input-field:focus { border-color: var(--color-salvia); box-shadow: 0 0 0 3px rgba(122,158,120,0.12); }
+.input-wrapper:focus-within .input-icon { color: var(--fill-salvia); }
+.input-field:focus { border-color: var(--fill-salvia); box-shadow: 0 0 0 3px rgba(122,158,120,0.12); }
 
 .hint-msg {
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   color: var(--text-secondary);
   padding-left: 0.25rem;
   opacity: 0.85;
@@ -79,7 +79,7 @@
   border: 1.5px solid rgba(0,0,0,0.08);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 0.5rem 0.875rem;
   border-radius: var(--radius-full);
@@ -87,18 +87,18 @@
   transition: var(--transition);
 }
 
-.servico-chip .material-symbols-rounded { font-size: 1rem; }
+.servico-chip .material-symbols-rounded { font-size: var(--text-base); }
 
 .servico-chip--on {
-  background: var(--color-salvia);
-  border-color: var(--color-salvia);
+  background: var(--fill-salvia);
+  border-color: var(--fill-salvia);
   color: white;
   box-shadow: 0 2px 8px rgba(122,158,120,0.3);
 }
 
 .preco-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
 .preco-item { display: flex; flex-direction: column; gap: 0.25rem; }
-.preco-label { font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); padding-left: 0.25rem; }
+.preco-label { font-size: var(--text-2xs); font-weight: 600; color: var(--text-secondary); padding-left: 0.25rem; }
 .preco-item .input-field { padding: 0.625rem 0.75rem; text-align: center; }
 
 .geo-btn {
@@ -110,10 +110,10 @@
   padding: 0.875rem;
   background: white;
   border: 1.5px dashed var(--color-salvia);
-  color: var(--color-salvia);
+  color: var(--fill-salvia);
   border-radius: var(--radius-md);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
@@ -121,7 +121,7 @@
 
 .geo-btn:hover { background: rgba(122,158,120,0.06); }
 .geo-btn--ok { border-style: solid; background: rgba(122,158,120,0.08); }
-.geo-btn .material-symbols-rounded { font-size: 1.125rem; }
+.geo-btn .material-symbols-rounded { font-size: var(--text-lg); }
 
 .btn-spinner {
   width: 16px;

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../services/supabase.service';
 import { Pet } from '../../models/interfaces';
 import { RouterModule } from '@angular/router';
+import { logError } from '../../utils/logger.util';
 
 @Component({
   selector: 'app-my-pets',
@@ -32,7 +33,7 @@ export class MyPetsComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error(err);
+          logError(err);
           this.isLoading.set(false);
         }
       });

@@ -3,11 +3,10 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--color-areia);
 }
 
 .auth-hero {
-  background: linear-gradient(150deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
+  background: var(--header-terracota);
   position: relative;
   flex-shrink: 0;
 }
@@ -33,18 +32,18 @@
 }
 
 .auth-logo .material-symbols-rounded {
-  font-size: 2.25rem;
+  font-size: var(--text-2xl);
   color: white;
 }
 
 .auth-hero h1 {
-  font-size: 1.75rem;
+  font-size: var(--text-title);
   color: white;
   letter-spacing: -0.03em;
 }
 
 .auth-hero p {
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   color: rgba(255,255,255,0.8);
 }
 
@@ -62,7 +61,7 @@
 
 .auth-body {
   flex: 1;
-  padding: 0 1.25rem 2rem;
+  padding: 0 var(--gutter-narrow) 2rem;
 }
 
 .auth-card {
@@ -70,7 +69,7 @@
 }
 
 .auth-card-title {
-  font-size: 1.1875rem;
+  font-size: var(--text-lg);
   margin-bottom: 1.375rem;
   color: var(--text-primary);
 }
@@ -85,7 +84,7 @@
   position: absolute;
   left: 0.875rem;
   color: #B5AFA9;
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   pointer-events: none;
   transition: var(--transition);
 }
@@ -95,7 +94,7 @@
 }
 
 .input-wrapper:focus-within .input-icon {
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
 }
 
 .btn-spinner {
@@ -111,12 +110,12 @@
 .auth-switch-text {
   text-align: center;
   margin-top: 1.25rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--text-secondary);
 }
 
 .auth-switch-text a {
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
   font-weight: 600;
   text-decoration: none;
 }

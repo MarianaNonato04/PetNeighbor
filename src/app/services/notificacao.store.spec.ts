@@ -8,13 +8,14 @@ describe('NotificacaoStore', () => {
   let store: NotificacaoStore;
   let supabaseSpy: jasmine.SpyObj<SupabaseService>;
   let realtimeCallback: ((n: Notificacao) => void) | null = null;
+  let cancelarSpy: jasmine.Spy;
 
   beforeEach(() => {
     const spy = jasmine.createSpyObj('SupabaseService', [
       'getNotificacoes',
       'subscribeNotificacoes',
       'marcarNotificacaoLida',
-      'removeChannel'
+      'marcarNotificacoesLidas'
     ]);
 
     TestBed.configureTestingModule({
@@ -28,9 +29,10 @@ describe('NotificacaoStore', () => {
     supabaseSpy = TestBed.inject(SupabaseService) as jasmine.SpyObj<SupabaseService>;
 
     realtimeCallback = null;
+    cancelarSpy = jasmine.createSpy('cancelar');
     supabaseSpy.subscribeNotificacoes.and.callFake((userId: number, callback: (n: Notificacao) => void) => {
       realtimeCallback = callback;
-      return { id: 'mock-channel' } as any;
+      return cancelarSpy;
     });
   });
 
@@ -42,8 +44,8 @@ describe('NotificacaoStore', () => {
 
   it('should fetch notifications and set state when starting', () => {
     const mockNotifs: Notificacao[] = [
-      { id_notificacao: 1, id_user: 10, titulo: 'Notif 1', mensagem: 'Hello', lida: false, created_at: '' },
-      { id_notificacao: 2, id_user: 10, titulo: 'Notif 2', mensagem: 'World', lida: true, created_at: '' }
+      { id_notificacao: 1, id_user: 10, tipo: 'sistema', titulo: 'Notif 1', mensagem: 'Hello', lida: false, created_at: '' },
+      { id_notificacao: 2, id_user: 10, tipo: 'sistema', titulo: 'Notif 2', mensagem: 'World', lida: true, created_at: '' }
     ];
     supabaseSpy.getNotificacoes.and.returnValue(of(mockNotifs));
 
@@ -62,7 +64,7 @@ describe('NotificacaoStore', () => {
     expect(store.notificacoes()).toEqual([]);
     expect(realtimeCallback).not.toBeNull();
 
-    const newNotif: Notificacao = { id_notificacao: 3, id_user: 10, titulo: 'Realtime', mensagem: 'Test', lida: false, created_at: '' };
+    const newNotif: Notificacao = { id_notificacao: 3, id_user: 10, tipo: 'sistema', titulo: 'Realtime', mensagem: 'Test', lida: false, created_at: '' };
     realtimeCallback!(newNotif);
 
     expect(store.notificacoes()).toEqual([newNotif]);
@@ -70,7 +72,7 @@ describe('NotificacaoStore', () => {
   });
 
   it('should mark notification as read', () => {
-    const mockNotif: Notificacao = { id_notificacao: 1, id_user: 10, titulo: 'Test', mensagem: 'Hello', lida: false };
+    const mockNotif: Notificacao = { id_notificacao: 1, id_user: 10, tipo: 'sistema', titulo: 'Test', mensagem: 'Hello', lida: false };
     store.notificacoes.set([mockNotif]);
     supabaseSpy.marcarNotificacaoLida.and.returnValue(of([{ id_notificacao: 1, lida: true } as any]));
 
@@ -83,26 +85,25 @@ describe('NotificacaoStore', () => {
 
   it('should mark all notifications as read', () => {
     const mockNotifs: Notificacao[] = [
-      { id_notificacao: 1, id_user: 10, titulo: '1', mensagem: '', lida: false },
-      { id_notificacao: 2, id_user: 10, titulo: '2', mensagem: '', lida: false }
+      { id_notificacao: 1, id_user: 10, tipo: 'sistema', titulo: '1', mensagem: '', lida: false },
+      { id_notificacao: 2, id_user: 10, tipo: 'sistema', titulo: '2', mensagem: '', lida: false }
     ];
     store.notificacoes.set(mockNotifs);
-    supabaseSpy.marcarNotificacaoLida.and.returnValue(of([]));
+    supabaseSpy.marcarNotificacoesLidas.and.returnValue(of([]));
 
     store.marcarTodasLidas();
 
-    expect(supabaseSpy.marcarNotificacaoLida).toHaveBeenCalledTimes(2);
+    
+    expect(supabaseSpy.marcarNotificacoesLidas).toHaveBeenCalledOnceWith([1, 2]);
+    expect(store.naoLidas()).toBe(0);
   });
 
   it('should stop store and clean up', () => {
     supabaseSpy.getNotificacoes.and.returnValue(of([]));
     store.iniciar(10);
-    expect((store as any).canal).toBeDefined();
-
     store.parar();
 
-    expect(supabaseSpy.removeChannel).toHaveBeenCalled();
-    expect((store as any).canal).toBeUndefined();
+    expect(cancelarSpy).toHaveBeenCalled();
     expect(store.notificacoes()).toEqual([]);
   });
 });

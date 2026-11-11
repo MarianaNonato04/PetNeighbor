@@ -2,7 +2,10 @@ import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Observable } from 'rxjs';
+import { logError } from '../../utils/logger.util';
+import { LIMITES } from '../../utils/limits';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +18,10 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  
+  papel: 'tutor' | 'cuidador' = this.route.snapshot.data?.['papel'] === 'cuidador' ? 'cuidador' : 'tutor';
 
   loginForm: FormGroup;
   isSubmitting = signal(false);
@@ -23,9 +30,16 @@ export class LoginComponent {
 
   constructor() {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required]]
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(LIMITES.email)]],
+      senha: ['', [Validators.required, Validators.maxLength(LIMITES.senhaMax)]]
     });
+  }
+
+  
+  private urlRetorno(): string {
+    const url = this.route.snapshot.queryParamMap.get('returnUrl');
+    const padrao = this.papel === 'cuidador' ? '/area-cuidador' : '/';
+    return url && url.startsWith('/') && !url.startsWith('//') ? url : padrao;
   }
 
   togglePasswordVisibility() {
@@ -37,19 +51,24 @@ export class LoginComponent {
       this.isSubmitting.set(true);
       this.errorMessage.set('');
 
-      const { email, senha } = this.loginForm.value;
+      const { senha } = this.loginForm.value;
+      const email = this.loginForm.value.email.trim().toLowerCase();
 
-      this.supabase.login(email, senha).subscribe({
-        next: (users) => {
-          if (users && users.length > 0) {
-            this.router.navigate(['/']);
+      const login$: Observable<unknown[]> = this.papel === 'cuidador'
+        ? this.supabase.loginCuidador(email, senha)
+        : this.supabase.login(email, senha);
+
+      login$.subscribe({
+        next: (rows: unknown[]) => {
+          if (rows && rows.length > 0) {
+            this.router.navigateByUrl(this.urlRetorno());
           } else {
             this.errorMessage.set('E-mail ou senha incorretos.');
             this.isSubmitting.set(false);
           }
         },
         error: (err) => {
-          console.error(err);
+          logError(err);
           this.errorMessage.set('Ocorreu um erro ao tentar entrar. Tente novamente.');
           this.isSubmitting.set(false);
         }

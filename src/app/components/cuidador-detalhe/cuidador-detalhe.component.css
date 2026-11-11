@@ -6,7 +6,7 @@
 }
 
 .detalhe-hero {
-  background: linear-gradient(150deg, var(--color-salvia) 0%, #5E8A5C 100%);
+  background: var(--header-salvia);
   padding: 3rem 1.5rem 2rem;
   display: flex;
   flex-direction: column;
@@ -52,29 +52,29 @@
 .hero-avatar .material-symbols-rounded { font-size: 3.5rem; color: white; }
 
 .hero-name {
-  font-size: 1.5rem;
+  font-size: var(--text-title);
   color: white;
   display: flex;
   align-items: center;
   gap: 0.375rem;
 }
 
-.hero-name .verified { font-size: 1.25rem; color: #C7E0FF; }
+.hero-name .verified { font-size: var(--text-lg); color: #C7E0FF; }
 
 .hero-cidade {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: rgba(255,255,255,0.85);
   margin-top: 0.25rem;
 }
 
-.hero-cidade .material-symbols-rounded { font-size: 1rem; }
+.hero-cidade .material-symbols-rounded { font-size: var(--text-base); }
 
 .page-body {
   flex: 1;
-  padding: 1.25rem;
+  padding: 1.25rem var(--gutter);
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
@@ -84,14 +84,14 @@
   .detalhe-hero {
     align-items: flex-start;
     text-align: left;
-    padding: 3rem 2.25rem 2.5rem;
+    padding: 3rem var(--gutter) 2.5rem;
   }
 
   .page-body {
     flex-direction: row;
     align-items: flex-start;
     gap: 1.5rem;
-    padding: 2rem;
+    padding: 2rem var(--gutter);
   }
 
   .page-body > .glass-card {
@@ -103,7 +103,7 @@
 }
 
 .section-label {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -112,7 +112,7 @@
 }
 
 .bio-text {
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   color: var(--text-primary);
   line-height: 1.55;
 }
@@ -131,26 +131,26 @@
   height: 38px;
   border-radius: 10px;
   background: rgba(122,158,120,0.12);
-  color: var(--color-salvia);
+  color: var(--fill-salvia);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.servico-icon .material-symbols-rounded { font-size: 1.125rem; }
+.servico-icon .material-symbols-rounded { font-size: var(--text-lg); }
 
 .servico-nome {
   flex: 1;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .servico-preco {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 700;
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
 }
 
 .action-bar {
@@ -174,10 +174,10 @@
   padding: 0.9375rem;
   background: white;
   border: 1.5px solid var(--color-salvia);
-  color: var(--color-salvia);
+  color: var(--fill-salvia);
   border-radius: var(--radius-md);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -189,7 +189,7 @@
 
 .btn-outline-action:hover { background: rgba(122,158,120,0.06); }
 .btn-outline-action .material-symbols-rounded,
-.action-bar .btn-primary .material-symbols-rounded { font-size: 1.125rem; }
+.action-bar .btn-primary .material-symbols-rounded { font-size: var(--text-lg); }
 
 .state-box {
   text-align: center;

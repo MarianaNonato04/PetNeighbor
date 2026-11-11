@@ -5,8 +5,8 @@
 }
 
 .page-header {
-  background: linear-gradient(135deg, var(--color-terracota) 0%, var(--color-terracota-dark) 100%);
-  padding: 3rem 1.25rem 1.5rem;
+  background: var(--header-terracota);
+  padding: 3rem var(--gutter-narrow) 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -29,10 +29,10 @@
 }
 
 .back-btn:hover { background: rgba(255,255,255,0.3); }
-.header-text h1 { font-size: 1.5rem; color: white; letter-spacing: -0.02em; }
-.header-text p { font-size: 0.875rem; color: rgba(255,255,255,0.8); margin-top: 0.125rem; }
+.header-text h1 { font-size: var(--text-title); color: white; letter-spacing: -0.02em; }
+.header-text p { font-size: var(--text-sm); color: rgba(255,255,255,0.8); margin-top: 0.125rem; }
 
-.page-body { flex: 1; padding: 1.25rem; }
+.page-body { flex: 1; padding: 1.25rem var(--gutter-narrow); }
 
 .state-box {
   text-align: center;
@@ -52,13 +52,13 @@
 }
 
 .no-pets .material-symbols-rounded {
-  font-size: 2.75rem;
-  color: var(--color-terracota);
+  font-size: var(--text-3xl);
+  color: var(--fill-terracota);
   opacity: 0.6;
   margin-bottom: 0.75rem;
 }
 
-.no-pets p { color: var(--text-secondary); font-size: 0.9375rem; }
+.no-pets p { color: var(--text-secondary); font-size: var(--text-base); }
 
 .pet-options, .servico-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
@@ -70,7 +70,7 @@
   border: 1.5px solid rgba(0,0,0,0.08);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 0.5rem 0.875rem;
   border-radius: var(--radius-full);
@@ -78,10 +78,10 @@
   transition: var(--transition);
 }
 
-.pet-option .material-symbols-rounded { font-size: 1rem; }
+.pet-option .material-symbols-rounded { font-size: var(--text-base); }
 .pet-option--on {
-  background: var(--color-terracota);
-  border-color: var(--color-terracota);
+  background: var(--fill-terracota);
+  border-color: var(--fill-terracota);
   color: white;
 }
 
@@ -102,26 +102,26 @@
 }
 
 .servico-option .material-symbols-rounded {
-  font-size: 1.25rem;
-  color: var(--color-terracota);
+  font-size: var(--text-lg);
+  color: var(--fill-terracota);
 }
 
 .servico-option-nome {
   flex: 1;
   text-align: left;
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .servico-option-preco {
-  font-size: 0.9375rem;
+  font-size: var(--text-base);
   font-weight: 700;
-  color: var(--color-terracota);
+  color: var(--fill-terracota);
 }
 
 .servico-option--on {
-  border-color: var(--color-terracota);
+  border-color: var(--fill-terracota);
   background: rgba(201,123,94,0.06);
   box-shadow: 0 0 0 3px rgba(201,123,94,0.08);
 }
@@ -136,7 +136,7 @@
   border: 1.5px solid rgba(0,0,0,0.08);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   padding: 0.625rem;
   border-radius: var(--radius-md);
@@ -145,13 +145,13 @@
 }
 
 .rec-option--on {
-  background: var(--color-salvia);
-  border-color: var(--color-salvia);
+  background: var(--fill-salvia);
+  border-color: var(--fill-salvia);
   color: white;
 }
 
 .hint-msg {
-  font-size: 0.7rem;
+  font-size: var(--text-2xs);
   color: var(--text-secondary);
   padding-left: 0.25rem;
   opacity: 0.85;
@@ -170,11 +170,11 @@
   justify-content: space-between;
 }
 
-.resumo-card span { font-size: 0.875rem; opacity: 0.85; }
-.resumo-card strong { font-size: 1.375rem; font-weight: 700; }
-.resumo-card small { font-size: 0.75rem; opacity: 0.7; font-weight: 500; }
+.resumo-card span { font-size: var(--text-sm); opacity: 0.85; }
+.resumo-card strong { font-size: var(--text-xl); font-weight: 700; }
+.resumo-card small { font-size: var(--text-xs); opacity: 0.7; font-weight: 500; }
 
-.input-field:focus { border-color: var(--color-terracota); box-shadow: 0 0 0 3px rgba(201,123,94,0.12); }
+.input-field:focus { border-color: var(--fill-terracota); box-shadow: 0 0 0 3px rgba(201,123,94,0.12); }
 
 .btn-spinner {
   width: 16px;

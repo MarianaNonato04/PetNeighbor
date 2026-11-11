@@ -1,5 +1,9 @@
 <nav class="bottom-nav-container" *ngIf="visivel()">
   <div class="nav-pill">
+    <a routerLink="/" class="nav-brand" aria-label="PetNeighbor, página inicial">
+      <span class="nav-brand-mark"><span class="material-symbols-rounded">pets</span></span>
+      PetNeighbor
+    </a>
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">
       <span class="material-symbols-rounded">home</span>
       <span class="label">Início</span>
@@ -11,7 +15,8 @@
 
     <div class="nav-center">
       <a routerLink="/meus-pets" class="add-btn" aria-label="Meus Pets">
-        <span class="material-symbols-rounded">pets</span>
+        <span class="material-symbols-rounded" aria-hidden="true">pets</span>
+        <span class="add-label">Meus pets</span>
       </a>
     </div>
 

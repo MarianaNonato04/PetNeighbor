@@ -74,6 +74,7 @@
       <div class="form-group mt-4">
         <label for="obs">Observações</label>
         <textarea id="obs" rows="2" class="input-field" placeholder="Instruções para o cuidador..."
+          [attr.maxlength]="limites.observacoes"
           [ngModel]="observacoes()" (ngModelChange)="observacoes.set($event)" name="obs"></textarea>
       </div>
 

@@ -23,7 +23,10 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npx ng test --watch=false --browsers=ChromeHeadless
 
       - name: Build Application
         run: npx ng build --configuration production --base-href /PetNeighbor/

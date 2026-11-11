@@ -3,10 +3,15 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { RealtimeChannel } from '@supabase/supabase-js';
-import { SupabaseService } from '../../services/supabase.service';
-import { Cuidador, Mensagem } from '../../models/interfaces';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { SupabaseService, Cancelar } from '../../services/supabase.service';
+import { Mensagem } from '../../models/interfaces';
+import { logError } from '../../utils/logger.util';
+import { fotoSegura } from '../../utils/foto.util';
+import { LIMITES } from '../../utils/limits';
+
+type Papel = 'tutor' | 'cuidador';
+
 
 @Component({
   selector: 'app-chat',
@@ -17,47 +22,77 @@ import { Cuidador, Mensagem } from '../../models/interfaces';
 })
 export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private supabase = inject(SupabaseService);
 
   @ViewChild('scrollArea') scrollArea?: ElementRef<HTMLDivElement>;
 
-  cuidador = signal<Cuidador | null>(null);
+  papel: Papel = 'tutor';
+  
+  nomeContato = signal('');
+  fotoContato = signal<string | null>(null);
+  linkVoltar = '/explorar';
+
   mensagens = signal<Mensagem[]>([]);
   isLoading = signal(true);
   novaMensagem = signal('');
   enviando = signal(false);
+  readonly limites = LIMITES;
 
   private conversaId = '';
+  private idUser = 0;
   private idCuidador = 0;
-  private canal?: RealtimeChannel;
+  private cancelarAssinatura?: Cancelar;
   private deveRolar = false;
 
   ngOnInit() {
-    const tutor = this.supabase.currentUser();
-    if (!tutor) { this.router.navigate(['/login']); return; }
+    this.papel = this.route.snapshot.data['papel'] === 'cuidador' ? 'cuidador' : 'tutor';
+    const idParam = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.idCuidador = Number(this.route.snapshot.paramMap.get('id'));
-    this.conversaId = this.supabase.buildConversaId(tutor.id_user!, this.idCuidador);
+    
+    if (this.papel === 'tutor') {
+      const tutor = this.supabase.currentUser();
+      if (!tutor) return;
+      this.idUser = tutor.id_user!;
+      this.idCuidador = idParam;
+      this.linkVoltar = `/cuidador/${idParam}`;
+      this.supabase.getCuidador(this.idCuidador).subscribe({
+        next: data => {
+          this.nomeContato.set(data?.[0]?.nome ?? 'Cuidador');
+          this.fotoContato.set(fotoSegura(data?.[0]?.foto_url));
+        },
+        error: err => logError(err)
+      });
+    } else {
+      const cuidador = this.supabase.currentCuidador();
+      if (!cuidador) return;
+      this.idCuidador = cuidador.id_cuidador!;
+      this.idUser = idParam;
+      this.linkVoltar = '/area-cuidador';
+      this.supabase.getUsuarioNome(this.idUser).subscribe({
+        next: data => this.nomeContato.set(data?.[0]?.nome ?? 'Tutor'),
+        error: err => logError(err)
+      });
+    }
 
-    this.supabase.getCuidador(this.idCuidador).subscribe({
-      next: data => this.cuidador.set(data?.[0] ?? null)
-    });
+    this.conversaId = this.supabase.buildConversaId(this.idUser, this.idCuidador);
 
     this.supabase.getMensagens(this.conversaId).subscribe({
       next: msgs => {
         this.mensagens.set(msgs || []);
         this.isLoading.set(false);
         this.deveRolar = true;
+        if (msgs?.some(m => !m.lida && !this.ehMinha(m))) this.marcarLidas();
       },
-      error: () => this.isLoading.set(false)
+      error: err => { logError(err); this.isLoading.set(false); }
     });
 
-    this.canal = this.supabase.subscribeMensagens(this.conversaId, msg => {
+    this.cancelarAssinatura = this.supabase.subscribeMensagens(this.conversaId, msg => {
       this.mensagens.update(list =>
         list.some(m => m.id_mensagem === msg.id_mensagem) ? list : [...list, msg]
       );
       this.deveRolar = true;
+      
+      if (!this.ehMinha(msg)) this.marcarLidas();
     });
   }
 
@@ -69,27 +104,34 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
-    if (this.canal) this.supabase.removeChannel(this.canal);
+    this.cancelarAssinatura?.();
+  }
+
+  ehMinha(m: Mensagem): boolean {
+    return m.remetente === this.papel;
+  }
+
+  private marcarLidas() {
+    const outroLado = this.papel === 'tutor' ? 'cuidador' : 'tutor';
+    this.supabase.marcarMensagensLidas(this.conversaId, outroLado).subscribe({ error: e => logError(e) });
   }
 
   enviar() {
     const texto = this.novaMensagem().trim();
-    const tutor = this.supabase.currentUser();
-    if (!texto || !tutor || this.enviando()) return;
+    if (!texto || !this.idUser || !this.idCuidador || this.enviando() || texto.length > LIMITES.mensagem) return;
 
     this.enviando.set(true);
     const msg: Mensagem = {
       conversa_id: this.conversaId,
-      id_user: tutor.id_user!,
+      id_user: this.idUser,
       id_cuidador: this.idCuidador,
-      remetente: 'tutor',
+      remetente: this.papel,
       conteudo: texto,
       lida: false
     };
 
     this.supabase.sendMensagem(msg).subscribe({
       next: created => {
-
         const salva = created?.[0];
         if (salva) {
           this.mensagens.update(list =>
@@ -99,12 +141,22 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.novaMensagem.set('');
         this.enviando.set(false);
         this.deveRolar = true;
+        this.notificarDestinatario();
       },
       error: err => {
-        console.error(err);
+        logError(err);
         this.enviando.set(false);
       }
     });
+  }
+
+  
+  private notificarDestinatario() {
+    const destino = this.papel === 'cuidador'
+      ? { id_user: this.idUser, mensagem: `${this.supabase.currentCuidador()?.nome ?? 'O cuidador'} respondeu sua conversa.` }
+      : { id_cuidador: this.idCuidador, mensagem: `${this.supabase.currentUser()?.nome ?? 'Um tutor'} enviou uma mensagem.` };
+    this.supabase.createNotificacao({ ...destino, tipo: 'mensagem', titulo: 'Nova mensagem', lida: false })
+      .subscribe({ error: e => logError(e) });
   }
 
   formatHora(iso?: string): string {

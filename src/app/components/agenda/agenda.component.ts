@@ -1,9 +1,9 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { SupabaseService } from '../../services/supabase.service';
-import { Agendamento, Cuidador, Pet, StatusAgendamento } from '../../models/interfaces';
+import { Agendamento, StatusAgendamento } from '../../models/interfaces';
+import { logError } from '../../utils/logger.util';
 
 @Component({
   selector: 'app-agenda',
@@ -32,30 +32,19 @@ export class AgendaComponent implements OnInit {
     const user = this.supabase.currentUser();
     if (!user) { this.isLoading.set(false); return; }
 
-    forkJoin({
-      ags: this.supabase.getAgendamentosByUser(user.id_user!),
-      cuidadores: this.supabase.getCuidadores(),
-      pets: this.supabase.getPetsByUser(user.id_user!)
-    }).subscribe({
-      next: ({ ags, cuidadores, pets }) => {
-        const mapaCuidador = new Map<number, Cuidador>(cuidadores.map(c => [c.id_cuidador!, c]));
-        const mapaPet = new Map<number, Pet>(pets.map(p => [p.id_pet!, p]));
-        this.agendamentos.set(
-          (ags || []).map(a => ({
-            ...a,
-            nome_cuidador: mapaCuidador.get(a.id_cuidador)?.nome ?? 'Cuidador',
-            nome_pet: mapaPet.get(a.id_pet)?.nome_pet ?? 'Pet'
-          }))
-        );
+    
+    this.supabase.getAgendamentosByUser(user.id_user!).subscribe({
+      next: ags => {
+        this.agendamentos.set(ags);
         this.isLoading.set(false);
       },
-      error: err => { console.error(err); this.isLoading.set(false); }
+      error: err => { logError(err); this.isLoading.set(false); }
     });
   }
 
   cancelar(a: Agendamento) {
     if (!a.id_agendamento) return;
-    this.supabase.updateAgendamentoStatus(a.id_agendamento, 'Cancelado').subscribe({
+    this.supabase.cancelarAgendamento(a.id_agendamento).subscribe({
       next: () => {
         this.agendamentos.update(list =>
           list.map(x => x.id_agendamento === a.id_agendamento ? { ...x, status: 'Cancelado' as StatusAgendamento } : x)
@@ -69,10 +58,19 @@ export class AgendaComponent implements OnInit {
             mensagem: `O ${a.tipo_servico} com ${a.nome_cuidador} foi cancelado.`,
             lida: false,
             id_agendamento: a.id_agendamento
-          }).subscribe({ error: e => console.error(e) });
+          }).subscribe({ error: e => logError(e) });
+
+          this.supabase.createNotificacao({
+            id_cuidador: a.id_cuidador,
+            tipo: 'agendamento',
+            titulo: 'Agendamento cancelado',
+            mensagem: `${user.nome} cancelou o ${a.tipo_servico} de ${a.nome_pet}.`,
+            lida: false,
+            id_agendamento: a.id_agendamento
+          }).subscribe({ error: e => logError(e) });
         }
       },
-      error: e => console.error(e)
+      error: e => logError(e)
     });
   }
 

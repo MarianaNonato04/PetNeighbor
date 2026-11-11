@@ -62,8 +62,8 @@
 
       <button class="cuidador-card glass-card" *ngFor="let c of cuidadoresProximos()" (click)="abrirCuidador(c)">
         <div class="cuidador-avatar">
-          <img *ngIf="c.foto_url" [src]="c.foto_url" [alt]="c.nome">
-          <span *ngIf="!c.foto_url" class="material-symbols-rounded">account_circle</span>
+          <img *ngIf="fotoSegura(c.foto_url) as foto" [src]="foto" [alt]="c.nome">
+          <span *ngIf="!fotoSegura(c.foto_url)" class="material-symbols-rounded">account_circle</span>
           <span class="verified-badge" *ngIf="c.verificado" title="Verificado">
             <span class="material-symbols-rounded">verified</span>
           </span>

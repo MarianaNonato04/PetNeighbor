@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
 import { Router, RouterModule } from '@angular/router';
+import { logError } from '../../utils/logger.util';
+import { LIMITES } from '../../utils/limits';
 
 @Component({
   selector: 'app-register',
@@ -20,14 +22,17 @@ export class RegisterComponent {
   isSubmitting = signal(false);
   showPassword = signal(false);
   successMessage = signal('');
+  readonly limites = LIMITES;
   errorMessage = signal('');
 
   constructor() {
     this.registerForm = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(3)]],
-      idade: ['', [Validators.required, Validators.min(0)]],
-      email: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required, Validators.minLength(6)]]
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(LIMITES.nome)]],
+      idade: ['', [Validators.required, Validators.min(0), Validators.max(LIMITES.idadeMax)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(LIMITES.email)]],
+      senha: ['', [Validators.required, Validators.minLength(LIMITES.senhaMin), Validators.maxLength(LIMITES.senhaMax)]],
+      
+      aceite: [false, [Validators.requiredTrue]]
     });
   }
 
@@ -36,14 +41,16 @@ export class RegisterComponent {
       this.isSubmitting.set(true);
       this.errorMessage.set('');
 
-      this.supabase.registerUsuario(this.registerForm.value).subscribe({
+      const { aceite, ...v } = this.registerForm.value;
+      this.supabase.registerUsuario({ ...v, nome: v.nome.trim(), email: v.email.trim().toLowerCase(),
+        aceite_privacidade_em: new Date().toISOString() }).subscribe({
         next: () => {
           this.isSubmitting.set(false);
           this.successMessage.set('Conta criada com sucesso!');
           setTimeout(() => this.router.navigate(['/cadastro-pet']), 1500);
         },
         error: (err) => {
-          console.error(err);
+          logError(err);
           this.isSubmitting.set(false);
           this.errorMessage.set('Erro ao criar conta. Tente outro e-mail.');
         }

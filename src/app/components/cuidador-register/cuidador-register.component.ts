@@ -4,7 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
 import { Cuidador, TipoServico, SERVICOS } from '../../models/interfaces';
-import { getCurrentPosition } from '../../services/geo.util';
+import { getCurrentPosition, arredondarCoord } from '../../services/geo.util';
+import { logError } from '../../utils/logger.util';
+import { LIMITES } from '../../utils/limits';
 
 @Component({
   selector: 'app-cuidador-register',
@@ -24,6 +26,7 @@ export class CuidadorRegisterComponent {
   isSubmitting = signal(false);
   showPassword = signal(false);
   successMessage = signal('');
+  readonly limites = LIMITES;
   errorMessage = signal('');
 
   geoStatus = signal<'pendente' | 'ok' | 'erro'>('pendente');
@@ -32,15 +35,16 @@ export class CuidadorRegisterComponent {
 
   constructor() {
     this.form = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required, Validators.minLength(6)]],
-      cidade: ['', [Validators.required]],
-      bio: ['', [Validators.required, Validators.minLength(10)]],
-      documento: ['', [Validators.required]],
-      preco_passeio: [30, [Validators.min(0)]],
-      preco_alimentacao: [20, [Validators.min(0)]],
-      preco_companhia: [25, [Validators.min(0)]]
+      nome: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(LIMITES.nome)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(LIMITES.email)]],
+      senha: ['', [Validators.required, Validators.minLength(LIMITES.senhaMin), Validators.maxLength(LIMITES.senhaMax)]],
+      cidade: ['', [Validators.required, Validators.maxLength(LIMITES.cidade)]],
+      bio: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(LIMITES.bio)]],
+      documento: ['', [Validators.required, Validators.maxLength(LIMITES.documento)]],
+      preco_passeio: [30, [Validators.min(0), Validators.max(LIMITES.precoMax)]],
+      preco_alimentacao: [20, [Validators.min(0), Validators.max(LIMITES.precoMax)]],
+      preco_companhia: [25, [Validators.min(0), Validators.max(LIMITES.precoMax)]],
+      aceite: [false, [Validators.requiredTrue]]
     });
   }
 
@@ -87,6 +91,9 @@ export class CuidadorRegisterComponent {
     }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.errorMessage.set(this.form.get('aceite')?.invalid
+        ? 'É preciso aceitar a Política de Privacidade para continuar.'
+        : `Verifique os campos: textos dentro do limite e preços entre R$ 0 e R$ ${LIMITES.precoMax}.`);
       return;
     }
 
@@ -94,29 +101,31 @@ export class CuidadorRegisterComponent {
     const pos = this.coords()!;
     const v = this.form.value;
     const cuidador: Cuidador = {
-      nome: v.nome,
-      email: v.email,
+      nome: v.nome.trim(),
+      email: v.email.trim().toLowerCase(),
       senha: v.senha,
       cidade: v.cidade,
       bio: v.bio,
       documento: v.documento,
-      latitude: pos.latitude,
-      longitude: pos.longitude,
+      
+      
+      latitude: arredondarCoord(pos.latitude),
+      longitude: arredondarCoord(pos.longitude),
       servicos: Array.from(this.servicosSelecionados()),
       preco_passeio: v.preco_passeio,
       preco_alimentacao: v.preco_alimentacao,
       preco_companhia: v.preco_companhia,
-      verificado: false
+      aceite_privacidade_em: new Date().toISOString()
     };
 
     this.supabase.registerCuidador(cuidador).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.successMessage.set('Cadastro realizado! Você já aparece no Explorar.');
-        setTimeout(() => this.router.navigate(['/explorar']), 1500);
+        setTimeout(() => this.router.navigate(['/area-cuidador']), 1500);
       },
       error: err => {
-        console.error(err);
+        logError(err);
         this.isSubmitting.set(false);
         this.errorMessage.set('Erro ao cadastrar. Verifique os dados e tente novamente.');
       }

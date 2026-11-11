@@ -6,6 +6,9 @@ import { SupabaseService } from '../../services/supabase.service';
 import {
   Cuidador, Pet, TipoServico, Recorrencia, Agendamento
 } from '../../models/interfaces';
+import { hojeLocal } from '../../utils/date.util';
+import { logError } from '../../utils/logger.util';
+import { LIMITES } from '../../utils/limits';
 
 @Component({
   selector: 'app-agendar',
@@ -25,6 +28,7 @@ export class AgendarComponent implements OnInit {
   isSubmitting = signal(false);
   errorMessage = signal('');
   recorrencias: Recorrencia[] = ['Único', 'Diário', 'Semanal'];
+  readonly limites = LIMITES;
 
   petSelecionado = signal<number | null>(null);
   servicoSelecionado = signal<TipoServico | null>(null);
@@ -43,13 +47,11 @@ export class AgendarComponent implements OnInit {
   });
 
   ngOnInit() {
+    
     const tutor = this.supabase.currentUser();
-    if (!tutor) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!tutor) return;
 
-    this.data.set(new Date().toISOString().split('T')[0]);
+    this.data.set(hojeLocal());
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.supabase.getCuidador(id).subscribe({
@@ -71,7 +73,7 @@ export class AgendarComponent implements OnInit {
   }
 
   hoje(): string {
-    return new Date().toISOString().split('T')[0];
+    return hojeLocal();
   }
 
   confirmar() {
@@ -83,6 +85,11 @@ export class AgendarComponent implements OnInit {
     if (!this.petSelecionado()) { this.errorMessage.set('Cadastre ou selecione um pet.'); return; }
     if (!this.servicoSelecionado()) { this.errorMessage.set('Selecione um serviço.'); return; }
     if (!this.data()) { this.errorMessage.set('Escolha uma data.'); return; }
+    if (this.data() < hojeLocal()) { this.errorMessage.set('A data não pode estar no passado.'); return; }
+    if (this.observacoes().length > LIMITES.observacoes) {
+      this.errorMessage.set(`As observações podem ter no máximo ${LIMITES.observacoes} caracteres.`);
+      return;
+    }
 
     this.isSubmitting.set(true);
     const agendamento: Agendamento = {
@@ -94,7 +101,7 @@ export class AgendarComponent implements OnInit {
       hora: this.hora(),
       recorrencia: this.recorrencia(),
       preco: this.precoSelecionado(),
-      observacoes: this.observacoes(),
+      observacoes: this.observacoes().trim(),
       status: 'Pendente'
     };
 
@@ -108,13 +115,22 @@ export class AgendarComponent implements OnInit {
           mensagem: `Seu pedido de ${agendamento.tipo_servico} com ${c.nome} foi enviado e aguarda confirmação.`,
           lida: false,
           id_agendamento: created?.[0]?.id_agendamento
-        }).subscribe({ error: e => console.error(e) });
+        }).subscribe({ error: e => logError(e) });
+
+        this.supabase.createNotificacao({
+          id_cuidador: c.id_cuidador!,
+          tipo: 'agendamento',
+          titulo: 'Novo pedido',
+          mensagem: `${tutor.nome} pediu ${agendamento.tipo_servico} para ${agendamento.data.split('-').reverse().join('/')} às ${agendamento.hora}.`,
+          lida: false,
+          id_agendamento: created?.[0]?.id_agendamento
+        }).subscribe({ error: e => logError(e) });
 
         this.isSubmitting.set(false);
         this.router.navigate(['/agenda']);
       },
       error: err => {
-        console.error(err);
+        logError(err);
         this.isSubmitting.set(false);
         this.errorMessage.set('Não foi possível criar o agendamento. Tente novamente.');
       }

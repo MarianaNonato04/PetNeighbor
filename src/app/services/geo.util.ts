@@ -27,6 +27,11 @@ export function getCurrentPosition(): Promise<{ latitude: number; longitude: num
   });
 }
 
+
+export function arredondarCoord(valor: number): number {
+  return Math.round(valor * 1000) / 1000;
+}
+
 export function formatDistancia(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1).replace('.', ',')} km`;

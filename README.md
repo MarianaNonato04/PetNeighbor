@@ -86,6 +86,57 @@ O design utiliza cores suaves e acolhedoras que remetem a natureza e bem-estar a
 
 ---
 
+## 📝 Atividades Pendentes
+
+### 🔒 Segurança do banco de dados (prioridade alta)
+
+Hoje o login é feito comparando e-mail/senha direto na tabela `usuarios`, as senhas são salvas em texto puro e as tabelas não têm RLS. Na prática, qualquer pessoa com a chave pública (visível no front-end) consegue ler, alterar ou apagar dados de qualquer tabela. Como paliativo, o `SupabaseService` já deixou de pedir as colunas `senha` e `documento`, mas a correção definitiva é:
+
+- [ ] **Migrar para o Supabase Auth**: usar `supabase.auth.signUp()` / `signInWithPassword()` no cadastro e login de tutores e cuidadores. As senhas passam a ser guardadas com hash pelo Supabase.
+- [ ] Adicionar a coluna `auth_id uuid references auth.users(id)` em `usuarios` e `cuidadores` e **remover as colunas `senha`**.
+- [ ] Trocar o "usuário logado" salvo no `localStorage` pela sessão do Supabase Auth (`supabase.auth.getSession()` / `onAuthStateChange`).
+- [ ] **Ativar RLS** (`alter table ... enable row level security`) em `usuarios`, `pets`, `cuidadores`, `agendamentos`, `mensagens` e `notificacoes`.
+- [ ] Criar policies baseadas em `auth.uid()`:
+    - `usuarios` / `pets` / `notificacoes`: cada usuário lê e altera só os próprios registros;
+    - `agendamentos` / `mensagens`: acesso só para o tutor e o cuidador envolvidos;
+    - `cuidadores`: leitura pública só das colunas sem dados sensíveis (via *view*), escrita só pelo próprio cuidador.
+- [ ] Restringir o Realtime (chat/notificações) para respeitar as policies de RLS.
+- [ ] No painel do Supabase: rodar o **Security Advisor**, ativar a confirmação de e-mail e a proteção contra senhas vazadas.
+- [ ] Remover do `supabase_setup.sql` os cuidadores de exemplo com senha `123456`.
+- [ ] (Opcional) Backup semanal via GitHub Actions com `pg_dump`, usando a connection string em um *secret*.
+
+### 🛡️ Regras de negócio no banco (dependem do banco ativo)
+
+O front já valida tudo isso, mas quem chama a API direto consegue pular essas validações. Por isso elas precisam existir também no banco:
+
+- [ ] **`verificado`**: impedir que o cuidador defina o próprio selo, liberando a escrita da coluna só para admin. O front já não envia mais esse campo.
+- [ ] **Preço do agendamento**: calcular por *trigger* a partir dos preços do cuidador, ignorando o `preco` enviado pelo tutor.
+- [ ] **Status do agendamento**: o tutor só pode `Cancelar`. `Confirmar`, `Em andamento` e `Concluído` ficam só para o cuidador.
+- [ ] **Notificações**: criar por *trigger* (ao inserir ou alterar agendamento e mensagem) em vez de pelo front, e impedir `insert` direto pela API.
+- [ ] **Mensagens**: o `remetente` e o `id_user` precisam bater com o usuário logado (`auth.uid()`).
+- [ ] **`CHECK` constraints**: `status` e `tipo_servico` só com os valores válidos, preços entre 0 e 1000, idade e peso positivos, `data` não pode estar no passado, e limite de tamanho em `bio`, `observacoes`, `conteudo` e nomes (os mesmos de `src/app/utils/limits.ts`).
+- [ ] **`foto_url`**: aceitar só URLs do Storage do projeto (`CHECK` ou upload via Supabase Storage). O front já esconde fotos de outros domínios.
+- [ ] **Coordenadas**: arredondar no banco também (o front já arredonda para ~100 m em novos cadastros) e atualizar os cuidadores já cadastrados.
+- [ ] **CPF (`documento`)**: tirar do acesso público (tabela separada ou coluna sem `select` para `anon`).
+
+### 🧩 Funcionalidades pendentes
+
+- [x] Login e painel do cuidador (`/area-cuidador`): pedidos, ativos e histórico, confirmar, recusar, iniciar e concluir agendamentos (o tutor é notificado), lista de conversas e chat respondendo como cuidador.
+- [x] Agenda e painel usando *join* do PostgREST (`select('*, cuidadores(nome), pets(nome_pet)')`).
+- [x] Política de Privacidade (`/privacidade`), aceite obrigatório nos cadastros e avisos sobre CPF e localização.
+- [x] Bundle inicial reduzido de ~675 kB para ~440 kB, com o `supabase-js` carregado sob demanda.
+
+**Testar com o banco ativo:** login de cuidador, painel (joins com `usuarios` e `pets`), troca de status, chat do lado do cuidador e notificações para o tutor. O código foi testado com testes unitários e no navegador, mas sem acesso ao banco.
+
+**Implementado no front, falta rodar `supabase_migration_funcionalidades.sql` no banco e testar.** Até a migração rodar, os cadastros falham, porque enviam a coluna `aceite_privacidade_em` e ela ainda não existe.
+
+- [x] Registrar o aceite da política: os cadastros enviam `aceite_privacidade_em`.
+- [x] Notificações para o cuidador (`notificacoes.id_cuidador`): novo pedido, cancelamento pelo tutor e mensagem nova. O painel recebe tudo em tempo real e mostra o quadro "Novidades" (no lugar do recarregamento a cada 60 s).
+- [x] Excluir conta pelo app, no Perfil e na Área do cuidador. A migração liga as FKs com `on delete cascade`, então pets, agendamentos, mensagens e notificações são apagados junto.
+- [x] Mensagens lidas: ao abrir o chat, as mensagens recebidas são marcadas como lidas, e o painel do cuidador mostra o contador de não lidas por conversa e na aba Chat.
+
+---
+
 ## 🚀 Como Rodar Localmente
 
 Siga os passos abaixo para executar a aplicação em sua máquina:

@@ -2,7 +2,9 @@ import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SupabaseService } from '../../services/supabase.service';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { logError } from '../../utils/logger.util';
+import { LIMITES } from '../../utils/limits';
 
 @Component({
   selector: 'app-pet-register',
@@ -14,22 +16,22 @@ import { Router, RouterModule } from '@angular/router';
 export class PetRegisterComponent {
   private fb = inject(FormBuilder);
   private supabase = inject(SupabaseService);
-  private router = inject(Router);
 
   petForm: FormGroup;
   isSubmitting = signal(false);
   successMessage = signal('');
+  readonly limites = LIMITES;
   errorMessage = signal('');
 
   isUserLoggedIn = computed(() => this.supabase.currentUser() !== null);
 
   constructor() {
     this.petForm = this.fb.group({
-      nome_pet: ['', [Validators.required]],
-      idade_pet: ['', [Validators.required]],
-      porte: ['Pequeno', [Validators.required]],
-      peso: ['', [Validators.required]],
-      describ_pet: ['', [Validators.required]]
+      nome_pet: ['', [Validators.required, Validators.maxLength(LIMITES.nome)]],
+      idade_pet: ['', [Validators.required, Validators.min(0), Validators.max(LIMITES.idadePetMax)]],
+      porte: ['Pequeno', [Validators.required, Validators.pattern(/^(Pequeno|Médio|Grande)$/)]],
+      peso: ['', [Validators.required, Validators.min(0.1), Validators.max(LIMITES.pesoMax)]],
+      describ_pet: ['', [Validators.required, Validators.maxLength(LIMITES.descricaoPet)]]
     });
   }
 
@@ -51,7 +53,7 @@ export class PetRegisterComponent {
           this.petForm.reset({ porte: 'Pequeno' });
         },
         error: (err) => {
-          console.error(err);
+          logError(err);
           this.isSubmitting.set(false);
           this.errorMessage.set('Erro ao cadastrar pet. Tente novamente.');
         }

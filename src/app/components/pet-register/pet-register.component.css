@@ -5,8 +5,8 @@
 }
 
 .page-header {
-  background: linear-gradient(135deg, var(--color-salvia) 0%, #5E8A5C 100%);
-  padding: 3rem 1.25rem 1.5rem;
+  background: var(--header-terracota);
+  padding: 3rem var(--gutter-narrow) 1.5rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -39,13 +39,13 @@
 }
 
 .header-text h1 {
-  font-size: 1.5rem;
+  font-size: var(--text-title);
   color: white;
   letter-spacing: -0.02em;
 }
 
 .header-text p {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: rgba(255,255,255,0.8);
   margin-top: 0.125rem;
 }
@@ -66,7 +66,7 @@
 
 .page-body {
   flex: 1;
-  padding: 1.25rem;
+  padding: 1.25rem var(--gutter-narrow);
 }
 
 .form-card {
@@ -89,7 +89,7 @@
   position: absolute;
   left: 0.875rem;
   color: #B5AFA9;
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   pointer-events: none;
   transition: var(--transition);
 }
@@ -99,12 +99,12 @@
 }
 
 .input-wrapper:focus-within .input-icon {
-  color: var(--color-salvia);
+  color: var(--fill-terracota);
 }
 
 .input-field:focus {
-  border-color: var(--color-salvia);
-  box-shadow: 0 0 0 3px rgba(122, 158, 120, 0.12);
+  border-color: var(--fill-terracota);
+  box-shadow: 0 0 0 3px rgba(165, 90, 61, 0.12);
 }
 
 .btn-spinner {

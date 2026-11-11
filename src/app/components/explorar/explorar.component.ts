@@ -1,10 +1,12 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
+import { fotoSegura } from '../../utils/foto.util';
 import { Cuidador, CuidadorProximo, TipoServico, SERVICOS } from '../../models/interfaces';
 import { haversineKm, getCurrentPosition, formatDistancia } from '../../services/geo.util';
+import { logError } from '../../utils/logger.util';
 
 @Component({
   selector: 'app-explorar',
@@ -16,11 +18,13 @@ import { haversineKm, getCurrentPosition, formatDistancia } from '../../services
 export class ExplorarComponent implements OnInit {
   private supabase = inject(SupabaseService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   servicos = SERVICOS;
   formatDistancia = formatDistancia;
 
   isLoading = signal(true);
+  fotoSegura = fotoSegura;
   geoStatus = signal<'pedindo' | 'ok' | 'negado'>('pedindo');
   errorMessage = signal('');
 
@@ -46,6 +50,9 @@ export class ExplorarComponent implements OnInit {
   });
 
   async ngOnInit() {
+    
+    const servico = this.route.snapshot.queryParamMap.get('servico') as TipoServico;
+    if (SERVICOS.includes(servico)) this.filtroServico.set(servico);
     this.carregarCuidadores();
     await this.localizar();
   }
@@ -57,7 +64,7 @@ export class ExplorarComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: err => {
-        console.error(err);
+        logError(err);
         this.errorMessage.set('Não foi possível carregar os cuidadores.');
         this.isLoading.set(false);
       }

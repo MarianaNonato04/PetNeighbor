@@ -1,7 +1,7 @@
 import { Injectable, computed, signal, inject } from '@angular/core';
-import { RealtimeChannel } from '@supabase/supabase-js';
-import { SupabaseService } from './supabase.service';
+import { SupabaseService, Cancelar } from './supabase.service';
 import { Notificacao } from '../models/interfaces';
+import { logError } from '../utils/logger.util';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacaoStore {
@@ -10,7 +10,7 @@ export class NotificacaoStore {
   notificacoes = signal<Notificacao[]>([]);
   naoLidas = computed(() => this.notificacoes().filter(n => !n.lida).length);
 
-  private canal?: RealtimeChannel;
+  private cancelarAssinatura?: Cancelar;
   private userIdAtivo: number | null = null;
 
   iniciar(userId: number) {
@@ -20,10 +20,10 @@ export class NotificacaoStore {
 
     this.supabase.getNotificacoes(userId).subscribe({
       next: data => this.notificacoes.set(data || []),
-      error: err => console.error(err)
+      error: err => logError(err)
     });
 
-    this.canal = this.supabase.subscribeNotificacoes(userId, nova => {
+    this.cancelarAssinatura = this.supabase.subscribeNotificacoes(userId, nova => {
       this.notificacoes.update(list =>
         list.some(n => n.id_notificacao === nova.id_notificacao) ? list : [nova, ...list]
       );
@@ -36,19 +36,24 @@ export class NotificacaoStore {
       next: () => this.notificacoes.update(list =>
         list.map(x => x.id_notificacao === n.id_notificacao ? { ...x, lida: true } : x)
       ),
-      error: err => console.error(err)
+      error: err => logError(err)
     });
   }
 
   marcarTodasLidas() {
-    this.notificacoes().filter(n => !n.lida).forEach(n => this.marcarLida(n));
+    const ids = this.notificacoes().filter(n => !n.lida && n.id_notificacao).map(n => n.id_notificacao!);
+    if (ids.length === 0) return;
+    this.supabase.marcarNotificacoesLidas(ids).subscribe({
+      next: () => this.notificacoes.update(list =>
+        list.map(x => ids.includes(x.id_notificacao!) ? { ...x, lida: true } : x)
+      ),
+      error: err => logError(err)
+    });
   }
 
   parar() {
-    if (this.canal) {
-      this.supabase.removeChannel(this.canal);
-      this.canal = undefined;
-    }
+    this.cancelarAssinatura?.();
+    this.cancelarAssinatura = undefined;
     this.userIdAtivo = null;
     this.notificacoes.set([]);
   }

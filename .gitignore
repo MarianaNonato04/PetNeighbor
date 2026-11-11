@@ -15,6 +15,17 @@ bazel-out/
 node_modules/
 npm-debug.log
 yarn-error.log
+*.log
+
+# Testes
+coverage/
+
+# Variáveis de ambiente locais
+.env
+.env.*
+
+# Claude Code
+.claude/
 
 # IDEs and editors
 .idea/
@@ -27,5 +38,4 @@ yarn-error.log
 *.sublime-workspace
 
 # System Files
-Thumbs.db
 Desktop.ini

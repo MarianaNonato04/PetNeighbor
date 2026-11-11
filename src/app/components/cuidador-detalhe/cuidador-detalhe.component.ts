@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../services/supabase.service';
+import { fotoSegura } from '../../utils/foto.util';
 import { Cuidador, TipoServico } from '../../models/interfaces';
 
 @Component({
@@ -18,6 +19,7 @@ export class CuidadorDetalheComponent implements OnInit {
 
   cuidador = signal<Cuidador | null>(null);
   isLoading = signal(true);
+  fotoSegura = fotoSegura;
 
   ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));

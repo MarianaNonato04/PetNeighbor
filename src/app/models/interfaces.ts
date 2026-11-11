@@ -4,6 +4,7 @@ export interface Usuario {
   idade: number;
   email: string;
   senha?: string;
+  aceite_privacidade_em?: string;
 }
 
 export interface Pet {
@@ -40,6 +41,7 @@ export interface Cuidador {
   documento?: string;
   verificado?: boolean;
   foto_url?: string;
+  aceite_privacidade_em?: string;
   created_at?: string;
 }
 
@@ -71,6 +73,7 @@ export interface Agendamento {
   created_at?: string;
 
   nome_cuidador?: string;
+  nome_tutor?: string;
   nome_pet?: string;
 }
 
@@ -87,7 +90,9 @@ export interface Mensagem {
 
 export interface Notificacao {
   id_notificacao?: number;
-  id_user: number;
+  
+  id_user?: number;
+  id_cuidador?: number;
   tipo: 'agendamento' | 'mensagem' | 'sistema';
   titulo: string;
   mensagem: string;
